@@ -82,3 +82,5 @@ def doctor_settings(request):
 def doctor_patient_list(request):
     return render(request, "Doctor/DoctorPatientList.html")
 
+def patient_appointment_list(request):
+    return render(request, "Patient/PatientAppointment/PatientAppointmentList.html")

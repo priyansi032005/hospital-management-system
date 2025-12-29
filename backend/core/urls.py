@@ -28,6 +28,7 @@ from .views import (
     doctor_sidebar,
     doctor_settings,
     doctor_patient_list,
+    patient_appointment_list,
 )
 
 urlpatterns = [
@@ -44,4 +45,6 @@ urlpatterns = [
     path("doctor/sidebar/", doctor_sidebar, name="doctor_sidebar"),
     path("doctor/settings/", doctor_settings, name="doctor_settings"),
     path("doctor/patientlist/", doctor_patient_list, name="doctor_patient_list"),
+
+    path("patient/appointments/", patient_appointment_list, name="patient_appointment_list"),
 ]
