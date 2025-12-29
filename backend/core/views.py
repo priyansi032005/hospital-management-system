@@ -75,3 +75,10 @@ def prescriptionPDF_view(request, prescription_id):
 
 def doctor_sidebar(request):
     return render(request, "Doctor/DoctorSidebar/DoctorSidebar.html")
+
+def doctor_settings(request):
+    return render(request, "Doctor/DoctorSettings/DoctorSettings.html")
+
+def doctor_patient_list(request):
+    return render(request, "Doctor/DoctorPatientList.html")
+

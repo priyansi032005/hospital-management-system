@@ -26,6 +26,8 @@ from .views import (
     prescription_list,
     prescriptionPDF_view,
     doctor_sidebar,
+    doctor_settings,
+    doctor_patient_list,
 )
 
 urlpatterns = [
@@ -40,4 +42,6 @@ urlpatterns = [
     path("doctor/prescriptions/", prescription_list, name="prescription_list"),
     path("doctor/prescriptions/<int:prescription_id>/pdf/", prescriptionPDF_view, name="prescription_pdf"),
     path("doctor/sidebar/", doctor_sidebar, name="doctor_sidebar"),
+    path("doctor/settings/", doctor_settings, name="doctor_settings"),
+    path("doctor/patientlist/", doctor_patient_list, name="doctor_patient_list"),
 ]
