@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Appointments</title>
+    <link rel="stylesheet" href="../../static/css/doctor/appointment_list.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h2>Doctor Portal</h2>
+                <button id="closeSidebar" class="close-btn">&times;</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item">Dashboard</a>
+                <a href="#" class="nav-item active">Appointments</a>
+                <a href="#" class="nav-item">Patients</a>
+                <a href="#" class="nav-item">Schedule</a>
+                <a href="#" class="nav-item">Settings</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-wrapper">
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-left">
+                        <button id="menuToggle" class="menu-toggle">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        </button>
+                        <h1>Appointments</h1>
+                    </div>
+
+                    <div class="date-filters">
+                        <div class="date-input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <input type="date" id="startDate" placeholder="Start Date">
+                        </div>
+                        <div class="date-input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <input type="date" id="endDate" placeholder="End Date">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading Skeleton -->
+                <div id="loadingSkeleton" class="skeleton-container" style="display: none;">
+                    <div class="skeleton-card">
+                        <div class="skeleton-animation">
+                            <div class="skeleton-flex">
+                                <div class="skeleton-circle"></div>
+                                <div class="skeleton-text-wrapper">
+                                    <div class="skeleton-text skeleton-text-short"></div>
+                                    <div class="skeleton-text skeleton-text-long"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-animation">
+                            <div class="skeleton-flex">
+                                <div class="skeleton-circle"></div>
+                                <div class="skeleton-text-wrapper">
+                                    <div class="skeleton-text skeleton-text-short"></div>
+                                    <div class="skeleton-text skeleton-text-long"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-animation">
+                            <div class="skeleton-flex">
+                                <div class="skeleton-circle"></div>
+                                <div class="skeleton-text-wrapper">
+                                    <div class="skeleton-text skeleton-text-short"></div>
+                                    <div class="skeleton-text skeleton-text-long"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+                <!-- No Appointments -->
+                <div id="noAppointments" class="no-appointments" style="display: none;">
+                    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <h3>No appointments found</h3>
+                    <p>There are no appointments within the selected date range.</p>
+                </div>
+
+                <!-- Appointments List -->
+                <div id="appointmentsList" class="appointments-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../static/js/doctor/appointment_list.js"></script>
+</body>
+</html>

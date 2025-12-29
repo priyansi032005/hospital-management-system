@@ -1,0 +1,92 @@
+:root {
+    --primary-color: #48B3AF;
+    --primary-dark: #379a97;
+    --bg-light: #f4fefe;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(120deg, var(--primary-color), var(--primary-dark));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== Main Layout ===== */
+.auth-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== Form Card ===== */
+.auth-container {
+    background: #ffffff;
+    padding: 70px 65px;
+    width: 100%;
+    max-width: 520px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+.auth-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 26px;
+    color: #333;
+}
+
+.auth-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.auth-container input,
+.auth-container select {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.auth-container input:focus,
+.auth-container select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.auth-container button {
+    margin-top: 10px;
+    padding: 12px;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.auth-container button:hover {
+    background: var(--primary-dark);
+}
+
+.auth-container p {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 14px;
+}
+
+.auth-container a {
+    color: var(--primary-color);
+    font-weight: bold;
+    text-decoration: none;
+}

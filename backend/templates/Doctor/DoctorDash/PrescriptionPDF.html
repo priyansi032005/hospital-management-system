@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription Module</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f9fafb; color: #1f2937; }
+        
+        .container { padding: 1rem; min-height: 100vh; }
+        .max-w-7xl { max-width: 1280px; margin: 0 auto; }
+        
+        /* Header */
+        .header-card { background: #fff; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1rem; margin-bottom: 1.5rem; }
+        .header-title { font-size: 1.5rem; font-weight: 700; color: #1f2937; display: flex; align-items: center; gap: 0.5rem; }
+        .header-subtitle { color: #4b5563; margin-top: 0.25rem; }
+        .header-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+        
+        /* Button Styles */
+        .btn { padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; font-family: inherit; font-size: 0.875rem; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: #14b8a6; color: #fff; }
+        .btn-primary:hover { background: #0d9488; }
+        .btn-secondary { background: #e5e7eb; color: #374151; }
+        .btn-secondary:hover { background: #d1d5db; }
+        .btn-secondary.active { background: #ccfbf1; color: #0d9488; }
+        .btn-blue { background: #3b82f6; color: #fff; }
+        .btn-blue:hover { background: #2563eb; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Grid Layout */
+        .grid-container { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        @media (min-width: 1024px) { .grid-container { grid-template-columns: 1fr 1fr; } }
+        
+        /* Form Card */
+        .form-card { background: #fff; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-title { font-size: 1.25rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        
+        /* Form Elements */
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem; }
+        .required { color: #ef4444; }
+        .form-input, .form-textarea, .form-select { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-family: inherit; font-size: 0.875rem; }
+        .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: #14b8a6; box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1); }
+        .form-textarea { resize: vertical; }
+        
+        /* Medicine Card */
+        .medicine-card { padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; background: #f9fafb; margin-bottom: 0.75rem; }
+        .medicine-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .medicine-title { font-size: 0.875rem; font-weight: 500; color: #374151; display: flex; align-items: center; gap: 0.5rem; }
+        .medicine-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
+        @media (min-width: 640px) { .medicine-grid { grid-template-columns: 1fr 1fr; } .medicine-grid-3 { grid-template-columns: repeat(3, 1fr); } }
+        
+        .duration-input { display: flex; }
+        .duration-input input { border-radius: 0.375rem 0 0 0.375rem; border-right: 0; }
+        .duration-input select { border-radius: 0 0.375rem 0.375rem 0; background: #f9fafb; padding: 0.5rem; }
+        
+        .add-medicine-btn { font-size: 0.875rem; color: #14b8a6; cursor: pointer; background: none; border: none; display: flex; align-items: center; gap: 0.25rem; }
+        .add-medicine-btn:hover { color: #0d9488; }
+        
+        .remove-btn { font-size: 0.75rem; color: #ef4444; cursor: pointer; background: none; border: none; display: flex; align-items: center; gap: 0.25rem; }
+        .remove-btn:hover { color: #dc2626; }
+        
+        /* Preview Section */
+        .preview-card { background: #fff; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
+        .preview-section { border-bottom: 1px solid #e5e7eb; padding-bottom: 1rem; margin-bottom: 1rem; }
+        .preview-section:last-child { border-bottom: none; }
+        .preview-label { font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem; }
+        .preview-value { font-weight: 500; color: #1f2937; }
+        .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .preview-medicine { margin-bottom: 0.75rem; }
+        .preview-medicine-name { font-weight: 500; color: #1f2937; }
+        .preview-medicine-details { font-size: 0.875rem; color: #6b7280; margin-left: 1.25rem; display: flex; flex-wrap: wrap; gap: 1rem; }
+        
+        .signature-area { margin-top: 2.5rem; display: flex; justify-content: flex-end; }
+        .signature-box { text-align: right; }
+        .signature-line { height: 3rem; margin-bottom: 0.25rem; }
+        .signature-name { font-weight: 500; color: #1f2937; border-top: 1px solid #9ca3af; padding-top: 0.25rem; }
+        .signature-title { font-size: 0.875rem; color: #6b7280; }
+        
+        .error-msg { font-size: 0.875rem; color: #ef4444; margin-top: 0.75rem; }
+        .note-text { font-size: 0.75rem; color: #6b7280; font-style: italic; margin-top: 0.25rem; }
+        
+        .mobile-tabs { display: block; margin-bottom: 1rem; }
+        .mobile-tabs-container { display: flex; background: #e5e7eb; padding: 0.25rem; border-radius: 0.5rem; }
+        .mobile-tab-btn { flex: 1; padding: 0.5rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #374151; }
+        .mobile-tab-btn.active { background: #fff; color: #0d9488; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        @media (min-width: 1024px) { .mobile-tabs { display: none; } }
+        
+        .hidden-mobile { display: none; }
+        @media (min-width: 1024px) { .hidden-mobile { display: block; } }
+        .active-mobile { display: block; }
+        @media (min-width: 1024px) { .form-card, .preview-card { display: block !important; } }
+        
+        @media (min-width: 768px) { .header-card { display: flex; justify-content: space-between; align-items: flex-start; } .header-actions { margin-top: 0; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="max-w-7xl">
+            <!-- Header -->
+            <div class="header-card">
+                <div>
+                    <h1 class="header-title">
+                        <i class="fas fa-clipboard-list" style="color: #14b8a6;"></i>
+                        Prescription
+                    </h1>
+                    <p class="header-subtitle">
+                        <span id="patientName" style="font-weight: 500;">John Doe</span> •
+                        <span id="appointmentDate">January 15, 2025 • 10:00 AM</span>
+                    </p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="history.back()">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Tabs -->
+            <div class="mobile-tabs">
+                <div class="mobile-tabs-container">
+                    <button class="mobile-tab-btn active" onclick="switchTab('form')">Edit Form</button>
+                    <button class="mobile-tab-btn" onclick="switchTab('preview')">Preview</button>
+                </div>
+            </div>
+
+            <!-- Grid Container -->
+            <div class="grid-container">
+                <!-- Form Section -->
+                <div id="formSection" class="form-card">
+                    <h2 class="form-title">
+                        <i class="fas fa-file-medical"></i>
+                        Prescription Details
+                    </h2>
+
+                    <div class="form-group">
+                        <label class="form-label">Diagnosis <span class="required">*</span></label>
+                        <textarea id="diagnosis" class="form-textarea" rows="2" placeholder="Enter patient's diagnosis"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Symptoms</label>
+                        <textarea id="symptoms" class="form-textarea" rows="2" placeholder="Enter patient's symptoms"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <label class="form-label" style="margin-bottom: 0;">Medicines <span class="required">*</span></label>
+                            <button class="add-medicine-btn" onclick="addMedicine()">
+                                <i class="fas fa-plus"></i> Add Medicine
+                            </button>
+                        </div>
+                        <div id="medicinesContainer"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Advice/Recommendations</label>
+                        <textarea id="advice" class="form-textarea" rows="2" placeholder="Enter advice for the patient"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar-alt" style="color: #14b8a6; margin-right: 0.5rem;"></i>
+                            Follow-up Date
+                        </label>
+                        <input type="date" id="followUpDate" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Comments (internal only)</label>
+                        <textarea id="comments" class="form-textarea" rows="2" placeholder="These comments won't be visible on the prescription"></textarea>
+                        <p class="note-text">Note: Comments are for internal reference only and won't appear on the prescription.</p>
+                    </div>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem;">
+                        <button class="btn btn-primary" onclick="savePrescription()">
+                            <i class="fas fa-save"></i> Save Prescription
+                        </button>
+                        <button class="btn btn-blue" onclick="downloadPDF()">
+                            <i class="fas fa-file-pdf"></i> Download PDF
+                        </button>
+                    </div>
+
+                    <div id="errorMsg" class="error-msg" style="display: none;"></div>
+                </div>
+
+                <!-- Preview Section -->
+                <div id="previewSection" class="preview-card hidden-mobile">
+                    <h2 class="form-title">Prescription Preview</h2>
+
+                    <!-- Organization Header -->
+                    <div class="preview-section">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <h1 style="font-size: 1.25rem; font-weight: 700; color: #1f2937;">Hospital Name</h1>
+                                <p style="font-size: 0.875rem; color: #6b7280;">Hospital Address</p>
+                                <p style="font-size: 0.875rem; color: #6b7280;">Contact Information</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <p style="font-size: 0.875rem; font-weight: 500;">Date: <span id="previewDate"></span></p>
+                                <p style="font-size: 0.875rem; font-weight: 500;">Ref: RX-12345</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Doctor Info -->
+                    <div class="preview-section">
+                        <h2 style="font-weight: 700; font-size: 1.125rem;">Dr. Sarah Johnson</h2>
+                        <p style="font-size: 0.875rem; color: #6b7280;">Cardiology</p>
+                    </div>
+
+                    <!-- Patient Info -->
+                    <div class="preview-section">
+                        <div class="preview-grid">
+                            <div>
+                                <p class="preview-label">Patient Name:</p>
+                                <p class="preview-value" id="previewPatientName">John Doe</p>
+                            </div>
+                            <div>
+                                <p class="preview-label">Age/Gender:</p>
+                                <p class="preview-value">-- / --</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diagnosis & Symptoms -->
+                    <div class="preview-section" id="previewDiagnosisSection" style="display: none;">
+                        <div id="previewDiagnosisDiv" style="display: none; margin-bottom: 0.5rem;">
+                            <p class="preview-label">Diagnosis:</p>
+                            <p class="preview-value" id="previewDiagnosis"></p>
+                        </div>
+                        <div id="previewSymptomsDiv" style="display: none;">
+                            <p class="preview-label">Symptoms:</p>
+                            <p class="preview-value" id="previewSymptoms"></p>
+                        </div>
+                    </div>
+
+                    <!-- Medicines -->
+                    <div class="preview-section">
+                        <h3 style="font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>Rx</span>
+                            <div style="flex: 1; border-bottom: 1px solid #9ca3af;"></div>
+                        </h3>
+                        <div id="previewMedicines">
+                            <p style="color: #6b7280; font-style: italic;">No medicines prescribed</p>
+                        </div>
+                    </div>
+
+                    <!-- Advice & Follow-up -->
+                    <div class="preview-section">
+                        <div id="previewAdviceDiv" style="display: none; margin-bottom: 0.5rem;">
+                            <p class="preview-label">Advice/Recommendations:</p>
+                            <p class="preview-value" id="previewAdvice"></p>
+                        </div>
+                        <div id="previewFollowUpDiv" style="display: none;">
+                            <p class="preview-label">Follow-up Date:</p>
+                            <p class="preview-value" id="previewFollowUp"></p>
+                        </div>
+                    </div>
+
+                    <!-- Signature -->
+                    <div class="signature-area">
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <div class="signature-name">Dr. Sarah Johnson</div>
+                            <div class="signature-title">Cardiology</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let medicines = [];
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            addMedicine();
+            updatePreview();
+            setTodayDate();
+            
+            // Add event listeners for real-time preview
+            document.getElementById('diagnosis').addEventListener('input', updatePreview);
+            document.getElementById('symptoms').addEventListener('input', updatePreview);
+            document.getElementById('advice').addEventListener('input', updatePreview);
+            document.getElementById('followUpDate').addEventListener('change', updatePreview);
+        });
+
+        function setTodayDate() {
+            const today = new Date();
+            const formatted = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            document.getElementById('previewDate').textContent = formatted;
+            
+            const minDate = today.toISOString().split('T')[0];
+            document.getElementById('followUpDate').setAttribute('min', minDate);
+        }
+
+        function addMedicine() {
+            const id = Date.now();
+            medicines.push({ id, name: '', dosage: '', frequency: '', duration: '', instruction: '' });
+            renderMedicines();
+        }
+
+        function removeMedicine(id) {
+            if (medicines.length <= 1) return;
+            medicines = medicines.filter(m => m.id !== id);
+            renderMedicines();
+            updatePreview();
+        }
+
+        function updateMedicine(id, field, value) {
+            const med = medicines.find(m => m.id === id);
+            if (med) {
+                med[field] = value;
+                updatePreview();
+            }
+        }
+
+        function renderMedicines() {
+            const container = document.getElementById('medicinesContainer');
+            container.innerHTML = medicines.map((med, idx) => `
+                <div class="medicine-card">
+                    <div class="medicine-header">
+                        <span class="medicine-title">
+                            <i class="fas fa-capsules" style="color: #14b8a6;"></i>
+                            Medicine ${idx + 1}
+                        </span>
+                        ${medicines.length > 1 ? `
+                            <button class="remove-btn" onclick="removeMedicine(${med.id})">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="medicine-grid">
+                        <div>
+                            <label class="form-label">Name <span class="required">*</span></label>
+                            <input type="text" class="form-input" placeholder="Medicine name" 
+                                value="${med.name}" 
+                                onchange="updateMedicine(${med.id}, 'name', this.value)">
+                        </div>
+                        <div>
+                            <label class="form-label">Dosage</label>
+                            <input type="text" class="form-input" placeholder="e.g. 500mg"
+                                value="${med.dosage}"
+                                onchange="updateMedicine(${med.id}, 'dosage', this.value)">
+                        </div>
+                    </div>
+                    
+                    <div class="medicine-grid medicine-grid-3">
+                        <div>
+                            <label class="form-label">Frequency</label>
+                            <select class="form-select" onchange="updateMedicine(${med.id}, 'frequency', this.value)">
+                                <option value="">Select frequency</option>
+                                <option ${med.frequency === 'Once daily' ? 'selected' : ''}>Once daily</option>
+                                <option ${med.frequency === 'Twice daily' ? 'selected' : ''}>Twice daily</option>
+                                <option ${med.frequency === 'Three times daily' ? 'selected' : ''}>Three times daily</option>
+                                <option ${med.frequency === '1-0-1' ? 'selected' : ''}>1-0-1</option>
+                                <option ${med.frequency === '1-1-1' ? 'selected' : ''}>1-1-1</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Duration</label>
+                            <div class="duration-input">
+                                <input type="number" class="form-input" placeholder="Duration" min="1"
+                                    value="${med.duration.split(' ')[0] || ''}"
+                                    onchange="updateMedicine(${med.id}, 'duration', this.value + ' ' + ('${med.duration.split(' ')[1] || 'days'}'))">
+                                <select class="form-select" onchange="updateMedicine(${med.id}, 'duration', '${med.duration.split(' ')[0] || ''}' + ' ' + this.value)">
+                                    <option ${med.duration.includes('days') ? 'selected' : ''}>days</option>
+                                    <option ${med.duration.includes('weeks') ? 'selected' : ''}>weeks</option>
+                                    <option ${med.duration.includes('months') ? 'selected' : ''}>months</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label">Instructions</label>
+                            <select class="form-select" onchange="updateMedicine(${med.id}, 'instruction', this.value)">
+                                <option value="">Select instruction</option>
+                                <option ${med.instruction === 'Before meals' ? 'selected' : ''}>Before meals</option>
+                                <option ${med.instruction === 'After meals' ? 'selected' : ''}>After meals</option>
+                                <option ${med.instruction === 'With meals' ? 'selected' : ''}>With meals</option>
+                                <option ${med.instruction === 'At bedtime' ? 'selected' : ''}>At bedtime</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updatePreview() {
+            const diagnosis = document.getElementById('diagnosis').value;
+            const symptoms = document.getElementById('symptoms').value;
+            const advice = document.getElementById('advice').value;
+            const followUpDate = document.getElementById('followUpDate').value;
+            
+            // Diagnosis & Symptoms
+            const diagSection = document.getElementById('previewDiagnosisSection');
+            const diagDiv = document.getElementById('previewDiagnosisDiv');
+            const sympDiv = document.getElementById('previewSymptomsDiv');
+            
+            if (diagnosis || symptoms) {
+                diagSection.style.display = 'block';
+                if (diagnosis) {
+                    diagDiv.style.display = 'block';
+                    document.getElementById('previewDiagnosis').textContent = diagnosis;
+                } else {
+                    diagDiv.style.display = 'none';
+                }
+                if (symptoms) {
+                    sympDiv.style.display = 'block';
+                    document.getElementById('previewSymptoms').textContent = symptoms;
+                } else {
+                    sympDiv.style.display = 'none';
+                }
+            } else {
+                diagSection.style.display = 'none';
+            }
+            
+            // Medicines
+            const medContainer = document.getElementById('previewMedicines');
+            const filledMeds = medicines.filter(m => m.name);
+            if (filledMeds.length > 0) {
+                medContainer.innerHTML = filledMeds.map((med, idx) => `
+                    <div class="preview-medicine">
+                        <div style="display: flex; align-items: baseline;">
+                            <span style="font-weight: 500;">${idx + 1}.</span>
+                            <div style="margin-left: 0.5rem;">
+                                <span style="font-weight: 500;">${med.name}</span>
+                                ${med.dosage ? `<span> ${med.dosage}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="preview-medicine-details">
+                            ${med.frequency ? `<div><span style="color: #6b7280;">Dosage:</span> ${med.frequency}</div>` : ''}
+                            ${med.duration ? `<div><span style="color: #6b7280;">Duration:</span> ${med.duration}</div>` : ''}
+                            ${med.instruction ? `<div><span style="color: #6b7280;">Instructions:</span> ${med.instruction}</div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                medContainer.innerHTML = '<p style="color: #6b7280; font-style: italic;">No medicines prescribed</p>';
+            }
+            
+            // Advice
+            const adviceDiv = document.getElementById('previewAdviceDiv');
+            if (advice) {
+                adviceDiv.style.display = 'block';
+                document.getElementById('previewAdvice').textContent = advice;
+            } else {
+                adviceDiv.style.display = 'none';
+            }
+            
+            // Follow-up
+            const followUpDiv = document.getElementById('previewFollowUpDiv');
+            if (followUpDate) {
+                followUpDiv.style.display = 'block';
+                const date = new Date(followUpDate);
+                document.getElementById('previewFollowUp').textContent = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            } else {
+                followUpDiv.style.display = 'none';
+            }
+        }
+
+        function validateForm() {
+            const diagnosis = document.getElementById('diagnosis').value;
+            const hasM medicine = medicines.some(m => m.name);
+            return diagnosis && hasMedicine;
+        }
+
+        function savePrescription() {
+            if (!validateForm()) {
+                document.getElementById('errorMsg').textContent = 'Please fill in all required fields (Diagnosis and at least one Medicine name)';
+                document.getElementById('errorMsg').style.display = 'block';
+                return;
+            }
+            document.getElementById('errorMsg').style.display = 'none';
+            alert('Prescription saved successfully!');
+        }
+
+        function downloadPDF() {
+            if (!validateForm()) {
+                document.getElementById('errorMsg').textContent = 'Please fill in all required fields (Diagnosis and at least one Medicine name)';
+                document.getElementById('errorMsg').style.display = 'block';
+                return;
+            }
+            document.getElementById('errorMsg').style.display = 'none';
+            alert('PDF download would start here. In production, this would generate a PDF file.');
+        }
+
+        function switchTab(tab) {
+            const formSection = document.getElementById('formSection');
+            const previewSection = document.getElementById('previewSection');
+            const tabs = document.querySelectorAll('.mobile-tab-btn');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'form') {
+                formSection.classList.remove('hidden-mobile');
+                formSection.classList.add('active-mobile');
+                previewSection.classList.add('hidden-mobile');
+                previewSection.classList.remove('active-mobile');
+                tabs[0].classList.add('active');
+            } else {
+                previewSection.classList.remove('hidden-mobile');
+                previewSection.classList.add('active-mobile');
+                formSection.classList.add('hidden-mobile');
+                formSection.classList.remove('active-mobile');
+                tabs[1].classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

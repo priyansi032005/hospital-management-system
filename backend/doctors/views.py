@@ -60,3 +60,19 @@ class UpdateAppointmentStatusView(APIView):
                 {"error": "Appointment not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+
+class DoctorDashboardView(APIView):
+    permission_classes = [permissions.IsAuthenticated, IsDoctor]
+
+    def get(self, request):
+        appointments = Appointment.objects.filter(
+            doctor__user=request.user
+        )
+
+        return Response({
+            "total_appointments": appointments.count(),
+            "pending": appointments.filter(status="PENDING").count(),
+            "approved": appointments.filter(status="APPROVED").count(),
+            "cancelled": appointments.filter(status="CANCELLED").count(),
+        })
