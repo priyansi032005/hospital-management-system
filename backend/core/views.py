@@ -1,9 +1,12 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.conf import settings
 import requests
 
-API_LOGIN_URL = "http://127.0.0.1:8000/api/login/"
-API_REGISTER_URL = "http://127.0.0.1:8000/api/register/"
+BASE_URL = getattr(settings, "BASE_URL", "http://127.0.0.1:8000")
+
+API_LOGIN_URL = f"{BASE_URL}/api/login/"
+API_REGISTER_URL = f"{BASE_URL}/api/register/"
 
 
 def home(request):
@@ -17,7 +20,12 @@ def login_page(request):
             "password": request.POST.get("password"),
         }
 
-        response = requests.post(API_LOGIN_URL, json=payload)
+        try:
+            response = requests.post(API_LOGIN_URL, json=payload, timeout=5)
+        except requests.exceptions.RequestException as e:
+            return render(request, "login.html", {
+                "error": "Server error. Please try again later."
+            })
 
         if response.status_code == 200:
             data = response.json()
@@ -34,10 +42,11 @@ def login_page(request):
                 return redirect("/patient/dashboard/")
             else:
                 return redirect("/")
-        else:
-            return render(request, "login.html", {
-                "error": "Invalid credentials"
-            })
+
+        return render(request, "login.html", {
+            "error": "Invalid credentials"
+        })
+
     return render(request, "login.html")
 
 
@@ -49,14 +58,19 @@ def register_page(request):
             "role": request.POST.get("role"),
         }
 
-        response = requests.post(API_REGISTER_URL, json=payload)
+        try:
+            response = requests.post(API_REGISTER_URL, json=payload, timeout=5)
+        except requests.exceptions.RequestException:
+            return render(request, "register.html", {
+                "error": "Server error. Please try again later."
+            })
 
         if response.status_code == 201:
             return redirect("/login/")
-        else:
-            return render(request, "register.html", {
-                "error": "Registration failed"
-            })
+
+        return render(request, "register.html", {
+            "error": "Registration failed"
+        })
 
     return render(request, "register.html")
 
