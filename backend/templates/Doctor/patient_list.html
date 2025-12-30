@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static '../static/css/doctor/patient_list.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+<div class="topbar">
+    <h3>Patients</h3>
+</div>
+
+<div class="table-box">
+    <table>
+        <thead>
+            <tr>
+                <th>Patient Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Contact</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Alice Brown</td>
+                <td>32</td>
+                <td>Female</td>
+                <td>9876543210</td>
+            </tr>
+            <tr>
+                <td>David Lee</td>
+                <td>45</td>
+                <td>Male</td>
+                <td>9123456789</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

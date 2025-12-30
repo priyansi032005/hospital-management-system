@@ -10,14 +10,14 @@ from appointments.models import Appointment
 from appointments.serializers import AppointmentSerializer
 
 
-class DoctorProfileCreateView(generics.CreateAPIView):
-    serializer_class = DoctorSerializer
-    permission_classes = [permissions.IsAuthenticated]
+# class DoctorProfileCreateView(generics.CreateAPIView):
+#     serializer_class = DoctorSerializer
+#     permission_classes = [permissions.IsAuthenticated]
 
-    def perform_create(self, serializer):
-        if Doctor.objects.filter(user=self.request.user).exists():
-            raise ValidationError("Doctor profile already exists.")
-        serializer.save(user=self.request.user)
+#     def perform_create(self, serializer):
+#         if Doctor.objects.filter(user=self.request.user).exists():
+#             raise ValidationError("Doctor profile already exists.")
+#         serializer.save(user=self.request.user)
 
 
 class DoctorProfileView(generics.RetrieveUpdateAPIView):
@@ -25,7 +25,10 @@ class DoctorProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsDoctor]
 
     def get_object(self):
-        return Doctor.objects.get(user=self.request.user)
+        doctor, created = Doctor.objects.get_or_create(
+            user=self.request.user
+        )
+        return doctor
 
 
 class DoctorAppointmentsView(generics.ListAPIView):

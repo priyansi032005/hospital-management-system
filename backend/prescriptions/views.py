@@ -34,4 +34,3 @@ class PatientPrescriptionListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Prescription.objects.filter(patient=self.request.user)
-

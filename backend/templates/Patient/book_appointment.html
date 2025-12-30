@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Book Appointment</h3>
+
+<form method="post">
+  {% csrf_token %}
+  <input type="date"><br><br>
+  <select>
+    <option>Select Doctor</option>
+  </select><br><br>
+  <button type="submit">Book</button>
+</form>
+{% endblock %}

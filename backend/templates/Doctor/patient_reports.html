@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static '../static/css/doctor/patient_reports.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="topbar">
+    <h3>Patient Reports</h3>
+</div>
+
+<div class="table-box">
+    <table>
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Report Type</th>
+                <th>Date</th>
+                <th>View</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Alice Brown</td>
+                <td>Blood Test</td>
+                <td>09 Sep 2025</td>
+                <td>
+                    <a href="#" style="color:#48B3AF;font-weight:bold;">View</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

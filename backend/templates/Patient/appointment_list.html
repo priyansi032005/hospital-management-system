@@ -1,0 +1,44 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Appointment List</title>
+
+    <!-- Appointment page CSS ONLY -->
+    <link rel="stylesheet" href="{% static 'css/appointments.css' %}">
+</head>
+<body>
+
+<div class="page-container">
+    <h2>Appointments</h2>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Patient Name</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>John Doe</td>
+                <td>12 Sep 2025</td>
+                <td>10:30 AM</td>
+                <td class="status-confirmed">Confirmed</td>
+            </tr>
+            <tr>
+                <td>Mary Smith</td>
+                <td>13 Sep 2025</td>
+                <td>01:00 PM</td>
+                <td class="status-pending">Pending</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
