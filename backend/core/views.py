@@ -45,8 +45,8 @@ def register_page(request):
     if request.method == "POST":
         payload = {
             "username": request.POST.get("username"),
-            "email": request.POST.get("email"),
             "password": request.POST.get("password"),
+            "role": request.POST.get("role"),
         }
 
         response = requests.post(API_REGISTER_URL, json=payload)
