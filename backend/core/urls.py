@@ -15,6 +15,8 @@ from .views import (
     doctor_settings,
     doctor_patient_list,
     patient_appointment_list,
+    appointment_schedular,
+    patient_dashboard,
 )
 
 urlpatterns = [
@@ -31,7 +33,11 @@ urlpatterns = [
     path("doctor/sidebar/", doctor_sidebar, name="doctor_sidebar"),
     path("doctor/settings/", doctor_settings, name="doctor_settings"),
     path("doctor/patientlist/", doctor_patient_list, name="doctor_patient_list"),
+
+    path("patient/dashboard/", patient_dashboard, name="patient_dashboard"),
     path("patient/appointments/", patient_appointment_list, name="patient_appointment_list"),
+    path("patient/appointments/add/", appointment_schedular, name="appointment_schedular"),
+
 
     path("api/", include("accounts.urls")),
     path("api/appointments/", include("appointments.urls")),

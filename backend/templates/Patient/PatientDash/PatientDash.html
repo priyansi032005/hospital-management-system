@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom right, #f0fdfa, #ffffff);
+      min-height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: -256px;
+      top: 0;
+      width: 256px;
+      height: 100vh;
+      background: white;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      transition: left 0.3s ease;
+      z-index: 30;
+      padding: 20px;
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.2);
+      backdrop-filter: blur(4px);
+      z-index: 20;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    header.scrolled {
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+      padding: 16px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .menu-btn {
+      padding: 8px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .menu-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .welcome-text h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .welcome-text p {
+      color: #6b7280;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      position: relative;
+    }
+
+    .user-profile:hover {
+      background: #f9fafb;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      ring: 2px solid rgba(13, 148, 136, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ccfbf1;
+      color: #0d9488;
+      font-weight: 500;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 8px;
+      width: 192px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border: 1px solid #f3f4f6;
+      padding: 8px 0;
+      z-index: 50;
+    }
+
+    .dropdown.active {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .dropdown a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      color: #374151;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .dropdown a:hover {
+      background: #f9fafb;
+    }
+
+    .dropdown a.logout {
+      color: #dc2626;
+    }
+
+    .dropdown a.logout:hover {
+      background: #fef2f2;
+    }
+
+    /* Main Section */
+    main {
+      flex: 1;
+      overflow: auto;
+      padding: 24px 16px;
+      background: #f9fafb;
+    }
+
+    .content-wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* Hero Card */
+    .hero-card {
+      background: linear-gradient(to bottom right, #14b8a6, #0d9488);
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      padding: 32px;
+      color: white;
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeInUp 0.7s ease forwards;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .hero-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      color: #0d9488;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .hero-info {
+      flex: 1;
+      text-align: center;
+    }
+
+    .hero-info h2 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .hero-info .patient-id {
+      color: #ccfbf1;
+      margin-bottom: 16px;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .badge {
+      padding: 4px 12px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 20px;
+      font-size: 0.875rem;
+    }
+
+    .new-appointment-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: white;
+      color: #0d9488;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .new-appointment-btn:hover {
+      background: #f0fdfa;
+      transform: scale(1.05);
+    }
+
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      padding: 24px;
+      opacity: 0;
+      transform: translateY(32px);
+      animation: fadeInUp 0.7s ease forwards;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.15s; }
+    .card:nth-child(2) { animation-delay: 0.3s; }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .card-header h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .card-header p {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    /* Appointments */
+    .appointments-list {
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    .appointment-item {
+      display: flex;
+      align-items: start;
+      gap: 16px;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #f3f4f6;
+      margin-bottom: 16px;
+      transition: all 0.2s;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    .appointment-item:hover {
+      background: #f9fafb;
+    }
+
+    .doctor-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0fdfa;
+      color: #0d9488;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .appointment-details {
+      flex: 1;
+    }
+
+    .appointment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 4px;
+    }
+
+    .doctor-name {
+      font-weight: 500;
+      color: #111827;
+    }
+
+    .appointment-time {
+      padding: 4px 12px;
+      background: #f0fdfa;
+      color: #0d9488;
+      border-radius: 20px;
+      font-size: 0.875rem;
+    }
+
+    .appointment-date {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      background: #f0fdfa;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #14b8a6;
+      margin-bottom: 16px;
+    }
+
+    .empty-state h4 {
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .empty-state p {
+      color: #6b7280;
+      text-align: center;
+      max-width: 320px;
+    }
+
+    /* Emergency Info */
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: start;
+      gap: 16px;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #f3f4f6;
+      transition: all 0.2s;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    .info-item:hover {
+      background: #f9fafb;
+    }
+
+    .info-icon {
+      padding: 12px;
+      border-radius: 12px;
+      background: #f0fdfa;
+      color: #0d9488;
+      transition: background 0.2s;
+    }
+
+    .info-item:hover .info-icon {
+      background: #ccfbf1;
+    }
+
+    .info-content h4 {
+      font-weight: 500;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .info-content p {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 64px;
+      height: 64px;
+      border: 4px solid #14b8a6;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+      color: #0d9488;
+      font-weight: 500;
+      font-size: 1.125rem;
+    }
+
+    /* Scrollbar */
+    .appointments-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .appointments-list::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+
+    .appointments-list::-webkit-scrollbar-thumb {
+      background: #0d9488;
+      border-radius: 8px;
+    }
+
+    .appointments-list::-webkit-scrollbar-thumb:hover {
+      background: #0f766e;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (min-width: 1024px) {
+      .sidebar {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 256px;
+      }
+
+      .menu-btn {
+        display: none;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .hero-content {
+        flex-direction: row;
+        text-align: left;
+      }
+
+      .hero-info {
+        text-align: left;
+      }
+
+      .badges {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .welcome-text h1 {
+        font-size: 1.25rem;
+      }
+
+      .hero-card {
+        padding: 24px;
+      }
+
+      .hero-info h2 {
+        font-size: 1.5rem;
+      }
+
+      .user-info {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading your health dashboard...</p>
+  </div>
+
+  <div id="app" class="container" style="display: none;">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <aside class="sidebar" id="sidebar">
+      <h2 style="font-size: 1.5rem; font-weight: 700; color: #0d9488; margin-bottom: 24px;">patient portal</h2>
+      <nav>
+        <a href="/patient/dashboard/" style="display: block; padding: 12px; color: #0d9488; background: #f0fdfa; border-radius: 8px; margin-bottom: 8px; text-decoration: none; font-weight: 500;">Dashboard</a>
+        <a href="/patient/appointments/" style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Appointments</a>
+        <a href="#" style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Medical Records</a>
+        <a href="#" style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Profile</a>
+      </nav>
+    </aside>
+
+    <div class="main-content">
+      <header id="header">
+        <div class="header-content">
+          <div class="header-top">
+            <button class="menu-btn" id="menuBtn">
+              <i data-lucide="menu" style="width: 24px; height: 24px; color: #6b7280;"></i>
+            </button>
+
+            <div class="welcome-text" id="welcomeText">
+              <h1>Welcome back, <span id="userName">User</span>! 👋</h1>
+              <p>Here's your health overview for today</p>
+            </div>
+
+            <div class="user-profile" id="userProfile">
+              <div class="avatar" id="headerAvatar">U</div>
+              <div class="user-info">
+                <p style="font-weight: 500; color: #111827;" id="headerUserName">User</p>
+                <p style="font-size: 0.875rem; color: #0d9488;">Patient</p>
+              </div>
+              <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: #9ca3af;"></i>
+              
+              <div class="dropdown" id="dropdown">
+                <a href="/">Help Center</a>
+                <a href="/logout/" class="logout">Sign Out</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <div class="content-wrapper">
+          <div class="hero-card">
+            <div class="hero-content">
+              <div class="hero-avatar" id="heroAvatar">U</div>
+              
+              <div class="hero-info">
+                <h2>Health Overview</h2>
+                <p class="patient-id">Patient ID: #<span id="patientId">12345</span></p>
+                <div class="badges">
+                  <span class="badge">Blood Type: <span id="bloodType">O+</span></span>
+                  <span class="badge" id="insuranceProvider">Blue Cross Blue Shield</span>
+                </div>
+              </div>
+
+              <button type="button" class="add-btn" onclick="window.location.href='/patient/appointments/add/'">
+                <i data-lucide="plus" style="width: 20px; height: 20px;"></i>
+                <span>New Appointment</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3>Upcoming Appointments</h3>
+                  <p>Your scheduled visits</p>
+                </div>
+              </div>
+              <div class="appointments-list" id="appointmentsList"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3>Emergency Information</h3>
+                  <p>Important contacts and details</p>
+                </div>
+              </div>
+              <div class="info-list" id="infoList"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    // Mock data
+    const mockUser = {
+      id: 12345,
+      username: 'John Doe',
+      avatar: null
+    };
+
+    const mockHealthData = {
+      bloodType: 'O+',
+      insuranceProvider: 'Blue Cross Blue Shield',
+      policyNumber: 'BCBS-123456',
+      emergencyContactName: 'Jane Doe',
+      emergencyContactNumber: '+1 (555) 123-4567',
+      allergies: 'Penicillin, Peanuts',
+      chronicConditions: 'Hypertension'
+    };
+
+    const mockAppointments = [
+      {
+        id: 1,
+        doctor: { firstname: 'Sarah', lastname: 'Johnson', photo: null },
+        date: '2025-01-05T10:00:00',
+        startTime: '2025-01-05T10:00:00',
+        status: 'BOOKED'
+      },
+      {
+        id: 2,
+        doctor: { firstname: 'Michael', lastname: 'Chen', photo: null },
+        date: '2025-01-08T14:30:00',
+        startTime: '2025-01-08T14:30:00',
+        status: 'BOOKED'
+      }
+    ];
+
+    // DOM elements
+    const loading = document.getElementById('loading');
+    const app = document.getElementById('app');
+    const header = document.getElementById('header');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const menuBtn = document.getElementById('menuBtn');
+    const userProfile = document.getElementById('userProfile');
+    const dropdown = document.getElementById('dropdown');
+
+    // Simulate loading
+    setTimeout(() => {
+      loading.style.display = 'none';
+      app.style.display = 'flex';
+      renderDashboard();
+      
+      // Initialize Lucide icons after rendering
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    }, 1000);
+
+    // Scroll handler
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 0) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+
+    // Sidebar toggle
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.add('open');
+      sidebarOverlay.classList.add('active');
+    });
+
+    sidebarOverlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+    });
+
+    // Dropdown toggle
+    userProfile.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle('active');
+    });
+
+    document.addEventListener('click', () => {
+      dropdown.classList.remove('active');
+    });
+
+    // Format date
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}`;
+    }
+
+    function formatTime(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    }
+
+    // Render dashboard
+    function renderDashboard() {
+      // Update user info
+      document.getElementById('userName').textContent = mockUser.username;
+      document.getElementById('headerUserName').textContent = mockUser.username;
+      const initial = mockUser.username[0].toUpperCase();
+      document.getElementById('headerAvatar').textContent = initial;
+      document.getElementById('heroAvatar').textContent = initial;
+      document.getElementById('patientId').textContent = mockUser.id;
+      
+      // Update health data
+      document.getElementById('bloodType').textContent = mockHealthData.bloodType;
+      document.getElementById('insuranceProvider').textContent = mockHealthData.insuranceProvider;
+
+      // Render appointments
+      const appointmentsList = document.getElementById('appointmentsList');
+      const filteredAppointments = mockAppointments.filter(apt => apt.status === 'BOOKED');
+      
+      if (filteredAppointments.length > 0) {
+        appointmentsList.innerHTML = filteredAppointments.map((apt, index) => `
+          <div class="appointment-item" style="animation-delay: ${200 + index * 50}ms">
+            <div class="doctor-avatar">
+              ${apt.doctor.firstname[0]}${apt.doctor.lastname[0]}
+            </div>
+            <div class="appointment-details">
+              <div class="appointment-header">
+                <div>
+                  <p class="doctor-name">Dr. ${apt.doctor.firstname} ${apt.doctor.lastname}</p>
+                  <p class="appointment-date">${formatDate(apt.date)}</p>
+                </div>
+                <span class="appointment-time">${formatTime(apt.startTime)}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        appointmentsList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i data-lucide="calendar" style="width: 32px; height: 32px;"></i>
+            </div>
+            <h4>No Appointments Yet</h4>
+            <p>You don't have any upcoming appointments scheduled at the moment.</p>
+          </div>
+        `;
+      }
+
+      // Render emergency info
+      const infoList = document.getElementById('infoList');
+      const infoItems = [
+        {
+          title: 'Primary Contact',
+          content: [mockHealthData.emergencyContactName, mockHealthData.emergencyContactNumber],
+          icon: 'users'
+        },
+        {
+          title: 'Blood Type',
+          content: [mockHealthData.bloodType],
+          icon: 'activity'
+        },
+        {
+          title: 'Insurance Details',
+          content: [`Provider: ${mockHealthData.insuranceProvider}`, `Policy: ${mockHealthData.policyNumber}`],
+          icon: 'file-text'
+        },
+        {
+          title: 'Allergies & Conditions',
+          content: [mockHealthData.allergies, mockHealthData.chronicConditions],
+          icon: 'alert-circle'
+        }
+      ];
+
+      infoList.innerHTML = infoItems.map((item, index) => `
+        <div class="info-item" style="animation-delay: ${350 + index * 50}ms">
+          <div class="info-icon">
+            <i data-lucide="${item.icon}" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div class="info-content">
+            <h4>${item.title}</h4>
+            ${item.content.map(line => `<p>${line}</p>`).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      // Reinitialize icons
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    }
+  </script>
+</body>
+</html>

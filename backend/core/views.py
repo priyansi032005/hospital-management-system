@@ -24,8 +24,16 @@ def login_page(request):
 
             request.session["access"] = data.get("access")
             request.session["refresh"] = data.get("refresh")
+            request.session["role"] = data.get("role")
 
-            return redirect("/patient/dashboard/")
+            role = data.get("role")
+
+            if role == "DOCTOR":
+                return redirect("/doctor/dashboard/")
+            elif role == "PATIENT":
+                return redirect("/patient/dashboard/")
+            else:
+                return redirect("/")
         else:
             return render(request, "login.html", {
                 "error": "Invalid credentials"
@@ -82,5 +90,12 @@ def doctor_settings(request):
 def doctor_patient_list(request):
     return render(request, "Doctor/DoctorPatientList.html")
 
+
+def patient_dashboard(request):
+    return render(request, "Patient/PatientDash/PatientDash.html")
+
 def patient_appointment_list(request):
     return render(request, "Patient/PatientAppointment/PatientAppointmentList.html")
+
+def appointment_schedular(request):
+    return render(request, "Patient/PatientAppointment/AppointmentSchedular.html")
