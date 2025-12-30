@@ -17,6 +17,7 @@ from .views import (
     patient_appointment_list,
     appointment_schedular,
     patient_dashboard,
+    patient_profile,
 )
 
 urlpatterns = [
@@ -37,6 +38,7 @@ urlpatterns = [
     path("patient/dashboard/", patient_dashboard, name="patient_dashboard"),
     path("patient/appointments/", patient_appointment_list, name="patient_appointment_list"),
     path("patient/appointments/add/", appointment_schedular, name="appointment_schedular"),
+    path("patient/profile/", patient_profile, name="patient_profile"),
 
 
     path("api/", include("accounts.urls")),

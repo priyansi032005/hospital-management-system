@@ -99,3 +99,6 @@ def patient_appointment_list(request):
 
 def appointment_schedular(request):
     return render(request, "Patient/PatientAppointment/AppointmentSchedular.html")
+
+def patient_profile(request):
+    return render(request, "Patient/PatientProfile/PatientProfile.html")

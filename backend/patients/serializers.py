@@ -4,9 +4,31 @@ from doctors.models import Doctor
 from appointments.models import Appointment
 
 class PatientSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source="user.username", read_only=True)
+    email = serializers.EmailField(source="user.email", read_only=True)
+
     class Meta:
         model = Patient
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "email",
+            "age",
+            "gender",
+            "phone",
+            "address",
+            "blood_group",
+            "health_status",
+            "allergies",
+            "chronic_conditions",
+            "current_medications",
+            "family_medical_history",
+            "insurance_provider",
+            "insurance_policy_number",
+            "emergency_contact_name",
+            "emergency_contact_phone",
+            "created_at",
+        ]
         read_only_fields = ["user"]
 
 

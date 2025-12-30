@@ -14,12 +14,12 @@ from doctors.models import Doctor
 from appointments.models import Appointment
 
 
-class CreatePatientProfileView(generics.CreateAPIView):
-    serializer_class = PatientSerializer
-    permission_classes = [IsAuthenticated, IsPatient]
+# class CreatePatientProfileView(generics.CreateAPIView):
+#     serializer_class = PatientSerializer
+#     permission_classes = [IsAuthenticated, IsPatient]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+#     def perform_create(self, serializer):
+#         serializer.save(user=self.request.user)
 
 
 
@@ -28,8 +28,10 @@ class PatientProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated, IsPatient]
 
     def get_object(self):
-        return Patient.objects.get(user=self.request.user)
-
+        patient, _ = Patient.objects.get_or_create(
+            user=self.request.user
+        )
+        return patient
 
 
 class DoctorListView(generics.ListAPIView):
@@ -110,3 +112,6 @@ class PatientDashboardView(APIView):
             "approved": appointments.filter(status="APPROVED").count(),
             "cancelled": appointments.filter(status="CANCELLED").count(),
         })
+
+
+

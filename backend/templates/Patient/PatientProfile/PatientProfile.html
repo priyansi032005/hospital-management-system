@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f9fafb;
+      min-height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: -256px;
+      top: 0;
+      width: 256px;
+      height: 100vh;
+      background: white;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      transition: left 0.3s ease;
+      z-index: 30;
+      padding: 20px;
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .sidebar h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #0d9488;
+      margin-bottom: 24px;
+    }
+
+    .sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      color: #6b7280;
+      text-decoration: none;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
+      background: #f0fdfa;
+      color: #0d9488;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.2);
+      backdrop-filter: blur(4px);
+      z-index: 20;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      overflow: auto;
+      padding: 16px;
+    }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 64px;
+      height: 64px;
+      border: 4px solid #14b8a6;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+      color: #374151;
+      font-weight: 500;
+      font-size: 1.125rem;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* Profile Card */
+    .profile-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      overflow: hidden;
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeInUp 0.5s ease forwards;
+      transition: box-shadow 0.3s;
+    }
+
+    .profile-card:hover {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+
+    .profile-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Left Column - Profile Info */
+    .profile-left {
+      background: linear-gradient(to bottom, #14b8a6, #0d9488);
+      padding: 24px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .profile-avatar-wrapper {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .profile-avatar {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      background: white;
+      padding: 4px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .profile-badge {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: #ccfbf1;
+      border-radius: 50%;
+      padding: 4px;
+      border: 2px solid white;
+    }
+
+    .profile-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .profile-info {
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .profile-info-item {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 12px;
+      backdrop-filter: blur(8px);
+    }
+
+    .profile-info-item svg {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .profile-info-item span {
+      font-size: 0.875rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Right Column - Details */
+    .profile-right {
+      padding: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .section-header svg {
+      width: 24px;
+      height: 24px;
+      color: #0d9488;
+      margin-right: 8px;
+    }
+
+    .section-header h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .info-box {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      transition: box-shadow 0.2s;
+    }
+
+    .info-box:hover {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .info-label {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+
+    .info-value {
+      font-weight: 500;
+      color: #1f2937;
+    }
+
+    .divider {
+      border-top: 1px solid #e5e7eb;
+      padding-top: 24px;
+      margin-top: 24px;
+    }
+
+    /* Health Details Card */
+    .health-details-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      overflow: hidden;
+      padding: 24px;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeInUp 0.5s ease forwards 0.3s;
+      transition: box-shadow 0.3s;
+    }
+
+    .health-details-card:hover {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+
+    .health-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .health-box {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      transition: box-shadow 0.2s;
+    }
+
+    .health-box:hover {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .health-box h3 {
+      font-weight: 500;
+      color: #0d9488;
+      margin-bottom: 8px;
+      font-size: 0.875rem;
+    }
+
+    .health-box ul {
+      list-style: disc;
+      padding-left: 20px;
+      font-size: 0.875rem;
+      color: #1f2937;
+    }
+
+    .health-box p {
+      font-size: 0.875rem;
+      color: #1f2937;
+    }
+
+    .health-box .detail-line {
+      margin-bottom: 4px;
+    }
+
+    .detail-label {
+      color: #6b7280;
+    }
+
+    .pulse-icon {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.75rem;
+      margin: 16px 0 24px;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Responsive */
+    @media (min-width: 768px) {
+      .profile-content {
+        flex-direction: row;
+      }
+
+      .profile-left {
+        width: 33.333%;
+      }
+
+      .profile-right {
+        width: 66.667%;
+      }
+
+      .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .health-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .sidebar {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 256px;
+      }
+
+      .health-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading profile...</p>
+  </div>
+
+  <div id="app" class="container" style="display: none;">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+      <aside class="sidebar" id="sidebar">
+      <h2 style="font-size: 1.5rem; font-weight: 700; color: #0d9488; margin-bottom: 24px;">patient portal</h2>
+      <nav>
+        <a href="/patient/dashboard/" style="display: block; padding: 12px; color: #0d9488; background: #f0fdfa; border-radius: 8px; margin-bottom: 8px; text-decoration: none; font-weight: 500;">Dashboard</a>
+        <a href="/patient/appointments/" style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Appointments</a>
+        <a href="#" style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Medical Records</a>
+        <a href="/patient/profile/" style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Profile</a>
+      </nav>
+    </aside>
+
+    <div class="main-content" id="mainContent">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <div class="profile-content">
+          <div class="profile-left">
+            <div class="profile-avatar-wrapper">
+              <div class="profile-avatar">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6upkc6jjdNBwfdiHyTHtOv0M4C2YHf4nmCQ&s" alt="Profile" id="profileImage">
+              </div>
+              <div class="profile-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+            </div>
+
+            <h1 class="profile-name" id="profileName">John Doe</h1>
+
+            <div class="profile-info">
+              <div class="profile-info-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <span id="profileEmail">john.doe@email.com</span>
+              </div>
+
+              <div class="profile-info-item" id="contactItem" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span id="profileContact"></span>
+              </div>
+
+              <div class="profile-info-item" id="addressItem" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span id="profileAddress"></span>
+              </div>
+
+              <div class="profile-info-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                <span id="memberSince">Member since Jan 1, 2024</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-right">
+            <div class="section-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <h2>Personal Information</h2>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-box">
+                <p class="info-label">Gender</p>
+                <p class="info-value" id="gender">Not specified</p>
+              </div>
+
+              <div class="info-box">
+                <p class="info-label">Age</p>
+                <p class="info-value" id="age">Not specified</p>
+              </div>
+            </div>
+
+            <div class="divider">
+              <div class="section-header">
+                <svg class="pulse-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                <h2>Health Summary</h2>
+              </div>
+
+              <div class="info-grid" id="healthSummary">
+                <div class="info-box">
+                  <p class="info-label">Health Status</p>
+                  <p class="info-value" id="healthStatus">Not specified</p>
+                </div>
+
+                <div class="info-box">
+                  <p class="info-label">Blood Type</p>
+                  <p class="info-value" id="bloodType">Not specified</p>
+                </div>
+
+                <div class="info-box">
+                  <p class="info-label">Insurance</p>
+                  <p class="info-value" id="insurance">Not specified</p>
+                </div>
+
+                <div class="info-box">
+                  <p class="info-label">Emergency Contact</p>
+                  <p class="info-value" id="emergencyContact">Not specified</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Health Information -->
+      <div class="health-details-card">
+        <div class="section-header">
+          <svg class="pulse-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          <h2>Detailed Health Information</h2>
+        </div>
+
+        <div class="health-grid">
+          <div class="health-box">
+            <h3>Allergies</h3>
+            <div id="allergies">None</div>
+          </div>
+
+          <div class="health-box">
+            <h3>Chronic Conditions</h3>
+            <div id="chronicConditions">None</div>
+          </div>
+
+          <div class="health-box">
+            <h3>Current Medications</h3>
+            <div id="medications">None</div>
+          </div>
+
+          <div class="health-box">
+            <h3>Insurance Details</h3>
+            <div id="insuranceDetails">
+              <p class="detail-line"><span class="detail-label">Provider:</span> <span id="insuranceProvider">Not specified</span></p>
+              <p class="detail-line"><span class="detail-label">Policy #:</span> <span id="policyNumber">Not specified</span></p>
+              <p class="detail-line"><span class="detail-label">Valid:</span> <span id="policyDates">Not specified</span></p>
+            </div>
+          </div>
+
+          <div class="health-box">
+            <h3>Emergency Contact</h3>
+            <div id="emergencyDetails">
+              <p class="detail-line"><span class="detail-label">Name:</span> <span id="emergencyName">Not specified</span></p>
+              <p class="detail-line"><span class="detail-label">Phone:</span> <span id="emergencyPhone">Not specified</span></p>
+            </div>
+          </div>
+
+          <div class="health-box" id="familyHistoryBox" style="display: none;">
+            <h3>Family Medical History</h3>
+            <p id="familyHistory"></p>
+          </div>
+        </div>
+
+        <div id="additionalNotesBox" style="display: none; margin-top: 16px;">
+          <div class="health-box">
+            <h3>Additional Notes</h3>
+            <p id="additionalNotes"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        Last updated: <span id="lastUpdated"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock data
+    const mockProfileData = {
+      id: 12345,
+      username: 'John Doe',
+      email: 'john.doe@email.com',
+      contact: '+1 (555) 123-4567',
+      address: '123 Main Street, New York, NY 10001',
+      gender: 'Male',
+      age: 35,
+      createdAt: '2024-01-15T10:00:00Z'
+    };
+
+    const mockHealthData = {
+      healthStatus: 'Good',
+      bloodType: 'O+',
+      insuranceProvider: 'Blue Cross Blue Shield',
+      policyNumber: 'BCBS-123456',
+      policyStartDate: '2024-01-01',
+      policyEndDate: '2024-12-31',
+      emergencyContactName: 'Jane Doe',
+      emergencyContactNumber: '+1 (555) 987-6543',
+      allergies: ['Penicillin', 'Peanuts'],
+      chronicConditions: ['Hypertension'],
+      medicationHistory: ['Lisinopril 10mg', 'Aspirin 81mg'],
+      familyMedicalHistory: 'Father had heart disease, mother has diabetes',
+      additionalNotes: 'Patient is physically active and follows a healthy diet.'
+    };
+
+    // DOM elements
+    const loading = document.getElementById('loading');
+    const app = document.getElementById('app');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    // Format date
+    function formatDate(dateStr) {
+      if (!dateStr) return 'Not specified';
+      return new Date(dateStr).toLocaleDateString();
+    }
+
+    // Render list items
+    function renderListItems(items) {
+      if (!items || items.length === 0) return 'None';
+      const ul = document.createElement('ul');
+      items.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        ul.appendChild(li);
+      });
+      return ul.outerHTML;
+    }
+
+    // Populate profile data
+    function populateProfile() {
+      // Profile info
+      document.getElementById('profileName').textContent = mockProfileData.username;
+      document.getElementById('profileEmail').textContent = mockProfileData.email;
+      
+      if (mockProfileData.contact) {
+        document.getElementById('contactItem').style.display = 'flex';
+        document.getElementById('profileContact').textContent = mockProfileData.contact;
+      }
+      
+      if (mockProfileData.address) {
+        document.getElementById('addressItem').style.display = 'flex';
+        document.getElementById('profileAddress').textContent = mockProfileData.address;
+      }
+      
+      document.getElementById('memberSince').textContent = `Member since ${formatDate(mockProfileData.createdAt)}`;
+      
+      // Personal info
+      document.getElementById('gender').textContent = mockProfileData.gender || 'Not specified';
+      document.getElementById('age').textContent = mockProfileData.age ? `${mockProfileData.age} years` : 'Not specified';
+      
+      // Health summary
+      document.getElementById('healthStatus').textContent = mockHealthData.healthStatus || 'Not specified';
+      document.getElementById('bloodType').textContent = mockHealthData.bloodType || 'Not specified';
+      document.getElementById('insurance').textContent = mockHealthData.insuranceProvider || 'Not specified';
+      document.getElementById('emergencyContact').textContent = mockHealthData.emergencyContactName || 'Not specified';
+      
+      // Detailed health info
+      document.getElementById('allergies').innerHTML = renderListItems(mockHealthData.allergies);
+      document.getElementById('chronicConditions').innerHTML = renderListItems(mockHealthData.chronicConditions);
+      document.getElementById('medications').innerHTML = renderListItems(mockHealthData.medicationHistory);
+      
+      // Insurance details
+      document.getElementById('insuranceProvider').textContent = mockHealthData.insuranceProvider || 'Not specified';
+      document.getElementById('policyNumber').textContent = mockHealthData.policyNumber || 'Not specified';
+      document.getElementById('policyDates').textContent = `${formatDate(mockHealthData.policyStartDate)} - ${formatDate(mockHealthData.policyEndDate)}`;
+      
+      // Emergency contact details
+      document.getElementById('emergencyName').textContent = mockHealthData.emergencyContactName || 'Not specified';
+      document.getElementById('emergencyPhone').textContent = mockHealthData.emergencyContactNumber || 'Not specified';
+      
+      // Family history
+      if (mockHealthData.familyMedicalHistory) {
+        document.getElementById('familyHistoryBox').style.display = 'block';
+        document.getElementById('familyHistory').textContent = mockHealthData.familyMedicalHistory;
+      }
+      
+      // Additional notes
+      if (mockHealthData.additionalNotes) {
+        document.getElementById('additionalNotesBox').style.display = 'block';
+        document.getElementById('additionalNotes').textContent = mockHealthData.additionalNotes;
+      }
+      
+      // Last updated
+      document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+    }
+
+    // Simulate loading
+    setTimeout(() => {
+      loading.style.display = 'none';
+      app.style.display = 'flex';
+      populateProfile();
+    }, 1000);
+
+    // Sidebar toggle
+    sidebarOverlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+    });
+
+    // Mobile menu (would need a button in real implementation)
+    // For now, clicking overlay closes sidebar
+  </script>
+</body>
+</html>
