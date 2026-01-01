@@ -12,6 +12,7 @@ class Doctor(models.Model):
     experience_years = models.PositiveIntegerField()
     phone = models.CharField(max_length=15)
     is_available = models.BooleanField(default=True)
+    bio = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.user.username

@@ -2,6 +2,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 
 from .models import Patient
 from .serializers import (
@@ -14,12 +15,19 @@ from doctors.models import Doctor
 from appointments.models import Appointment
 
 
-# class CreatePatientProfileView(generics.CreateAPIView):
-#     serializer_class = PatientSerializer
-#     permission_classes = [IsAuthenticated, IsPatient]
+def get_patient(user):
+    try:
+        return Patient.objects.get(user=user)
+    except Patient.DoesNotExist:
+        raise ValidationError("Patient profile does not exist")
 
-#     def perform_create(self, serializer):
-#         serializer.save(user=self.request.user)
+
+class CreatePatientProfileView(generics.CreateAPIView):
+    serializer_class = PatientSerializer
+    permission_classes = [IsAuthenticated, IsPatient]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 
@@ -47,11 +55,15 @@ class CreateAppointmentView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, IsPatient]
 
     def perform_create(self, serializer):
+        try:
+            patient = Patient.objects.get(user=self.request.user)
+        except Patient.DoesNotExist:
+            raise ValidationError("Patient profile does not exist")
+
         serializer.save(
-            patient=self.request.user,
+            patient=patient,
             status="PENDING"
         )
-
 
 
 class PatientAppointmentsView(generics.ListAPIView):
@@ -59,10 +71,8 @@ class PatientAppointmentsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, IsPatient]
 
     def get_queryset(self):
-        return Appointment.objects.filter(
-            patient=self.request.user
-        )
-
+        patient = Patient.objects.get(user=self.request.user)
+        return Appointment.objects.filter(patient=patient)
 
 
 class PatientAppointmentDetailView(generics.RetrieveAPIView):
@@ -70,9 +80,8 @@ class PatientAppointmentDetailView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated, IsPatient]
 
     def get_queryset(self):
-        return Appointment.objects.filter(
-            patient=self.request.user
-        )
+        patient = Patient.objects.get(user=self.request.user)
+        return Appointment.objects.filter(patient=patient)
 
 
 class CancelAppointmentView(APIView):
@@ -80,16 +89,25 @@ class CancelAppointmentView(APIView):
 
     def patch(self, request, pk):
         try:
+            patient = Patient.objects.get(user=request.user)
             appointment = Appointment.objects.get(
                 pk=pk,
-                patient=request.user
+                patient=patient
             )
             appointment.status = "CANCELLED"
             appointment.save()
+
             return Response(
                 {"message": "Appointment cancelled"},
                 status=status.HTTP_200_OK
             )
+
+        except Patient.DoesNotExist:
+            return Response(
+                {"error": "Patient profile not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
         except Appointment.DoesNotExist:
             return Response(
                 {"error": "Appointment not found"},
@@ -97,14 +115,12 @@ class CancelAppointmentView(APIView):
             )
 
 
-
 class PatientDashboardView(APIView):
     permission_classes = [IsAuthenticated, IsPatient]
 
     def get(self, request):
-        appointments = Appointment.objects.filter(
-            patient=request.user
-        )
+        patient = Patient.objects.get(user=request.user)
+        appointments = Appointment.objects.filter(patient=patient)
 
         return Response({
             "total_appointments": appointments.count(),
@@ -112,6 +128,5 @@ class PatientDashboardView(APIView):
             "approved": appointments.filter(status="APPROVED").count(),
             "cancelled": appointments.filter(status="CANCELLED").count(),
         })
-
 
 

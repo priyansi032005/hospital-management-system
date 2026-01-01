@@ -41,7 +41,7 @@ def login_page(request):
             elif role == "PATIENT":
                 return redirect("/patient/dashboard/")
             else:
-                return redirect("/")
+                return redirect("/admin/")
 
         return render(request, "login.html", {
             "error": "Invalid credentials"

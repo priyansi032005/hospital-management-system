@@ -704,14 +704,10 @@
         </div>
     </div>
 <script>
-/* ===========================
-   CONFIGURATION
-=========================== */
 const API_CONFIG = {
     BASE_URL: 'http://127.0.0.1:8000/api/doctors/',
     ENDPOINTS: {
-        DOCTOR_PROFILE: '/profile/',
-        DASHBOARD_STATS: '/dashboard/stats/'
+        DOCTOR_PROFILE: 'profile/'
     },
     TIMEOUT: 10000
 };
@@ -733,12 +729,7 @@ const elements = {
     doctorEmail: document.getElementById('doctorEmail'),
     doctorSpecialty: document.getElementById('doctorSpecialty'),
     doctorExperience: document.getElementById('doctorExperience'),
-    avatarPlaceholder: document.getElementById('avatarPlaceholder'),
-
-    statAppointments: document.getElementById('statAppointments'),
-    statPatients: document.getElementById('statPatients'),
-    statPending: document.getElementById('statPending'),
-    statCancelled: document.getElementById('statCancelled')
+    avatarPlaceholder: document.getElementById('avatarPlaceholder')
 };
 
 /* ===========================
@@ -768,36 +759,28 @@ async function fetchWithTimeout(url) {
 }
 
 /* ===========================
-   API CALLS
+   API CALL
 =========================== */
 async function fetchDoctorProfile() {
     const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.DOCTOR_PROFILE;
     return await fetchWithTimeout(url);
 }
 
-async function fetchDashboardStats() {
-    const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.DASHBOARD_STATS;
-    return await fetchWithTimeout(url);
-}
-
 /* ===========================
-   UI RENDER FUNCTIONS
+   UI RENDER
 =========================== */
 function renderDoctorProfile(data) {
     elements.doctorName.textContent = data.name || 'Doctor';
     elements.doctorEmail.textContent = data.email || '-';
     elements.doctorSpecialty.textContent = data.specialization || '-';
-    elements.doctorExperience.textContent = `${data.experience_years || 0} Years Experience`;
+    elements.doctorExperience.textContent =
+        `${data.experience_years || 0} Years Experience`;
 
-    const firstLetter = data.name ? data.name.charAt(0).toUpperCase() : 'D';
+    const firstLetter = data.name
+        ? data.name.charAt(0).toUpperCase()
+        : 'D';
+
     elements.avatarPlaceholder.textContent = firstLetter;
-}
-
-function renderStats(stats) {
-    elements.statAppointments.textContent = stats.today_appointments || 0;
-    elements.statPatients.textContent = stats.total_patients || 0;
-    elements.statPending.textContent = stats.pending_appointments || 0;
-    elements.statCancelled.textContent = stats.cancelled_appointments || 0;
 }
 
 /* ===========================
@@ -818,19 +801,14 @@ async function loadDashboard() {
         elements.loadingState.style.display = 'flex';
         elements.errorState.style.display = 'none';
 
-        const [profile, stats] = await Promise.all([
-            fetchDoctorProfile(),
-            fetchDashboardStats()
-        ]);
-
+        const profile = await fetchDoctorProfile();
         renderDoctorProfile(profile);
-        renderStats(stats);
 
         elements.loadingState.style.display = 'none';
         elements.contentContainer.style.display = 'block';
 
     } catch (error) {
-        showError('Unable to load dashboard data.');
+        showError('Unable to load doctor profile.');
         console.error(error);
     }
 }

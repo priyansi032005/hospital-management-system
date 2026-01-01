@@ -5,14 +5,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Patient Dashboard</title>
+  <!-- Google Fonts - Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- ==================== STYLES ==================== -->
   <style>
+    /* ==================== GLOBAL RESET ==================== */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    /* ==================== BASE STYLES ==================== */
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(to bottom right, #f0fdfa, #ffffff);
@@ -24,10 +29,10 @@
       min-height: 100vh;
     }
 
-    /* Sidebar */
+    /* ==================== SIDEBAR STYLES ==================== */
     .sidebar {
       position: fixed;
-      left: -256px;
+      left: -256px; /* Hidden by default on mobile */
       top: 0;
       width: 256px;
       height: 100vh;
@@ -42,6 +47,7 @@
       left: 0;
     }
 
+    /* Sidebar overlay for mobile */
     .sidebar-overlay {
       display: none;
       position: fixed;
@@ -55,7 +61,7 @@
       display: block;
     }
 
-    /* Main Content */
+    /* ==================== MAIN CONTENT AREA ==================== */
     .main-content {
       flex: 1;
       display: flex;
@@ -63,7 +69,7 @@
       min-height: 100vh;
     }
 
-    /* Header */
+    /* ==================== HEADER STYLES ==================== */
     header {
       position: sticky;
       top: 0;
@@ -72,6 +78,7 @@
       transition: all 0.3s ease;
     }
 
+    /* Header with scroll effect */
     header.scrolled {
       background: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(12px);
@@ -91,6 +98,7 @@
       gap: 16px;
     }
 
+    /* Menu button for mobile */
     .menu-btn {
       padding: 8px;
       border: none;
@@ -104,6 +112,7 @@
       background: #f3f4f6;
     }
 
+    /* Welcome text section */
     .welcome-text h1 {
       font-size: 1.875rem;
       font-weight: 700;
@@ -115,6 +124,7 @@
       color: #6b7280;
     }
 
+    /* User profile dropdown */
     .user-profile {
       display: flex;
       align-items: center;
@@ -130,6 +140,7 @@
       background: #f9fafb;
     }
 
+    /* Avatar styling */
     .avatar {
       width: 40px;
       height: 40px;
@@ -150,6 +161,7 @@
       object-fit: cover;
     }
 
+    /* Dropdown menu */
     .dropdown {
       display: none;
       position: absolute;
@@ -192,7 +204,7 @@
       background: #fef2f2;
     }
 
-    /* Main Section */
+    /* ==================== MAIN CONTENT SECTION ==================== */
     main {
       flex: 1;
       overflow: auto;
@@ -205,7 +217,8 @@
       margin: 0 auto;
     }
 
-    /* Hero Card */
+    /* ==================== HERO CARD ==================== */
+    /* Main hero card with gradient background */
     .hero-card {
       background: linear-gradient(to bottom right, #14b8a6, #0d9488);
       border-radius: 16px;
@@ -225,6 +238,7 @@
       gap: 24px;
     }
 
+    /* Large avatar in hero section */
     .hero-avatar {
       width: 96px;
       height: 96px;
@@ -256,6 +270,7 @@
       margin-bottom: 16px;
     }
 
+    /* Badge container */
     .badges {
       display: flex;
       flex-wrap: wrap;
@@ -270,33 +285,14 @@
       font-size: 0.875rem;
     }
 
-    .new-appointment-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      background: white;
-      color: #0d9488;
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-
-    .new-appointment-btn:hover {
-      background: #f0fdfa;
-      transform: scale(1.05);
-    }
-
-    /* Grid Layout */
+    /* ==================== GRID LAYOUT ==================== */
     .grid {
       display: grid;
       gap: 24px;
       margin-top: 24px;
     }
 
+    /* Card styling with animation */
     .card {
       background: white;
       border-radius: 16px;
@@ -333,13 +329,14 @@
       font-size: 0.875rem;
     }
 
-    /* Appointments */
+    /* ==================== APPOINTMENTS SECTION ==================== */
     .appointments-list {
       max-height: 400px;
       overflow-y: auto;
       padding-right: 8px;
     }
 
+    /* Individual appointment item */
     .appointment-item {
       display: flex;
       align-items: start;
@@ -358,6 +355,7 @@
       background: #f9fafb;
     }
 
+    /* Doctor avatar in appointment */
     .doctor-avatar {
       width: 48px;
       height: 48px;
@@ -401,6 +399,8 @@
       color: #6b7280;
     }
 
+    /* ==================== EMPTY STATE ==================== */
+    /* Shown when no appointments exist */
     .empty-state {
       display: flex;
       flex-direction: column;
@@ -435,7 +435,7 @@
       max-width: 320px;
     }
 
-    /* Emergency Info */
+    /* ==================== EMERGENCY INFO SECTION ==================== */
     .info-list {
       display: flex;
       flex-direction: column;
@@ -482,7 +482,7 @@
       color: #6b7280;
     }
 
-    /* Loading */
+    /* ==================== LOADING STATE ==================== */
     .loading {
       display: flex;
       flex-direction: column;
@@ -492,6 +492,7 @@
       gap: 16px;
     }
 
+    /* Rotating spinner */
     .spinner {
       width: 64px;
       height: 64px;
@@ -507,7 +508,50 @@
       font-size: 1.125rem;
     }
 
-    /* Scrollbar */
+    /* ==================== ERROR STATE ==================== */
+    .error-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .error-container.active {
+      display: flex;
+    }
+
+    .error-icon {
+      width: 64px;
+      height: 64px;
+      color: #ef4444;
+    }
+
+    .error-message {
+      color: #374151;
+      font-weight: 500;
+      font-size: 1.125rem;
+      text-align: center;
+    }
+
+    .retry-button {
+      padding: 12px 24px;
+      background: #0d9488;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .retry-button:hover {
+      background: #0f766e;
+    }
+
+    /* ==================== CUSTOM SCROLLBAR ==================== */
     .appointments-list::-webkit-scrollbar {
       width: 6px;
     }
@@ -526,7 +570,7 @@
       background: #0f766e;
     }
 
-    /* Animations */
+    /* ==================== ANIMATIONS ==================== */
     @keyframes fadeIn {
       from {
         opacity: 0;
@@ -557,7 +601,8 @@
       }
     }
 
-    /* Responsive */
+    /* ==================== RESPONSIVE DESIGN ==================== */
+    /* Desktop styles (1024px and above) */
     @media (min-width: 1024px) {
       .sidebar {
         left: 0;
@@ -589,6 +634,7 @@
       }
     }
 
+    /* Mobile styles (768px and below) */
     @media (max-width: 768px) {
       .welcome-text h1 {
         font-size: 1.25rem;
@@ -610,14 +656,24 @@
 </head>
 
 <body>
+  <!-- ==================== LOADING SCREEN ==================== -->
   <div id="loading" class="loading">
     <div class="spinner"></div>
     <p class="loading-text">Loading your health dashboard...</p>
   </div>
 
+  <!-- ==================== ERROR SCREEN ==================== -->
+  <div id="error" class="error-container">
+    <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <p class="error-message" id="errorMessage">Failed to load dashboard data</p>
+    <button class="retry-button" onclick="loadDashboardData()">Retry</button>
+  </div>
+
+  <!-- ==================== MAIN APPLICATION ==================== -->
   <div id="app" class="container" style="display: none;">
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+    <!-- ==================== SIDEBAR ==================== -->
     <aside class="sidebar" id="sidebar">
       <h2 style="font-size: 1.5rem; font-weight: 700; color: #0d9488; margin-bottom: 24px;">patient portal</h2>
       <nav>
@@ -633,7 +689,9 @@
       </nav>
     </aside>
 
+    <!-- ==================== MAIN CONTENT ==================== -->
     <div class="main-content">
+      <!-- Header Section -->
       <header id="header">
         <div class="header-content">
           <div class="header-top">
@@ -642,14 +700,14 @@
             </button>
 
             <div class="welcome-text" id="welcomeText">
-              <h1>Welcome back, <span id="userName">User</span>! 👋</h1>
+              <h1>Welcome back, <span id="userName">Loading...</span>! 👋</h1>
               <p>Here's your health overview for today</p>
             </div>
 
             <div class="user-profile" id="userProfile">
-              <div class="avatar" id="headerAvatar">U</div>
+              <div class="avatar" id="headerAvatar">...</div>
               <div class="user-info">
-                <p style="font-weight: 500; color: #111827;" id="headerUserName">User</p>
+                <p style="font-weight: 500; color: #111827;" id="headerUserName">Loading...</p>
                 <p style="font-size: 0.875rem; color: #0d9488;">Patient</p>
               </div>
               <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: #9ca3af;"></i>
@@ -663,24 +721,28 @@
         </div>
       </header>
 
+      <!-- Main Content -->
       <main>
         <div class="content-wrapper">
+          <!-- Hero Card -->
           <div class="hero-card">
             <div class="hero-content">
-              <div class="hero-avatar" id="heroAvatar">U</div>
+              <div class="hero-avatar" id="heroAvatar">...</div>
 
               <div class="hero-info">
                 <h2>Health Overview</h2>
-                <p class="patient-id">Patient ID: #<span id="patientId">12345</span></p>
+                <p class="patient-id">Patient ID: #<span id="patientId">Loading...</span></p>
                 <div class="badges">
-                  <span class="badge">Blood Type: <span id="bloodType">O+</span></span>
-                  <span class="badge" id="insuranceProvider">Blue Cross Blue Shield</span>
+                  <span class="badge">Blood Type: <span id="bloodType">Loading...</span></span>
+                  <span class="badge" id="insuranceProvider">Loading...</span>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- Cards Grid -->
           <div class="grid">
+            <!-- Appointments Card -->
             <div class="card">
               <div class="card-header">
                 <div>
@@ -688,9 +750,12 @@
                   <p>Your scheduled visits</p>
                 </div>
               </div>
-              <div class="appointments-list" id="appointmentsList"></div>
+              <div class="appointments-list" id="appointmentsList">
+                <!-- Appointments will be loaded here -->
+              </div>
             </div>
 
+            <!-- Emergency Info Card -->
             <div class="card">
               <div class="card-header">
                 <div>
@@ -698,7 +763,9 @@
                   <p>Important contacts and details</p>
                 </div>
               </div>
-              <div class="info-list" id="infoList"></div>
+              <div class="info-list" id="infoList">
+                <!-- Emergency info will be loaded here -->
+              </div>
             </div>
           </div>
         </div>
@@ -706,44 +773,22 @@
     </div>
   </div>
 
+  <!-- Lucide Icons Library -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- ==================== JAVASCRIPT ==================== -->
   <script>
-    // Mock data
-    const mockUser = {
-      id: 12345,
-      username: 'John Doe',
-      avatar: null
+    // ==================== API CONFIGURATION ====================
+    const API_CONFIG = {
+      profileEndpoint: 'http://127.0.0.1:8000/api/patient/profile/',
+      appointmentsEndpoint: 'http://127.0.0.1:8000/api/patient/appointments/',
+      authToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY3MjkyMjU4LCJpYXQiOjE3NjcyODg2NTgsImp0aSI6IjAxMzQ4OTgyM2FmYTQ1YzFhNGEyZWU5MmUzNGQzYjQ2IiwidXNlcl9pZCI6IjEyIn0.6I5CyRQSl2Ptdm_2IIr5S6IbLlYoKkRb5gj03ZmfuPA'  // Set your auth token here if required
     };
 
-    const mockHealthData = {
-      bloodType: 'O+',
-      insuranceProvider: 'Blue Cross Blue Shield',
-      policyNumber: 'BCBS-123456',
-      emergencyContactName: 'Jane Doe',
-      emergencyContactNumber: '+1 (555) 123-4567',
-      allergies: 'Penicillin, Peanuts',
-      chronicConditions: 'Hypertension'
-    };
-
-    const mockAppointments = [
-      {
-        id: 1,
-        doctor: { firstname: 'Sarah', lastname: 'Johnson', photo: null },
-        date: '2025-01-05T10:00:00',
-        startTime: '2025-01-05T10:00:00',
-        status: 'BOOKED'
-      },
-      {
-        id: 2,
-        doctor: { firstname: 'Michael', lastname: 'Chen', photo: null },
-        date: '2025-01-08T14:30:00',
-        startTime: '2025-01-08T14:30:00',
-        status: 'BOOKED'
-      }
-    ];
-
-    // DOM elements
+    // ==================== DOM ELEMENT REFERENCES ====================
     const loading = document.getElementById('loading');
+    const errorContainer = document.getElementById('error');
+    const errorMessage = document.getElementById('errorMessage');
     const app = document.getElementById('app');
     const header = document.getElementById('header');
     const sidebar = document.getElementById('sidebar');
@@ -752,19 +797,11 @@
     const userProfile = document.getElementById('userProfile');
     const dropdown = document.getElementById('dropdown');
 
-    // Simulate loading
-    setTimeout(() => {
-      loading.style.display = 'none';
-      app.style.display = 'flex';
-      renderDashboard();
-
-      // Initialize Lucide icons after rendering
-      if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-      }
-    }, 1000);
-
-    // Scroll handler
+    // ==================== EVENT LISTENERS ====================
+    
+    /**
+     * Scroll handler - add shadow to header when scrolled
+     */
     window.addEventListener('scroll', () => {
       if (window.scrollY > 0) {
         header.classList.add('scrolled');
@@ -773,7 +810,9 @@
       }
     });
 
-    // Sidebar toggle
+    /**
+     * Sidebar toggle for mobile
+     */
     menuBtn.addEventListener('click', () => {
       sidebar.classList.add('open');
       sidebarOverlay.classList.add('active');
@@ -784,7 +823,9 @@
       sidebarOverlay.classList.remove('active');
     });
 
-    // Dropdown toggle
+    /**
+     * Dropdown toggle for user menu
+     */
     userProfile.addEventListener('click', (e) => {
       e.stopPropagation();
       dropdown.classList.toggle('active');
@@ -794,7 +835,13 @@
       dropdown.classList.remove('active');
     });
 
-    // Format date
+    // ==================== UTILITY FUNCTIONS ====================
+    
+    /**
+     * Format date to readable format (e.g., "Monday, January 15")
+     * @param {string} dateStr - Date string to format
+     * @returns {string} Formatted date string
+     */
     function formatDate(dateStr) {
       const date = new Date(dateStr);
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -802,49 +849,130 @@
       return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}`;
     }
 
+    /**
+     * Format time to 24-hour format (e.g., "14:30")
+     * @param {string} dateStr - Date/time string to format
+     * @returns {string} Formatted time string
+     */
     function formatTime(dateStr) {
       const date = new Date(dateStr);
       return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
     }
 
-    // Render dashboard
-    function renderDashboard() {
-      // Update user info
-      document.getElementById('userName').textContent = mockUser.username;
-      document.getElementById('headerUserName').textContent = mockUser.username;
-      const initial = mockUser.username[0].toUpperCase();
+    /**
+     * Get user initials from name
+     * @param {string} name - Full name
+     * @returns {string} Initials (first letter or first two letters)
+     */
+    function getInitials(name) {
+      if (!name) return '?';
+      const parts = name.split(' ');
+      if (parts.length >= 2) {
+        return parts[0][0].toUpperCase() + parts[1][0].toUpperCase();
+      }
+      return name[0].toUpperCase();
+    }
+
+    // ==================== API COMMUNICATION ====================
+    
+    /**
+     * Fetch data from API endpoint
+     * @param {string} url - API endpoint URL
+     * @returns {Promise<Object>} Parsed JSON response
+     * @throws {Error} If request fails
+     */
+    async function fetchData(url) {
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Add authorization header if token is configured
+      if (API_CONFIG.authToken) {
+        headers['Authorization'] = `Bearer ${API_CONFIG.authToken}`;
+      }
+
+      const response = await fetch(url, { headers });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
+    }
+
+    // ==================== RENDER FUNCTIONS ====================
+    
+    /**
+     * Render user profile information in header and hero section
+     * @param {Object} profileData - User profile data from API
+     */
+    function renderUserProfile(profileData) {
+      const userName = profileData.username || 'User';
+      const userId = profileData.id || 'N/A';
+      const initial = getInitials(userName);
+
+      // Update header
+      document.getElementById('userName').textContent = userName;
+      document.getElementById('headerUserName').textContent = userName;
       document.getElementById('headerAvatar').textContent = initial;
+      
+      // Update hero section
       document.getElementById('heroAvatar').textContent = initial;
-      document.getElementById('patientId').textContent = mockUser.id;
-
+      document.getElementById('patientId').textContent = userId;
+      
       // Update health data
-      document.getElementById('bloodType').textContent = mockHealthData.bloodType;
-      document.getElementById('insuranceProvider').textContent = mockHealthData.insuranceProvider;
+      document.getElementById('bloodType').textContent = profileData.bloodType || 'Not specified';
+      document.getElementById('insuranceProvider').textContent = profileData.insuranceProvider || 'Not specified';
+    }
 
-      // Render appointments
+    /**
+     * Render appointments list
+     * @param {Array} appointments - Array of appointment objects
+     */
+    function renderAppointments(appointments) {
       const appointmentsList = document.getElementById('appointmentsList');
-      const filteredAppointments = mockAppointments.filter(apt => apt.status === 'BOOKED');
+      
+      // Filter only booked appointments
+      const bookedAppointments = appointments.filter(apt => 
+        apt.status === 'BOOKED' || apt.status === 'booked'
+      );
 
-      if (filteredAppointments.length > 0) {
-        appointmentsList.innerHTML = filteredAppointments.map((apt, index) => `
-          <div class="appointment-item" style="animation-delay: ${200 + index * 50}ms">
-            <div class="doctor-avatar">
-              ${apt.doctor.firstname[0]}${apt.doctor.lastname[0]}
-            </div>
-            <div class="appointment-details">
-              <div class="appointment-header">
-                <div>
-                  <p class="doctor-name">Dr. ${apt.doctor.firstname} ${apt.doctor.lastname}</p>
-                  <p class="appointment-date">${formatDate(apt.date)}</p>
+      if (bookedAppointments.length > 0) {
+        appointmentsList.innerHTML = bookedAppointments.map((apt, index) => {
+          const doctorName = apt.doctor ? 
+            `Dr. ${apt.doctor.firstname || ''} ${apt.doctor.lastname || ''}`.trim() : 
+            'Doctor';
+          const doctorInitials = apt.doctor ? 
+            getInitials(`${apt.doctor.firstname} ${apt.doctor.lastname}`) : 
+            'D';
+
+          return `
+            <div class="appointment-item" style="animation-delay: ${200 + index * 50}ms">
+              <div class="doctor-avatar">
+                ${doctorInitials}
+              </div>
+              <div class="appointment-details">
+                <div class="appointment-header">
+                  <div>
+                    <p class="doctor-name">${doctorName}</p>
+                    <p class="appointment-date">${formatDate(apt.date)}</p>
+                  </div>
+                  <span class="appointment-time">${formatTime(apt.startTime || apt.start_time)}</span>
                 </div>
-                <span class="appointment-time">${formatTime(apt.startTime)}</span>
               </div>
             </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       } else {
+        // Show empty state
         appointmentsList.innerHTML = `
           <div class="empty-state">
+            <div class="empty-icon">
+              <i data-lucide="calendar" style="width: 32px; height: 32px;"></i>
+            </div>
+            <h4>No Appointments Yet</h4>
+            <p>You don't have any upcoming appointments scheduled at the moment.</p>
+                      <div class="empty-state">
             <div class="empty-icon">
               <i data-lucide="calendar" style="width: 32px; height: 32px;"></i>
             </div>
@@ -854,49 +982,50 @@
         `;
       }
 
-      // Render emergency info
-      const infoList = document.getElementById('infoList');
-      const infoItems = [
-        {
-          title: 'Primary Contact',
-          content: [mockHealthData.emergencyContactName, mockHealthData.emergencyContactNumber],
-          icon: 'users'
-        },
-        {
-          title: 'Blood Type',
-          content: [mockHealthData.bloodType],
-          icon: 'activity'
-        },
-        {
-          title: 'Insurance Details',
-          content: [`Provider: ${mockHealthData.insuranceProvider}`, `Policy: ${mockHealthData.policyNumber}`],
-          icon: 'file-text'
-        },
-        {
-          title: 'Allergies & Conditions',
-          content: [mockHealthData.allergies, mockHealthData.chronicConditions],
-          icon: 'alert-circle'
-        }
-      ];
+      // Re-render lucide icons after DOM update
+      lucide.createIcons();
+    }
 
-      infoList.innerHTML = infoItems.map((item, index) => `
-        <div class="info-item" style="animation-delay: ${350 + index * 50}ms">
-          <div class="info-icon">
-            <i data-lucide="${item.icon}" style="width: 20px; height: 20px;"></i>
-          </div>
-          <div class="info-content">
-            <h4>${item.title}</h4>
-            ${item.content.map(line => `<p>${line}</p>`).join('')}
-          </div>
-        </div>
-      `).join('');
+    // ==================== INITIALIZATION ====================
 
-      // Reinitialize icons
-      if (typeof lucide !== 'undefined') {
+    /**
+     * Initialize dashboard – fetch profile & appointments
+     */
+    async function initDashboard() {
+      try {
+        loading.style.display = 'flex';
+        errorContainer.style.display = 'none';
+        app.style.display = 'none';
+
+        // Fetch profile & appointments in parallel
+        const [profileData, appointmentsData] = await Promise.all([
+          fetchData(API_CONFIG.profileEndpoint),
+          fetchData(API_CONFIG.appointmentsEndpoint)
+        ]);
+
+        // Render data
+        renderUserProfile(profileData);
+        renderAppointments(appointmentsData);
+
+        // Show app
+        loading.style.display = 'none';
+        app.style.display = 'block';
+
+        // Initialize icons
         lucide.createIcons();
+
+      } catch (error) {
+        console.error(error);
+
+        loading.style.display = 'none';
+        errorContainer.style.display = 'flex';
+        errorMessage.textContent =
+          'Failed to load dashboard data. Please try again later.';
       }
     }
+
+    // ==================== START APP ====================
+    document.addEventListener('DOMContentLoaded', initDashboard);
   </script>
 </body>
-
 </html>

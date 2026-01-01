@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Patient Profile</title>
+  <!-- Google Fonts - Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- ==================== STYLES ==================== -->
   <style>
+    /* ==================== GLOBAL RESET ==================== */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    /* ==================== BASE STYLES ==================== */
     body {
       font-family: 'Poppins', sans-serif;
       background: #f9fafb;
@@ -23,20 +29,23 @@
       min-height: 100vh;
     }
 
-    /* Sidebar */
+    /* ==================== SIDEBAR STYLES ==================== */
+    /* Sidebar positioned fixed on left, initially hidden on mobile */
     .sidebar {
       position: fixed;
       left: -256px;
+      /* Hidden by default on mobile */
       top: 0;
       width: 256px;
       height: 100vh;
       background: white;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
       transition: left 0.3s ease;
       z-index: 30;
       padding: 20px;
     }
 
+    /* Sidebar visible state */
     .sidebar.open {
       left: 0;
     }
@@ -67,11 +76,12 @@
       color: #0d9488;
     }
 
+    /* Sidebar overlay for mobile - darkens background when sidebar is open */
     .sidebar-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.2);
+      background: rgba(0, 0, 0, 0.2);
       backdrop-filter: blur(4px);
       z-index: 20;
     }
@@ -80,14 +90,15 @@
       display: block;
     }
 
-    /* Main Content */
+    /* ==================== MAIN CONTENT AREA ==================== */
     .main-content {
       flex: 1;
       overflow: auto;
       padding: 16px;
     }
 
-    /* Loading */
+    /* ==================== LOADING STATE ==================== */
+    /* Centered loading spinner with animation */
     .loading {
       display: flex;
       flex-direction: column;
@@ -97,6 +108,7 @@
       gap: 16px;
     }
 
+    /* Rotating spinner animation */
     .spinner {
       width: 64px;
       height: 64px;
@@ -106,6 +118,7 @@
       animation: spin 1s linear infinite;
     }
 
+    /* Pulsing loading text */
     .loading-text {
       color: #374151;
       font-weight: 500;
@@ -113,11 +126,57 @@
       animation: pulse 1.5s ease-in-out infinite;
     }
 
-    /* Profile Card */
+    /* ==================== ERROR STATE ==================== */
+    /* Error message displayed when API calls fail */
+    .error-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .error-container.active {
+      display: flex;
+    }
+
+    .error-icon {
+      width: 64px;
+      height: 64px;
+      color: #ef4444;
+    }
+
+    .error-message {
+      color: #374151;
+      font-weight: 500;
+      font-size: 1.125rem;
+      text-align: center;
+    }
+
+    /* Retry button styling */
+    .retry-button {
+      padding: 12px 24px;
+      background: #0d9488;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .retry-button:hover {
+      background: #0f766e;
+    }
+
+    /* ==================== PROFILE CARD ==================== */
+    /* Main profile card with fade-in animation */
     .profile-card {
       background: white;
       border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
       overflow: hidden;
       margin-bottom: 16px;
       opacity: 0;
@@ -127,15 +186,17 @@
     }
 
     .profile-card:hover {
-      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
     }
 
     .profile-content {
       display: flex;
       flex-direction: column;
+      /* Stacked on mobile */
     }
 
-    /* Left Column - Profile Info */
+    /* ==================== PROFILE LEFT SECTION ==================== */
+    /* Left column with gradient background - contains avatar and basic info */
     .profile-left {
       background: linear-gradient(to bottom, #14b8a6, #0d9488);
       padding: 24px;
@@ -157,7 +218,7 @@
       border-radius: 50%;
       background: white;
       padding: 4px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     }
 
     .profile-avatar img {
@@ -195,7 +256,7 @@
     .profile-info-item {
       display: flex;
       align-items: center;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       padding: 12px;
       backdrop-filter: blur(8px);
@@ -215,11 +276,13 @@
       white-space: nowrap;
     }
 
-    /* Right Column - Details */
+    /* ==================== PROFILE RIGHT SECTION ==================== */
+    /* Right column - detailed personal and health information */
     .profile-right {
       padding: 24px;
     }
 
+    /* Section header with icon and title */
     .section-header {
       display: flex;
       align-items: center;
@@ -239,13 +302,16 @@
       color: #1f2937;
     }
 
+    /* Grid layout for info boxes */
     .info-grid {
       display: grid;
       grid-template-columns: 1fr;
+      /* Single column on mobile */
       gap: 16px;
       margin-bottom: 24px;
     }
 
+    /* Individual info box styling */
     .info-box {
       background: #f9fafb;
       border-radius: 8px;
@@ -254,9 +320,10 @@
     }
 
     .info-box:hover {
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
 
+    /* Label and value styling */
     .info-label {
       font-size: 0.875rem;
       color: #6b7280;
@@ -268,35 +335,41 @@
       color: #1f2937;
     }
 
+    /* Visual divider between sections */
     .divider {
       border-top: 1px solid #e5e7eb;
       padding-top: 24px;
       margin-top: 24px;
     }
 
-    /* Health Details Card */
+    /* ==================== HEALTH DETAILS CARD ==================== */
+    /* Separate card for detailed health information */
     .health-details-card {
       background: white;
       border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
       overflow: hidden;
       padding: 24px;
       opacity: 0;
       transform: translateY(16px);
       animation: fadeInUp 0.5s ease forwards 0.3s;
+      /* Delayed animation */
       transition: box-shadow 0.3s;
     }
 
     .health-details-card:hover {
-      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
     }
 
+    /* Grid for health information boxes */
     .health-grid {
       display: grid;
       grid-template-columns: 1fr;
+      /* Single column on mobile */
       gap: 16px;
     }
 
+    /* Individual health info box */
     .health-box {
       background: #f9fafb;
       border-radius: 8px;
@@ -305,7 +378,7 @@
     }
 
     .health-box:hover {
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
 
     .health-box h3 {
@@ -315,6 +388,7 @@
       font-size: 0.875rem;
     }
 
+    /* List styling for allergies, conditions, medications */
     .health-box ul {
       list-style: disc;
       padding-left: 20px;
@@ -335,11 +409,12 @@
       color: #6b7280;
     }
 
+    /* Pulsing heart icon animation */
     .pulse-icon {
       animation: pulse 2s ease-in-out infinite;
     }
 
-    /* Footer */
+    /* ==================== FOOTER ==================== */
     .footer {
       text-align: center;
       color: #6b7280;
@@ -347,29 +422,45 @@
       margin: 16px 0 24px;
     }
 
-    /* Animations */
+    /* ==================== ANIMATIONS ==================== */
+    /* Fade in and slide up animation */
     @keyframes fadeInUp {
       from {
         opacity: 0;
         transform: translateY(16px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
+    /* Spinning animation for loader */
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
+    /* Pulse animation for loading text and icons */
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
     }
 
-    /* Responsive */
+    /* ==================== RESPONSIVE DESIGN ==================== */
+    /* Tablet styles (768px and above) */
     @media (min-width: 768px) {
+
+      /* Profile card side-by-side layout */
       .profile-content {
         flex-direction: row;
       }
@@ -382,6 +473,7 @@
         width: 66.667%;
       }
 
+      /* Two columns for info grids */
       .info-grid {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -391,37 +483,62 @@
       }
     }
 
+    /* Desktop styles (1024px and above) */
     @media (min-width: 1024px) {
+
+      /* Show sidebar by default on desktop */
       .sidebar {
         left: 0;
       }
 
+      /* Add left margin to main content to account for sidebar */
       .main-content {
         margin-left: 256px;
       }
 
+      /* Three columns for health grid on large screens */
       .health-grid {
         grid-template-columns: repeat(3, 1fr);
       }
     }
   </style>
 </head>
+
 <body>
+  <!-- ==================== LOADING SCREEN ==================== -->
+  <!-- Displayed while fetching data from API -->
   <div id="loading" class="loading">
     <div class="spinner"></div>
     <p class="loading-text">Loading profile...</p>
   </div>
 
+  <!-- ==================== ERROR SCREEN ==================== -->
+  <!-- Displayed when API calls fail -->
+  <div id="error" class="error-container">
+    <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+    <p class="error-message" id="errorMessage">Failed to load profile data</p>
+    <button class="retry-button" onclick="loadProfileData()">Retry</button>
+  </div>
+
+  <!-- ==================== MAIN APPLICATION ==================== -->
+  <!-- Hidden until data is loaded -->
   <div id="app" class="container" style="display: none;">
+    <!-- Sidebar overlay (for mobile) -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    
-      <aside class="sidebar" id="sidebar">
-      <h2 style="font-size: 1.5rem; font-weight: 700; color: #0d9488; margin-bottom: 24px;">patient portal</h2>
+
+    <!-- ==================== SIDEBAR NAVIGATION ==================== -->
+    <aside class="sidebar" id="sidebar">
+      <h2>patient portal</h2>
       <nav>
-        <a href="/patient/dashboard/" style="display: block; padding: 12px; color: #0d9488; background: #f0fdfa; border-radius: 8px; margin-bottom: 8px; text-decoration: none; font-weight: 500;">Dashboard</a>
-        <a href="/patient/appointments/" style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Appointments</a>
-        <a href="#" style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Medical Records</a>
-        <a href="/patient/profile/" style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Profile</a>
+        <a href="/patient/dashboard/" class="active">Dashboard</a>
+        <a href="/patient/appointments/">Appointments</a>
+        <a href="#">Medical Records</a>
+        <a href="/patient/profile/">Profile</a>
       </nav>
     </aside>
 
@@ -432,41 +549,67 @@
           <div class="profile-left">
             <div class="profile-avatar-wrapper">
               <div class="profile-avatar">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6upkc6jjdNBwfdiHyTHtOv0M4C2YHf4nmCQ&s" alt="Profile" id="profileImage">
+                <img src="https://ui-avatars.com/api/?name=Patient&size=128&background=0d9488&color=fff" alt="Profile"
+                  id="profileImage">
               </div>
               <div class="profile-badge">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
               </div>
             </div>
 
-            <h1 class="profile-name" id="profileName">John Doe</h1>
+            <h1 class="profile-name" id="profileName">Loading...</h1>
 
             <div class="profile-info">
               <div class="profile-info-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                <span id="profileEmail">john.doe@email.com</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+                <span id="profileEmail">Loading...</span>
               </div>
 
               <div class="profile-info-item" id="contactItem" style="display: none;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
                 <span id="profileContact"></span>
               </div>
 
               <div class="profile-info-item" id="addressItem" style="display: none;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
                 <span id="profileAddress"></span>
               </div>
 
               <div class="profile-info-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                <span id="memberSince">Member since Jan 1, 2024</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                  <line x1="16" x2="16" y1="2" y2="6" />
+                  <line x1="8" x2="8" y1="2" y2="6" />
+                  <line x1="3" x2="21" y1="10" y2="10" />
+                </svg>
+                <span id="memberSince">Loading...</span>
               </div>
             </div>
           </div>
 
           <div class="profile-right">
             <div class="section-header">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
               <h2>Personal Information</h2>
             </div>
 
@@ -484,7 +627,11 @@
 
             <div class="divider">
               <div class="section-header">
-                <svg class="pulse-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                <svg class="pulse-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                </svg>
                 <h2>Health Summary</h2>
               </div>
 
@@ -517,7 +664,11 @@
       <!-- Detailed Health Information -->
       <div class="health-details-card">
         <div class="section-header">
-          <svg class="pulse-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          <svg class="pulse-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+          </svg>
           <h2>Detailed Health Information</h2>
         </div>
 
@@ -540,17 +691,22 @@
           <div class="health-box">
             <h3>Insurance Details</h3>
             <div id="insuranceDetails">
-              <p class="detail-line"><span class="detail-label">Provider:</span> <span id="insuranceProvider">Not specified</span></p>
-              <p class="detail-line"><span class="detail-label">Policy #:</span> <span id="policyNumber">Not specified</span></p>
-              <p class="detail-line"><span class="detail-label">Valid:</span> <span id="policyDates">Not specified</span></p>
+              <p class="detail-line"><span class="detail-label">Provider:</span> <span id="insuranceProvider">Not
+                  specified</span></p>
+              <p class="detail-line"><span class="detail-label">Policy #:</span> <span id="policyNumber">Not
+                  specified</span></p>
+              <p class="detail-line"><span class="detail-label">Valid:</span> <span id="policyDates">Not
+                  specified</span></p>
             </div>
           </div>
 
           <div class="health-box">
             <h3>Emergency Contact</h3>
             <div id="emergencyDetails">
-              <p class="detail-line"><span class="detail-label">Name:</span> <span id="emergencyName">Not specified</span></p>
-              <p class="detail-line"><span class="detail-label">Phone:</span> <span id="emergencyPhone">Not specified</span></p>
+              <p class="detail-line"><span class="detail-label">Name:</span> <span id="emergencyName">Not
+                  specified</span></p>
+              <p class="detail-line"><span class="detail-label">Phone:</span> <span id="emergencyPhone">Not
+                  specified</span></p>
             </div>
           </div>
 
@@ -573,133 +729,246 @@
       </div>
     </div>
   </div>
-
   <script>
-    // Mock data
-    const mockProfileData = {
-      id: 12345,
-      username: 'John Doe',
-      email: 'john.doe@email.com',
-      contact: '+1 (555) 123-4567',
-      address: '123 Main Street, New York, NY 10001',
-      gender: 'Male',
-      age: 35,
-      createdAt: '2024-01-15T10:00:00Z'
+    // ==================== API CONFIGURATION ====================
+    // Replace this URL with your actual API endpoint
+    const API_CONFIG = {
+      profileEndpoint: 'http://127.0.0.1:8000/api/patient/profile/',
+      authToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY3MjkyMjU4LCJpYXQiOjE3NjcyODg2NTgsImp0aSI6IjAxMzQ4OTgyM2FmYTQ1YzFhNGEyZWU5MmUzNGQzYjQ2IiwidXNlcl9pZCI6IjEyIn0.6I5CyRQSl2Ptdm_2IIr5S6IbLlYoKkRb5gj03ZmfuPA'  // Set authentication token here if required (e.g., 'your-token-here')
     };
 
-    const mockHealthData = {
-      healthStatus: 'Good',
-      bloodType: 'O+',
-      insuranceProvider: 'Blue Cross Blue Shield',
-      policyNumber: 'BCBS-123456',
-      policyStartDate: '2024-01-01',
-      policyEndDate: '2024-12-31',
-      emergencyContactName: 'Jane Doe',
-      emergencyContactNumber: '+1 (555) 987-6543',
-      allergies: ['Penicillin', 'Peanuts'],
-      chronicConditions: ['Hypertension'],
-      medicationHistory: ['Lisinopril 10mg', 'Aspirin 81mg'],
-      familyMedicalHistory: 'Father had heart disease, mother has diabetes',
-      additionalNotes: 'Patient is physically active and follows a healthy diet.'
-    };
-
-    // DOM elements
+    // ==================== DOM ELEMENT REFERENCES ====================
     const loading = document.getElementById('loading');
+    const errorContainer = document.getElementById('error');
+    const errorMessage = document.getElementById('errorMessage');
     const app = document.getElementById('app');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-    // Format date
+    // ==================== UTILITY FUNCTIONS ====================
+
+    /**
+     * Format date string to localized date format
+     * @param {string} dateStr - Date string to format
+     * @returns {string} Formatted date or 'Not specified'
+     */
     function formatDate(dateStr) {
       if (!dateStr) return 'Not specified';
-      return new Date(dateStr).toLocaleDateString();
+      try {
+        return new Date(dateStr).toLocaleDateString();
+      } catch (e) {
+        return 'Invalid date';
+      }
     }
 
-    // Render list items
+    /**
+     * Convert array of items into HTML unordered list
+     * @param {Array} items - Array of items to render
+     * @returns {string} HTML string of list or 'None'
+     */
+
     function renderListItems(items) {
-      if (!items || items.length === 0) return 'None';
+      // If null or undefined
+      if (!items) return 'None';
+
+      // If backend sends string (very common)
+      if (typeof items === 'string') {
+        return items;
+      }
+
+      // If backend sends object instead of array
+      if (!Array.isArray(items)) {
+        console.error('Expected array but got:', items);
+        return 'None';
+      }
+
+      // If array is empty
+      if (items.length === 0) return 'None';
+
       const ul = document.createElement('ul');
+
       items.forEach(item => {
         const li = document.createElement('li');
         li.textContent = item;
         ul.appendChild(li);
       });
+
       return ul.outerHTML;
     }
 
-    // Populate profile data
-    function populateProfile() {
-      // Profile info
-      document.getElementById('profileName').textContent = mockProfileData.username;
-      document.getElementById('profileEmail').textContent = mockProfileData.email;
-      
-      if (mockProfileData.contact) {
+
+    // ==================== POPULATE UI WITH DATA ====================
+
+    /**
+     * Populate all profile data into the UI
+     * @param {Object} data - Profile data object from API
+     */
+    function populateProfile(data) {
+      // ========== Profile Image ==========
+      // Use provided image or generate avatar with initials
+      if (data.profileImage) {
+        document.getElementById('profileImage').src = data.profileImage;
+      } else if (data.username) {
+        document.getElementById('profileImage').src =
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username)}&size=128&background=0d9488&color=fff`;
+      }
+
+      // ========== Basic Profile Info ==========
+      document.getElementById('profileName').textContent = data.username || 'Not specified';
+      document.getElementById('profileEmail').textContent = data.email || 'Not specified';
+
+      // Show contact number if available
+      if (data.contact) {
         document.getElementById('contactItem').style.display = 'flex';
-        document.getElementById('profileContact').textContent = mockProfileData.contact;
+        document.getElementById('profileContact').textContent = data.contact;
       }
-      
-      if (mockProfileData.address) {
+
+      // Show address if available
+      if (data.address) {
         document.getElementById('addressItem').style.display = 'flex';
-        document.getElementById('profileAddress').textContent = mockProfileData.address;
+        document.getElementById('profileAddress').textContent = data.address;
       }
-      
-      document.getElementById('memberSince').textContent = `Member since ${formatDate(mockProfileData.createdAt)}`;
-      
-      // Personal info
-      document.getElementById('gender').textContent = mockProfileData.gender || 'Not specified';
-      document.getElementById('age').textContent = mockProfileData.age ? `${mockProfileData.age} years` : 'Not specified';
-      
-      // Health summary
-      document.getElementById('healthStatus').textContent = mockHealthData.healthStatus || 'Not specified';
-      document.getElementById('bloodType').textContent = mockHealthData.bloodType || 'Not specified';
-      document.getElementById('insurance').textContent = mockHealthData.insuranceProvider || 'Not specified';
-      document.getElementById('emergencyContact').textContent = mockHealthData.emergencyContactName || 'Not specified';
-      
-      // Detailed health info
-      document.getElementById('allergies').innerHTML = renderListItems(mockHealthData.allergies);
-      document.getElementById('chronicConditions').innerHTML = renderListItems(mockHealthData.chronicConditions);
-      document.getElementById('medications').innerHTML = renderListItems(mockHealthData.medicationHistory);
-      
-      // Insurance details
-      document.getElementById('insuranceProvider').textContent = mockHealthData.insuranceProvider || 'Not specified';
-      document.getElementById('policyNumber').textContent = mockHealthData.policyNumber || 'Not specified';
-      document.getElementById('policyDates').textContent = `${formatDate(mockHealthData.policyStartDate)} - ${formatDate(mockHealthData.policyEndDate)}`;
-      
-      // Emergency contact details
-      document.getElementById('emergencyName').textContent = mockHealthData.emergencyContactName || 'Not specified';
-      document.getElementById('emergencyPhone').textContent = mockHealthData.emergencyContactNumber || 'Not specified';
-      
-      // Family history
-      if (mockHealthData.familyMedicalHistory) {
+
+      // Display member since date
+      document.getElementById('memberSince').textContent =
+        `Member since ${formatDate(data.createdAt)}`;
+
+      // ========== Personal Information ==========
+      document.getElementById('gender').textContent = data.gender || 'Not specified';
+      document.getElementById('age').textContent =
+        data.age ? `${data.age} years` : 'Not specified';
+
+      // ========== Health Summary ==========
+      document.getElementById('healthStatus').textContent =
+        data.healthStatus || 'Not specified';
+      document.getElementById('bloodType').textContent =
+        data.bloodType || 'Not specified';
+      document.getElementById('insurance').textContent =
+        data.insuranceProvider || 'Not specified';
+      document.getElementById('emergencyContact').textContent =
+        data.emergencyContactName || 'Not specified';
+
+      // ========== Detailed Health Information ==========
+      // Render lists for allergies, conditions, and medications
+      document.getElementById('allergies').innerHTML =
+        renderListItems(data.allergies);
+      document.getElementById('chronicConditions').innerHTML =
+        renderListItems(data.chronicConditions);
+      document.getElementById('medications').innerHTML =
+        renderListItems(data.medicationHistory);
+
+      // ========== Insurance Details ==========
+      document.getElementById('insuranceProvider').textContent =
+        data.insuranceProvider || 'Not specified';
+      document.getElementById('policyNumber').textContent =
+        data.policyNumber || 'Not specified';
+      document.getElementById('policyDates').textContent =
+        `${formatDate(data.policyStartDate)} - ${formatDate(data.policyEndDate)}`;
+
+      // ========== Emergency Contact Details ==========
+      document.getElementById('emergencyName').textContent =
+        data.emergencyContactName || 'Not specified';
+      document.getElementById('emergencyPhone').textContent =
+        data.emergencyContactNumber || 'Not specified';
+
+      // ========== Optional: Family Medical History ==========
+      // Only display if data exists
+      if (data.familyMedicalHistory) {
         document.getElementById('familyHistoryBox').style.display = 'block';
-        document.getElementById('familyHistory').textContent = mockHealthData.familyMedicalHistory;
+        document.getElementById('familyHistory').textContent =
+          data.familyMedicalHistory;
       }
-      
-      // Additional notes
-      if (mockHealthData.additionalNotes) {
+
+      // ========== Optional: Additional Notes ==========
+      // Only display if data exists
+      if (data.additionalNotes) {
         document.getElementById('additionalNotesBox').style.display = 'block';
-        document.getElementById('additionalNotes').textContent = mockHealthData.additionalNotes;
+        document.getElementById('additionalNotes').textContent =
+          data.additionalNotes;
       }
-      
-      // Last updated
-      document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+
+      // ========== Last Updated Timestamp ==========
+      document.getElementById('lastUpdated').textContent =
+        new Date().toLocaleString();
     }
 
-    // Simulate loading
-    setTimeout(() => {
-      loading.style.display = 'none';
-      app.style.display = 'flex';
-      populateProfile();
-    }, 1000);
+    // ==================== API COMMUNICATION ====================
 
-    // Sidebar toggle
+    /**
+     * Fetch data from API endpoint
+     * @param {string} url - API endpoint URL
+     * @returns {Promise<Object>} Parsed JSON response
+     * @throws {Error} If request fails
+     */
+    async function fetchData(url) {
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+
+      // Add authorization header if token is configured
+      if (API_CONFIG.authToken) {
+        headers['Authorization'] = `Bearer ${API_CONFIG.authToken}`;
+      }
+
+      const response = await fetch(url, { headers });
+
+      // Check if response is successful
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    }
+
+    // ==================== MAIN LOAD FUNCTION ====================
+
+    /**
+     * Load profile data from API and populate UI
+     * Handles loading states and error display
+     */
+    async function loadProfileData() {
+      try {
+        // ========== Show Loading State ==========
+        errorContainer.classList.remove('active');
+        loading.style.display = 'flex';
+        app.style.display = 'none';
+
+        // ========== Fetch Profile Data ==========
+        const profileData = await fetchData(API_CONFIG.profileEndpoint);
+
+        // ========== Populate UI with Data ==========
+        populateProfile(profileData);
+
+        // ========== Show Application ==========
+        loading.style.display = 'none';
+        app.style.display = 'flex';
+
+      } catch (error) {
+        // ========== Handle Errors ==========
+        console.error('Error loading profile:', error);
+
+        // Show error state to user
+        loading.style.display = 'none';
+        errorMessage.textContent =
+          `Failed to load profile data: ${error.message}`;
+        errorContainer.classList.add('active');
+      }
+    }
+
+    // ==================== EVENT LISTENERS ====================
+
+    /**
+     * Sidebar overlay click - close sidebar on mobile
+     */
     sidebarOverlay.addEventListener('click', () => {
       sidebar.classList.remove('open');
       sidebarOverlay.classList.remove('active');
     });
 
-    // Mobile menu (would need a button in real implementation)
-    // For now, clicking overlay closes sidebar
+    // ==================== INITIALIZE APPLICATION ====================
+    // Load profile data when page loads
+    loadProfileData();
   </script>
 </body>
+
 </html>
