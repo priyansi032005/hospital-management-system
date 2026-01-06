@@ -167,6 +167,38 @@
             padding: 1.5rem;
         }
 
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        .refresh-btn {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #14b8a6;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background-color: #0f9384;
+        }
+
         /* Loading State */
         .loading-container {
             background: white;
@@ -447,7 +479,7 @@
                 <span>Appointments</span>
             </a>
 
-            <a href="#patients" class="menu-item active">
+            <a href="/doctor/patientlist/" class="menu-item active">
                 <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="9" cy="7" r="4"></circle>
@@ -482,6 +514,11 @@
 
             <!-- Main Content -->
             <main class="main-content">
+                <div class="page-header">
+                    <h1 class="page-title">My Patients</h1>
+                    <p class="page-subtitle">View and manage your patient list</p>
+                </div>
+
                 <!-- Loading State -->
                 <div id="loadingState" class="loading-container" style="display: none;">
                     <div class="loading-skeleton">
@@ -497,6 +534,7 @@
                 <!-- Error State -->
                 <div id="errorState" class="error-container" style="display: none;">
                     <p class="error-text" id="errorMessage"></p>
+                    <button class="refresh-btn" onclick="fetchPatients()">Retry</button>
                 </div>
 
                 <!-- Empty State -->
@@ -524,14 +562,14 @@
                                 </tr>
                             </thead>
                             <tbody id="patientTableBody">
-                                <!-- Patients will be inserted here dynamically -->
+                                <!-- Patients will be inserted here dynamically from backend -->
                             </tbody>
                         </table>
                     </div>
 
                     <!-- Mobile Cards View -->
                     <div class="mobile-cards" id="mobileCards">
-                        <!-- Mobile cards will be inserted here dynamically -->
+                        <!-- Mobile cards will be inserted here dynamically from backend -->
                     </div>
                 </div>
             </main>
@@ -539,212 +577,193 @@
     </div>
 
     <script>
-        // Sidebar Functions
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-        }
+/* ==================== CONFIG ==================== */
+const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_ENDPOINT = `${API_BASE_URL}/api/doctors/patients/`;
+const REFRESH_ENDPOINT = `${API_BASE_URL}/api/token/refresh/`;
 
-        function closeSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-        }
+/* ==================== SIDEBAR FUNCTIONS ==================== */
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
 
-        // Handle menu item clicks
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                if (window.innerWidth < 768) {
-                    closeSidebar();
-                }
-            });
+    if (!sidebar || !overlay) return;
+
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    if (!sidebar || !overlay) return;
+
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+}
+
+document.querySelectorAll('.menu-item').forEach(item => {
+    item.addEventListener('click', () => {
+        if (window.innerWidth < 768) closeSidebar();
+    });
+});
+
+window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768) closeSidebar();
+});
+
+/* ==================== AUTH FETCH FUNCTION ==================== */
+async function fetchWithAuth(url, options = {}, retry = false) {
+    let accessToken = localStorage.getItem('access');
+    if (!accessToken) throw new Error('Access token missing. Please login.');
+
+    const res = await fetch(url, {
+        ...options,
+        headers: {
+            ...(options.headers || {}),
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    // If token expired → refresh
+    if (res.status === 401 && !retry) {
+        const refreshToken = localStorage.getItem('refresh');
+        if (!refreshToken) throw new Error('Session expired. Please login again.');
+
+        const refreshRes = await fetch(REFRESH_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: refreshToken })
         });
 
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 768) {
-                closeSidebar();
-            }
-        });
+        if (!refreshRes.ok) throw new Error('Refresh token expired. Please login again.');
 
-        // Helper function to get cookie
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
+        const refreshData = await refreshRes.json();
+        localStorage.setItem('access', refreshData.access);
+        if (refreshData.refresh) localStorage.setItem('refresh', refreshData.refresh);
+
+        return fetchWithAuth(url, options, true);
+    }
+
+    if (!res.ok) {
+        if (res.status === 403) throw new Error('Forbidden – not a doctor');
+        throw new Error(`Error ${res.status}`);
+    }
+
+    return await res.json();
+}
+
+/* ==================== FETCH PATIENTS ==================== */
+async function fetchPatients() {
+    const loadingState = document.getElementById('loadingState');
+    const errorState = document.getElementById('errorState');
+    const emptyState = document.getElementById('emptyState');
+    const tableContainer = document.getElementById('tableContainer');
+
+    loadingState.style.display = 'block';
+    errorState.style.display = 'none';
+    emptyState.style.display = 'none';
+    tableContainer.style.display = 'none';
+
+    try {
+        const patients = await fetchWithAuth(API_ENDPOINT);
+
+        loadingState.style.display = 'none';
+
+        if (!Array.isArray(patients) || patients.length === 0) {
+            emptyState.style.display = 'block';
+            return;
         }
 
-        // Fetch patients function
-        async function fetchPatients() {
-            const loadingState = document.getElementById('loadingState');
-            const errorState = document.getElementById('errorState');
-            const emptyState = document.getElementById('emptyState');
-            const tableContainer = document.getElementById('tableContainer');
+        tableContainer.style.display = 'block';
+        renderPatients(patients);
 
-            // Show loading state
-            loadingState.style.display = 'block';
-            errorState.style.display = 'none';
-            emptyState.style.display = 'none';
-            tableContainer.style.display = 'none';
+    } catch (error) {
+        console.error(error);
+        loadingState.style.display = 'none';
+        errorState.style.display = 'block';
+        document.getElementById('errorMessage').textContent = error.message;
+    }
+}
 
-            try {
-                // Get authentication token from cookie
-                const token = getCookie('token');
-                
-                if (!token) {
-                    throw new Error('Authentication token not found. Please log in.');
-                }
+/* ==================== RENDER PATIENTS ==================== */
+function renderPatients(patients) {
+    const tableBody = document.getElementById('patientTableBody');
+    const mobileCards = document.getElementById('mobileCards');
 
-                // Make API call to fetch patients
-                const response = await fetch('http://127.0.0.1:8000/api/doctor/patients', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include'
-                });
+    tableBody.innerHTML = '';
+    mobileCards.innerHTML = '';
 
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        throw new Error('Unauthorized. Please log in again.');
-                    } else if (response.status === 403) {
-                        throw new Error('Access denied. You do not have permission to view patients.');
-                    } else {
-                        throw new Error(`Failed to fetch patients: ${response.status} ${response.statusText}`);
-                    }
-                }
+    patients.forEach(patient => {
+        const name = patient.name || patient.full_name || patient.user?.username || 'Unknown';
+        const email = patient.email || patient.user?.email || 'N/A';
+        const appointmentCount = patient.appointment_count || 0;
+        const initials = getInitials(name);
 
-                const data = await response.json();
-                
-                // Extract patients array from response
-                const patients = data.data || data.patients || data || [];
-
-                // Hide loading state
-                loadingState.style.display = 'none';
-
-                // Check if patients array is empty
-                if (!Array.isArray(patients) || patients.length === 0) {
-                    emptyState.style.display = 'block';
-                    return;
-                }
-
-                // Show table and render patients
-                tableContainer.style.display = 'block';
-                renderPatients(patients);
-
-            } catch (error) {
-                console.error('Error fetching patients:', error);
-                
-                // Show error state
-                loadingState.style.display = 'none';
-                errorState.style.display = 'block';
-                document.getElementById('errorMessage').textContent = 
-                    error.message || 'An error occurred while fetching patients. Please try again later.';
-            }
-        }
-
-        // Render patients in table and mobile cards
-        function renderPatients(patients) {
-            const tableBody = document.getElementById('patientTableBody');
-            const mobileCards = document.getElementById('mobileCards');
-
-            // Clear existing content
-            tableBody.innerHTML = '';
-            mobileCards.innerHTML = '';
-
-            patients.forEach(patient => {
-                // Get patient initials for avatar
-                const initials = getInitials(patient.name || 'Unknown');
-                
-                // Get appointment count
-                const appointmentCount = patient.numberOfAppointments || patient.appointments || 0;
-                
-                // Get prescription
-                const prescription = patient.prescription || 'No prescription';
-                
-                // Get email
-                const email = patient.email || 'No email';
-
-                // Create table row
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>
-                        <div class="patient-cell">
-                            <div class="avatar">
-                                <span class="avatar-text">${initials}</span>
-                            </div>
-                            <div class="patient-info">
-                                <div class="patient-name">${escapeHtml(patient.name || 'Unknown')}</div>
-                                <div class="patient-email">${escapeHtml(email)}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="hidden-lg">
-                        <span class="badge badge-teal">
-                            ${appointmentCount} visit${appointmentCount !== 1 ? 's' : ''}
-                        </span>
-                    </td>
-                    <td class="hidden-md">
-                        <span class="prescription-text">
-                            ${escapeHtml(prescription)}
-                        </span>
-                    </td>
-                    <td class="hidden-sm">
-                        <span class="badge badge-green">
-                            Active
-                        </span>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-
-                // Create mobile card
-                const card = document.createElement('div');
-                card.className = 'mobile-card';
-                card.innerHTML = `
-                    <div class="mobile-card-header">
-                        <div class="avatar">
-                            <span class="avatar-text">${initials}</span>
-                        </div>
-                        <div class="mobile-avatar-info">
-                            <div class="patient-name">${escapeHtml(patient.name || 'Unknown')}</div>
-                            <div class="patient-email">${escapeHtml(email)}</div>
-                        </div>
+        // Table Row
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div class="patient-cell">
+                    <div class="avatar">${initials}</div>
+                    <div>
+                        <div class="patient-name">${escapeHtml(name)}</div>
+                        <div class="patient-email">${escapeHtml(email)}</div>
                     </div>
-                    <div class="mobile-card-footer">
-                        <span class="badge badge-teal">
-                            ${appointmentCount} visit${appointmentCount !== 1 ? 's' : ''}
-                        </span>
-                        <span class="badge badge-green">
-                            Active
-                        </span>
-                    </div>
-                `;
-                mobileCards.appendChild(card);
-            });
-        }
+                </div>
+            </td>
+            <td>
+                <span class="badge badge-teal">
+                    ${appointmentCount} visit${appointmentCount !== 1 ? 's' : ''}
+                </span>
+            </td>
+            <td>
+                <span class="badge badge-green">Active</span>
+            </td>
+        `;
+        tableBody.appendChild(row);
 
-        // Helper function to get initials from name
-        function getInitials(name) {
-            const parts = name.trim().split(' ');
-            if (parts.length >= 2) {
-                return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-            }
-            return name.charAt(0).toUpperCase();
-        }
+        // Mobile Card
+        const card = document.createElement('div');
+        card.className = 'mobile-card';
+        card.innerHTML = `
+            <div class="mobile-card-header">
+                <div class="avatar">${initials}</div>
+                <div>
+                    <div class="patient-name">${escapeHtml(name)}</div>
+                    <div class="patient-email">${escapeHtml(email)}</div>
+                </div>
+            </div>
+            <div class="mobile-card-footer">
+                <span class="badge badge-teal">
+                    ${appointmentCount} visit${appointmentCount !== 1 ? 's' : ''}
+                </span>
+                <span class="badge badge-green">Active</span>
+            </div>
+        `;
+        mobileCards.appendChild(card);
+    });
+}
 
-        // Helper function to escape HTML to prevent XSS
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+/* ==================== HELPERS ==================== */
+function getInitials(name) {
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return name[0].toUpperCase();
+}
 
-        // Initialize on page load
-        window.addEventListener('DOMContentLoaded', fetchPatients);
-    </script>
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/* ==================== INIT ==================== */
+window.addEventListener('DOMContentLoaded', () => {
+    fetchPatients();
+});
+</script>
 </body>
 </html>

@@ -7,7 +7,7 @@
   <title>Patient Dashboard</title>
   <!-- Google Fonts - Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+
   <!-- ==================== STYLES ==================== -->
   <style>
     /* ==================== GLOBAL RESET ==================== */
@@ -32,7 +32,8 @@
     /* ==================== SIDEBAR STYLES ==================== */
     .sidebar {
       position: fixed;
-      left: -256px; /* Hidden by default on mobile */
+      left: -256px;
+      /* Hidden by default on mobile */
       top: 0;
       width: 256px;
       height: 100vh;
@@ -664,7 +665,12 @@
 
   <!-- ==================== ERROR SCREEN ==================== -->
   <div id="error" class="error-container">
-    <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
     <p class="error-message" id="errorMessage">Failed to load dashboard data</p>
     <button class="retry-button" onclick="loadDashboardData()">Retry</button>
   </div>
@@ -681,9 +687,9 @@
           style="display: block; padding: 12px; color: #0d9488; background: #f0fdfa; border-radius: 8px; margin-bottom: 8px; text-decoration: none; font-weight: 500;">Dashboard</a>
         <a href="/patient/appointments/"
           style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Appointments</a>
-        <a href="#"
+        <!-- <a href="/patient/medical-records/"
           style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Medical
-          Records</a>
+          Records</a> -->
         <a href="/patient/profile/"
           style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Profile</a>
       </nav>
@@ -773,16 +779,14 @@
     </div>
   </div>
 
-  <!-- Lucide Icons Library -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <!-- ==================== JAVASCRIPT ==================== -->
   <script>
     // ==================== API CONFIGURATION ====================
     const API_CONFIG = {
       profileEndpoint: 'http://127.0.0.1:8000/api/patient/profile/',
       appointmentsEndpoint: 'http://127.0.0.1:8000/api/patient/appointments/',
-      authToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY3MjkyMjU4LCJpYXQiOjE3NjcyODg2NTgsImp0aSI6IjAxMzQ4OTgyM2FmYTQ1YzFhNGEyZWU5MmUzNGQzYjQ2IiwidXNlcl9pZCI6IjEyIn0.6I5CyRQSl2Ptdm_2IIr5S6IbLlYoKkRb5gj03ZmfuPA'  // Set your auth token here if required
+      tokenRefreshEndpoint: 'http://127.0.0.1:8000/api/token/refresh/', // JWT refresh endpoint
+      timeout: 10000
     };
 
     // ==================== DOM ELEMENT REFERENCES ====================
@@ -797,22 +801,190 @@
     const userProfile = document.getElementById('userProfile');
     const dropdown = document.getElementById('dropdown');
 
-    // ==================== EVENT LISTENERS ====================
-    
-    /**
-     * Scroll handler - add shadow to header when scrolled
-     */
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 0) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
-      }
-    });
+    // ==================== UTILITY FUNCTIONS ====================
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}`;
+    }
 
-    /**
-     * Sidebar toggle for mobile
-     */
+    function formatTime(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    }
+
+    function getInitials(name) {
+      if (!name) return '?';
+      const parts = name.split(' ');
+      return parts.length >= 2 ? parts[0][0].toUpperCase() + parts[1][0].toUpperCase() : name[0].toUpperCase();
+    }
+
+
+
+
+    async function fetchWithAuth(url, options = {}) {
+      console.log(`Fetching ${url} with auth...`);
+      const token = localStorage.getItem("access");
+      console.log("Using access token:", token);
+
+      if (!token) {
+        throw new Error("JWT access token not found");
+      }
+
+      options.headers = {
+        ...options.headers,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+
+      let response = await fetch(url, options);
+
+      // 🔁 Auto refresh token
+      if (response.status === 401) {
+        const refreshToken = localStorage.getItem("refresh");
+
+        if (!refreshToken) {
+          localStorage.clear();
+          window.location.href = "/login/";
+          return;
+        }
+
+        const refreshResponse = await fetch(
+          "http://127.0.0.1:8000/api/token/refresh/",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refresh: refreshToken }),
+          }
+        );
+
+        if (!refreshResponse.ok) {
+          localStorage.clear();
+          window.location.href = "/login/";
+          return;
+        }
+
+        const refreshData = await refreshResponse.json();
+        localStorage.setItem("access", refreshData.access);
+
+        // Retry original request
+        options.headers.Authorization = `Bearer ${refreshData.access}`;
+        response = await fetch(url, options);
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error ${response.status}`);
+      }
+
+      return response.json();
+    }
+
+
+    // ==================== API FUNCTIONS ====================
+    async function fetchProfile() {
+      console.log("Fetching profile data...");
+      return fetchWithAuth(API_CONFIG.profileEndpoint);
+    }
+
+    async function fetchAppointments() {
+      console.log("Fetching appointments data...");
+      return fetchWithAuth(API_CONFIG.appointmentsEndpoint);
+    }
+
+    // ==================== RENDER FUNCTIONS ====================
+    function renderUserProfile(profileData) {
+      const userName =
+        profileData.username ||
+        profileData.user?.username ||
+        profileData.email ||
+        'User';
+      const userId = profileData.id || 'N/A';
+      const initial = getInitials(userName);
+      console.log("Rendering user profile for:", userName);
+      console.log(profileData);
+
+      document.getElementById('userName').textContent = userName;
+      document.getElementById('headerUserName').textContent = userName;
+      document.getElementById('headerAvatar').textContent = initial;
+
+      document.getElementById('heroAvatar').textContent = initial;
+      document.getElementById('patientId').textContent = userId;
+
+      document.getElementById('bloodType').textContent = profileData.bloodType || 'Not specified';
+      document.getElementById('insuranceProvider').textContent = profileData.insuranceProvider || 'Not specified';
+    }
+
+    function renderAppointments(appointments) {
+      const appointmentsList = document.getElementById('appointmentsList');
+      const bookedAppointments = appointments.filter(a => a.status.toLowerCase() === 'booked');
+
+      if (bookedAppointments.length > 0) {
+        appointmentsList.innerHTML = bookedAppointments.map((apt, index) => {
+          const doctorName = apt.doctor ? `Dr. ${apt.doctor.firstname || ''} ${apt.doctor.lastname || ''}`.trim() : 'Doctor';
+          const doctorInitials = apt.doctor ? getInitials(`${apt.doctor.firstname} ${apt.doctor.lastname}`) : 'D';
+
+          return `
+          <div class="appointment-item" style="animation-delay: ${200 + index * 50}ms">
+            <div class="doctor-avatar">${doctorInitials}</div>
+            <div class="appointment-details">
+              <div class="appointment-header">
+                <div>
+                  <p class="doctor-name">${doctorName}</p>
+                  <p class="appointment-date">${formatDate(apt.date)}</p>
+                </div>
+                <span class="appointment-time">${formatTime(apt.startTime || apt.start_time)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+        }).join('');
+      } else {
+        appointmentsList.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon"><i data-lucide="calendar" style="width:32px;height:32px;"></i></div>
+          <h4>No Appointments Yet</h4>
+          <p>You don't have any upcoming appointments scheduled at the moment.</p>
+        </div>
+      `;
+      }
+
+      lucide.createIcons();
+    }
+
+    // ==================== INITIALIZATION ====================
+    async function initDashboard() {
+      try {
+        loading.style.display = 'flex';
+        errorContainer.style.display = 'none';
+        app.style.display = 'none';
+
+        const [profileData, appointmentsData] = await Promise.all([
+          fetchProfile(),
+          fetchAppointments()
+        ]);
+
+        renderUserProfile(profileData);
+        renderAppointments(appointmentsData);
+
+        loading.style.display = 'none';
+        app.style.display = 'block';
+
+        lucide.createIcons();
+      } catch (error) {
+        console.error(error);
+        loading.style.display = 'none';
+        errorContainer.style.display = 'flex';
+        errorMessage.textContent = 'Failed to load dashboard. Please login again.';
+      }
+    }
+
+    // ==================== START APP ====================
+    document.addEventListener('DOMContentLoaded', initDashboard);
+
+    // ==================== HEADER & SIDEBAR INTERACTIONS ====================
+    window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 0));
+
     menuBtn.addEventListener('click', () => {
       sidebar.classList.add('open');
       sidebarOverlay.classList.add('active');
@@ -823,209 +995,13 @@
       sidebarOverlay.classList.remove('active');
     });
 
-    /**
-     * Dropdown toggle for user menu
-     */
     userProfile.addEventListener('click', (e) => {
       e.stopPropagation();
       dropdown.classList.toggle('active');
     });
 
-    document.addEventListener('click', () => {
-      dropdown.classList.remove('active');
-    });
-
-    // ==================== UTILITY FUNCTIONS ====================
-    
-    /**
-     * Format date to readable format (e.g., "Monday, January 15")
-     * @param {string} dateStr - Date string to format
-     * @returns {string} Formatted date string
-     */
-    function formatDate(dateStr) {
-      const date = new Date(dateStr);
-      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}`;
-    }
-
-    /**
-     * Format time to 24-hour format (e.g., "14:30")
-     * @param {string} dateStr - Date/time string to format
-     * @returns {string} Formatted time string
-     */
-    function formatTime(dateStr) {
-      const date = new Date(dateStr);
-      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-    }
-
-    /**
-     * Get user initials from name
-     * @param {string} name - Full name
-     * @returns {string} Initials (first letter or first two letters)
-     */
-    function getInitials(name) {
-      if (!name) return '?';
-      const parts = name.split(' ');
-      if (parts.length >= 2) {
-        return parts[0][0].toUpperCase() + parts[1][0].toUpperCase();
-      }
-      return name[0].toUpperCase();
-    }
-
-    // ==================== API COMMUNICATION ====================
-    
-    /**
-     * Fetch data from API endpoint
-     * @param {string} url - API endpoint URL
-     * @returns {Promise<Object>} Parsed JSON response
-     * @throws {Error} If request fails
-     */
-    async function fetchData(url) {
-      const headers = {
-        'Content-Type': 'application/json'
-      };
-      
-      // Add authorization header if token is configured
-      if (API_CONFIG.authToken) {
-        headers['Authorization'] = `Bearer ${API_CONFIG.authToken}`;
-      }
-
-      const response = await fetch(url, { headers });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      return await response.json();
-    }
-
-    // ==================== RENDER FUNCTIONS ====================
-    
-    /**
-     * Render user profile information in header and hero section
-     * @param {Object} profileData - User profile data from API
-     */
-    function renderUserProfile(profileData) {
-      const userName = profileData.username || 'User';
-      const userId = profileData.id || 'N/A';
-      const initial = getInitials(userName);
-
-      // Update header
-      document.getElementById('userName').textContent = userName;
-      document.getElementById('headerUserName').textContent = userName;
-      document.getElementById('headerAvatar').textContent = initial;
-      
-      // Update hero section
-      document.getElementById('heroAvatar').textContent = initial;
-      document.getElementById('patientId').textContent = userId;
-      
-      // Update health data
-      document.getElementById('bloodType').textContent = profileData.bloodType || 'Not specified';
-      document.getElementById('insuranceProvider').textContent = profileData.insuranceProvider || 'Not specified';
-    }
-
-    /**
-     * Render appointments list
-     * @param {Array} appointments - Array of appointment objects
-     */
-    function renderAppointments(appointments) {
-      const appointmentsList = document.getElementById('appointmentsList');
-      
-      // Filter only booked appointments
-      const bookedAppointments = appointments.filter(apt => 
-        apt.status === 'BOOKED' || apt.status === 'booked'
-      );
-
-      if (bookedAppointments.length > 0) {
-        appointmentsList.innerHTML = bookedAppointments.map((apt, index) => {
-          const doctorName = apt.doctor ? 
-            `Dr. ${apt.doctor.firstname || ''} ${apt.doctor.lastname || ''}`.trim() : 
-            'Doctor';
-          const doctorInitials = apt.doctor ? 
-            getInitials(`${apt.doctor.firstname} ${apt.doctor.lastname}`) : 
-            'D';
-
-          return `
-            <div class="appointment-item" style="animation-delay: ${200 + index * 50}ms">
-              <div class="doctor-avatar">
-                ${doctorInitials}
-              </div>
-              <div class="appointment-details">
-                <div class="appointment-header">
-                  <div>
-                    <p class="doctor-name">${doctorName}</p>
-                    <p class="appointment-date">${formatDate(apt.date)}</p>
-                  </div>
-                  <span class="appointment-time">${formatTime(apt.startTime || apt.start_time)}</span>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      } else {
-        // Show empty state
-        appointmentsList.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">
-              <i data-lucide="calendar" style="width: 32px; height: 32px;"></i>
-            </div>
-            <h4>No Appointments Yet</h4>
-            <p>You don't have any upcoming appointments scheduled at the moment.</p>
-                      <div class="empty-state">
-            <div class="empty-icon">
-              <i data-lucide="calendar" style="width: 32px; height: 32px;"></i>
-            </div>
-            <h4>No Appointments Yet</h4>
-            <p>You don't have any upcoming appointments scheduled at the moment.</p>
-          </div>
-        `;
-      }
-
-      // Re-render lucide icons after DOM update
-      lucide.createIcons();
-    }
-
-    // ==================== INITIALIZATION ====================
-
-    /**
-     * Initialize dashboard – fetch profile & appointments
-     */
-    async function initDashboard() {
-      try {
-        loading.style.display = 'flex';
-        errorContainer.style.display = 'none';
-        app.style.display = 'none';
-
-        // Fetch profile & appointments in parallel
-        const [profileData, appointmentsData] = await Promise.all([
-          fetchData(API_CONFIG.profileEndpoint),
-          fetchData(API_CONFIG.appointmentsEndpoint)
-        ]);
-
-        // Render data
-        renderUserProfile(profileData);
-        renderAppointments(appointmentsData);
-
-        // Show app
-        loading.style.display = 'none';
-        app.style.display = 'block';
-
-        // Initialize icons
-        lucide.createIcons();
-
-      } catch (error) {
-        console.error(error);
-
-        loading.style.display = 'none';
-        errorContainer.style.display = 'flex';
-        errorMessage.textContent =
-          'Failed to load dashboard data. Please try again later.';
-      }
-    }
-
-    // ==================== START APP ====================
-    document.addEventListener('DOMContentLoaded', initDashboard);
+    document.addEventListener('click', () => dropdown.classList.remove('active'));
   </script>
 </body>
+
 </html>

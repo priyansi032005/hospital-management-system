@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Dashboard</title>
+    <title>Create Prescription - Doctor Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -18,126 +18,331 @@
             color: #1f2937;
         }
 
-        .dashboard-container {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
         }
 
         /* Sidebar */
         .sidebar {
-            width: 256px;
-            background-color: #ffffff;
-            border-right: 1px solid #e5e7eb;
             position: fixed;
             left: 0;
             top: 0;
-            height: 100vh;
+            bottom: 0;
+            width: 256px;
+            background-color: white;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            transform: translateX(-100%);
             transition: transform 0.3s ease;
-            z-index: 1000;
-            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        @media (min-width: 768px) {
+            .sidebar {
+                transform: translateX(0);
+            }
         }
 
         .sidebar-header {
-            padding: 1.5rem;
+            padding: 1.5rem 1rem;
             border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
-        .sidebar-header h2 {
-            font-size: 1.25rem;
+        .logo-text {
+            font-size: 1.5rem;
             font-weight: 700;
             color: #14b8a6;
         }
 
         .close-btn {
-            display: none;
+            position: absolute;
+            top: 1.5rem;
+            right: 1rem;
+            padding: 0.5rem;
             background: none;
             border: none;
-            font-size: 2rem;
-            color: #6b7280;
             cursor: pointer;
-            line-height: 1;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
         }
 
-        .sidebar-nav {
+        .close-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        @media (min-width: 768px) {
+            .close-btn {
+                display: none;
+            }
+        }
+
+        .menu-container {
             padding: 1rem;
         }
 
-        .nav-item {
+        .menu-item {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            width: 100%;
             padding: 0.75rem 1rem;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
             border-radius: 0.5rem;
-            color: #6b7280;
             text-decoration: none;
+            color: #6b7280;
             transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-item:hover {
-            background-color: #f3f4f6;
-            color: #1f2937;
-        }
-
-        .nav-item.active {
-            background-color: #14b8a6;
-            color: #ffffff;
-        }
-
-        .nav-icon {
-            width: 1.25rem;
-            height: 1.25rem;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 256px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .menu-toggle {
-            display: none;
-            height: 2.5rem;
-            width: 2.5rem;
-            border-radius: 9999px;
             border: none;
             background: none;
             cursor: pointer;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s;
-            margin: 1rem;
+            font-size: 0.95rem;
         }
 
-        .menu-toggle:hover {
-            background-color: #f3f4f6;
+        .menu-item:hover {
+            background-color: #f0fdfa;
+            color: #14b8a6;
+        }
+
+        .menu-item.active {
+            background-color: #14b8a6;
+            color: white;
+        }
+
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            min-height: 100vh;
         }
 
         .content-wrapper {
             flex: 1;
-            overflow-y: auto;
-            padding: 0 1rem 2rem;
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
         }
 
-        .content-inner {
-            max-width: 1280px;
+        @media (min-width: 768px) {
+            .content-wrapper {
+                margin-left: 256px;
+            }
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            padding: 1.25rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+            display: block;
+        }
+
+        .mobile-menu-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        @media (min-width: 768px) {
+            .mobile-menu-btn {
+                display: none;
+            }
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 1.5rem;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
-        /* Loading */
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.25rem;
+            padding-right: 2.5rem;
+            appearance: none;
+        }
+
+        .form-help {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        /* Patient Info Display */
+        .patient-info-box {
+            background-color: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .patient-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #ccfbf1;
+        }
+
+        .patient-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .patient-info-label {
+            font-weight: 500;
+            color: #0f766e;
+        }
+
+        .patient-info-value {
+            color: #115e59;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: #14b8a6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0d9488;
+        }
+
+        .btn-primary:disabled {
+            background-color: #99f6e4;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+
+        /* Loading State */
         .loading-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 16rem;
+            padding: 3rem;
         }
 
         .spinner {
@@ -150,595 +355,429 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
-        /* Profile Card */
-        .profile-card {
-            margin-top: 1.5rem;
-            background-color: #ffffff;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .profile-header {
-            height: 6.25rem;
-            background: linear-gradient(to right, #14b8a6, #0d9488);
-            position: relative;
-        }
-
-        .profile-header::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            opacity: 0.1;
-            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.1) 10px, rgba(255,255,255,.1) 20px);
-        }
-
-        .profile-content {
-            padding: 1.5rem;
-        }
-
-        .profile-info {
-            padding: 0 1rem 1.5rem;
-            position: relative;
-        }
-
-        .profile-flex {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .profile-avatar {
-            height: 7rem;
-            width: 7rem;
-            border: 4px solid #ffffff;
-            border-radius: 1rem;
-            background-color: #ffffff;
-            margin-top: -4rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .profile-avatar img {
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-        }
-
-        .profile-avatar-placeholder {
-            height: 100%;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(to bottom right, #ccfbf1, #99f6e4);
-            color: #0f766e;
-            font-size: 3rem;
-            font-weight: 700;
-        }
-
-        .profile-details {
-            flex: 1;
-            padding-top: 0.5rem;
-        }
-
-        .profile-header-row {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .profile-name {
-            font-size: 1.875rem;
-            font-weight: 700;
-            color: #1f2937;
-        }
-
-        .specialty-badge {
-            background-color: #ccfbf1;
-            color: #0d9488;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            width: fit-content;
-        }
-
-        .profile-info-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
-            color: #4b5563;
-        }
-
-        .info-icon {
-            height: 1.25rem;
-            width: 1.25rem;
-            margin-right: 0.75rem;
-            color: #14b8a6;
-        }
-
-        .info-text {
-            color: #374151;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .stat-card {
-            background-color: #ffffff;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
-            transition: box-shadow 0.2s;
-        }
-
-        .stat-card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .stat-info {
-            flex: 1;
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: #6b7280;
-            font-weight: 500;
-        }
-
-        .stat-value {
-            font-size: 1.875rem;
-            font-weight: 700;
-            color: #1f2937;
-            margin-top: 0.25rem;
-        }
-
-        .stat-icon-wrapper {
-            height: 3rem;
-            width: 3rem;
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
             border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 0.75rem;
         }
 
-        .stat-icon {
-            height: 1.5rem;
-            width: 1.5rem;
+        .alert-success {
+            background-color: #d1fae5;
+            border: 1px solid #6ee7b7;
+            color: #065f46;
         }
 
-        .bg-blue-50 { background-color: #eff6ff; }
-        .text-blue-500 { color: #3b82f6; }
-        .bg-green-50 { background-color: #f0fdf4; }
-        .text-green-500 { color: #22c55e; }
-        .bg-yellow-50 { background-color: #fefce8; }
-        .text-yellow-500 { color: #eab308; }
-        .bg-purple-50 { background-color: #faf5ff; }
-        .text-purple-500 { color: #a855f7; }
-
-        .rating-stars {
-            display: flex;
-            align-items: center;
-            margin-top: 0.25rem;
-            gap: 0.5rem;
+        .alert-error {
+            background-color: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
         }
 
-        .star-group {
-            display: flex;
+        .alert-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            flex-shrink: 0;
         }
 
-        .star {
-            width: 1rem;
-            height: 1rem;
-        }
-
-        /* Schedule */
-        .schedule-section {
-            margin-top: 1.5rem;
-        }
-
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 1rem;
-        }
-
-        .schedule-card {
-            background-color: #ffffff;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            padding: 2rem;
-        }
-
-        .schedule-placeholder {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: #6b7280;
-        }
-
-        .schedule-placeholder-icon {
-            width: 4rem;
-            height: 4rem;
-            color: #d1d5db;
-            margin: 0 auto 1rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 1023px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .close-btn {
-                display: block;
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .menu-toggle {
-                display: flex;
-            }
-        }
-
-        @media (min-width: 640px) {
-            .profile-flex {
-                flex-direction: row;
-            }
-
-            .profile-avatar {
-                height: 9rem;
-                width: 9rem;
-                margin-top: -5rem;
-            }
-
-            .profile-header-row {
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-            }
-
-            .profile-info-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 768px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .content-wrapper {
-                padding: 0 1.5rem 2rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar">
-            <div class="sidebar-header">
-                <h2>Doctor Portal</h2>
-                <button id="closeSidebar" class="close-btn">&times;</button>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="#" class="nav-item active">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
-                    </svg>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                    <span>Appointments</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    <span>Patients</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    <span>Schedule</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                    <span>Settings</span>
-                </a>
-            </nav>
-        </aside>
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-        <!-- Main -->
-        <div class="main-content">
-            <button id="menuToggle" class="menu-toggle">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 1.5rem; height: 1.5rem; color: #374151;">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-text">Doctor Portal</span>
+            <button class="close-btn" onclick="closeSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <nav class="menu-container">
+            <a href="/doctor/dashboard" class="menu-item">
+                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/doctor/appointments" class="menu-item">
+                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>Appointments</span>
+            </a>
+
+            <a href="/doctor/patients" class="menu-item">
+                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span>Patients</span>
+            </a>
+
+            <a href="/doctor/prescriptions" class="menu-item active">
+                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span>Prescriptions</span>
+            </a>
+
+            <a href="/doctor/settings" class="menu-item">
+                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="content-wrapper">
+            <!-- Mobile Menu Button -->
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
                     <line x1="3" y1="6" x2="21" y2="6"></line>
                     <line x1="3" y1="18" x2="21" y2="18"></line>
                 </svg>
             </button>
 
-            <main class="content-wrapper">
-                <div class="content-inner">
-                    <div id="loadingState" class="loading-container">
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="page-header">
+                    <h1 class="page-title">Create Prescription</h1>
+                    <p class="page-subtitle">Create a new prescription for your patient</p>
+                </div>
+
+                <!-- Success Alert -->
+                <div id="successAlert" class="alert alert-success hidden">
+                    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <span id="successMessage">Prescription created successfully!</span>
+                </div>
+
+                <!-- Error Alert -->
+                <div id="errorAlert" class="alert alert-error hidden">
+                    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    <span id="errorMessage">An error occurred. Please try again.</span>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="form-card" style="display: none;">
+                    <div class="loading-container">
                         <div class="spinner"></div>
                     </div>
+                </div>
 
-                    <div id="contentContainer" style="display: none;">
-                        <!-- Profile -->
-                        <div class="profile-card">
-                            <div class="profile-header"></div>
-                            <div class="profile-content">
-                                <div class="profile-info">
-                                    <div class="profile-flex">
-                                        <div class="profile-avatar">
-                                            <div class="profile-avatar-placeholder" id="avatarPlaceholder">D</div>
-                                        </div>
-                                        <div class="profile-details">
-                                            <div class="profile-header-row">
-                                                <h2 class="profile-name" id="doctorName">Dr. John Doe</h2>
-                                                <div class="specialty-badge">
-                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 1rem; height: 1rem;">
-                                                        <circle cx="12" cy="8" r="7"></circle>
-                                                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-                                                    </svg>
-                                                    <span id="doctorSpecialty">Cardiology</span>
-                                                </div>
-                                            </div>
-                                            <div class="profile-info-grid">
-                                                <div class="info-item">
-                                                    <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                                        <polyline points="22,6 12,13 2,6"></polyline>
-                                                    </svg>
-                                                    <span class="info-text" id="doctorEmail">doctor@example.com</span>
-                                                </div>
-                                                <div class="info-item">
-                                                    <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <circle cx="12" cy="12" r="10"></circle>
-                                                        <polyline points="12 6 12 12 16 14"></polyline>
-                                                    </svg>
-                                                    <span class="info-text" id="doctorExperience">10 years experience</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                <!-- Prescription Form -->
+                <div id="prescriptionForm" class="form-card">
+                    <form id="prescForm">
+                        <!-- Appointment Selection -->
+                        <div class="form-section">
+                            <h2 class="section-title">Appointment Details</h2>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="appointment">
+                                    Select Appointment <span class="required">*</span>
+                                </label>
+                                <select id="appointment" class="form-select" required>
+                                    <option value="">Loading appointments...</option>
+                                </select>
+                                <p class="form-help">Choose the appointment for which you want to create a prescription</p>
+                            </div>
+
+                            <!-- Patient Info Display -->
+                            <div id="patientInfoBox" class="patient-info-box hidden">
+                                <div class="patient-info-item">
+                                    <span class="patient-info-label">Patient Name:</span>
+                                    <span class="patient-info-value" id="patientName">-</span>
+                                </div>
+                                <div class="patient-info-item">
+                                    <span class="patient-info-label">Patient Email:</span>
+                                    <span class="patient-info-value" id="patientEmail">-</span>
+                                </div>
+                                <div class="patient-info-item">
+                                    <span class="patient-info-label">Appointment Date:</span>
+                                    <span class="patient-info-value" id="appointmentDate">-</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Stats -->
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-content">
-                                    <div class="stat-info">
-                                        <p class="stat-label">Today's Appointments</p>
-                                        <h3 class="stat-value" id="statAppointments">0</h3>
-                                    </div>
-                                    <div class="stat-icon-wrapper bg-blue-50">
-                                        <svg class="stat-icon text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                                        </svg>
-                                    </div>
-                                </div>
+                        <!-- Prescription Details -->
+                        <div class="form-section">
+                            <h2 class="section-title">Prescription Details</h2>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="medicines">
+                                    Medicines <span class="required">*</span>
+                                </label>
+                                <textarea 
+                                    id="medicines" 
+                                    class="form-textarea" 
+                                    placeholder="e.g., Azithromycin 500mg - 3 times/day&#10;Paracetamol 650mg - 2 times/day"
+                                    required
+                                ></textarea>
+                                <p class="form-help">List all medicines with dosage and frequency. Use a new line for each medicine.</p>
                             </div>
 
-                            <div class="stat-card">
-                                <div class="stat-content">
-                                    <div class="stat-info">
-                                        <p class="stat-label">Total Patients</p>
-                                        <h3 class="stat-value" id="statPatients">0</h3>
-                                    </div>
-                                    <div class="stat-icon-wrapper bg-green-50">
-                                        <svg class="stat-icon text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="9" cy="7" r="4"></circle>
-                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="stat-card">
-                                <div class="stat-content">
-                                    <div class="stat-info">
-                                        <p class="stat-label">Reviews</p>
-                                        <h3 class="stat-value" id="statReviews">0</h3>
-                                    </div>
-                                    <div class="stat-icon-wrapper bg-yellow-50">
-                                        <svg class="stat-icon text-yellow-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="stat-card">
-                                <div class="stat-content">
-                                    <div class="stat-info">
-                                        <p class="stat-label">Rating</p>
-                                        <div class="rating-stars">
-                                            <h3 class="stat-value" id="statRating">0.0</h3>
-                                            <div class="star-group" id="starGroup"></div>
-                                        </div>
-                                    </div>
-                                    <div class="stat-icon-wrapper bg-purple-50">
-                                        <svg class="stat-icon text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                        </svg>
-                                    </div>
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label" for="instructions">
+                                    Instructions <span class="required">*</span>
+                                </label>
+                                <textarea 
+                                    id="instructions" 
+                                    class="form-textarea" 
+                                    placeholder="e.g., Take before food and take with warm water. Complete the full course even if symptoms improve."
+                                    required
+                                ></textarea>
+                                <p class="form-help">Provide detailed instructions for the patient</p>
                             </div>
                         </div>
 
-                        <!-- Schedule -->
-                        <div class="schedule-section">
-                            <h2 class="section-title">Your Schedule</h2>
-                            <div class="schedule-card">
-                                <div class="schedule-placeholder">
-                                    <svg class="schedule-placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                                    </svg>
-                                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">No Schedule Available</h3>
-                                    <p style="color: #6b7280;">Your schedule will appear here once you set up your availability.</p>
-                                </div>
-                            </div>
+                        <!-- Form Actions -->
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                Create Prescription
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="1 4 1 10 7 10"></polyline>
+                                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                </svg>
+                                Reset
+                            </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </main>
         </div>
     </div>
 
-   <script>
-    const mockDoctor = {
-        firstname: "Sarah",
-        lastname: "Johnson",
-        email: "sarah.johnson@hospital.com",
-        specialty: "Cardiology",
-        experience: 12,
-        photo: null
-    };
+  <script>
+/* ==========================
+   CONFIG
+========================== */
+const API_BASE_URL = 'http://127.0.0.1:8000';
 
-    const sidebar = document.getElementById('sidebar');
-    const menuToggle = document.getElementById('menuToggle');
-    const closeSidebar = document.getElementById('closeSidebar');
-    const loadingState = document.getElementById('loadingState');
-    const contentContainer = document.getElementById('contentContainer');
+const API_ENDPOINTS = {
+    appointments: `${API_BASE_URL}/api/doctors/appointments/`,
+    patients: `${API_BASE_URL}/api/doctors/patients/`,
+    createPrescription: `${API_BASE_URL}/api/prescriptions/`
+};
 
-    menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
-    closeSidebar.addEventListener('click', () => sidebar.classList.remove('open'));
+let appointmentsData = [];
 
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 1024) sidebar.classList.remove('open');
+/* ==========================
+   AUTH TOKEN
+========================== */
+function getAuthToken() {
+    return localStorage.getItem('access_token'); // MANUAL TOKEN FOR NOW
+}
+
+/* ==========================
+   SIDEBAR
+========================== */
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('active');
+}
+
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('active');
+}
+
+window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768) closeSidebar();
+});
+
+/* ==========================
+   ALERTS
+========================== */
+function showAlert(type, message) {
+    const successAlert = document.getElementById('successAlert');
+    const errorAlert = document.getElementById('errorAlert');
+
+    if (type === 'success') {
+        document.getElementById('successMessage').textContent = message;
+        successAlert.classList.remove('hidden');
+        errorAlert.classList.add('hidden');
+        setTimeout(() => successAlert.classList.add('hidden'), 4000);
+    } else {
+        document.getElementById('errorMessage').textContent = message;
+        errorAlert.classList.remove('hidden');
+        successAlert.classList.add('hidden');
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ==========================
+   FETCH APPOINTMENTS
+========================== */
+async function fetchAppointments() {
+    const token = getAuthToken();
+    if (!token) {
+        showAlert('error', 'Please login again');
+        return;
+    }
+
+    try {
+        const response = await fetch(API_ENDPOINTS.appointments, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch appointments');
+
+        const data = await response.json();
+        appointmentsData = data;
+        populateAppointments(appointmentsData);
+
+    } catch (error) {
+        console.error(error);
+        showAlert('error', 'Unable to load appointments');
+    }
+}
+
+/* ==========================
+   POPULATE APPOINTMENTS
+========================== */
+function populateAppointments(appointments) {
+    const select = document.getElementById('appointment');
+    select.innerHTML = `<option value="">Select Appointment</option>`;
+
+    appointments.forEach(appt => {
+        const option = document.createElement('option');
+        option.value = appt.id;
+        option.textContent = `#${appt.id} - ${appt.patient_name} (${appt.date})`;
+        option.dataset.data = JSON.stringify(appt);
+        select.appendChild(option);
     });
+}
 
-    function generateRandomStats() {
-        return {
-            appointments: Math.floor(Math.random() * 20) + 5,
-            patients: Math.floor(Math.random() * 100) + 50,
-            reviews: Math.floor(Math.random() * 50) + 10,
-            rating: (Math.random() * 2 + 3).toFixed(1)
+/* ==========================
+   APPOINTMENT CHANGE
+========================== */
+document.getElementById('appointment').addEventListener('change', e => {
+    const selected = e.target.selectedOptions[0];
+    const box = document.getElementById('patientInfoBox');
+
+    if (!selected || !selected.dataset.data) {
+        box.classList.add('hidden');
+        return;
+    }
+
+    const data = JSON.parse(selected.dataset.data);
+
+    document.getElementById('patientName').textContent = data.patient_name || 'N/A';
+    document.getElementById('patientEmail').textContent = data.patient_email || 'N/A';
+    document.getElementById('appointmentDate').textContent = data.date || 'N/A';
+
+    box.classList.remove('hidden');
+});
+
+/* ==========================
+   SUBMIT PRESCRIPTION
+========================== */
+document.getElementById('prescForm').addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const token = getAuthToken();
+    if (!token) {
+        showAlert('error', 'Login required');
+        return;
+    }
+
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating...';
+
+    try {
+        const appointmentSelect = document.getElementById('appointment');
+        const selectedOption = appointmentSelect.selectedOptions[0];
+        const appointmentData = JSON.parse(selectedOption.dataset.data);
+
+        const payload = {
+            appointment: appointmentData.id,
+            patient: appointmentData.patient,
+            medicines: document.getElementById('medicines').value.trim(),
+            instructions: document.getElementById('instructions').value.trim()
         };
-    }
 
-    function renderStarRating(rating) {
-        const starGroup = document.getElementById('starGroup');
-        starGroup.innerHTML = '';
+        const response = await fetch(API_ENDPOINTS.createPrescription, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
 
-        const fullStars = Math.floor(rating);
-
-        for (let i = 0; i < 5; i++) {
-            const star = document.createElement('svg');
-            star.setAttribute('viewBox', '0 0 24 24');
-            star.setAttribute('fill', i < fullStars ? '#facc15' : 'none');
-            star.setAttribute('stroke', '#facc15');
-            star.setAttribute('stroke-width', '2');
-            star.classList.add('star');
-
-            star.innerHTML = `
-                <polygon points="12 2 15.09 8.26 22 9.27 
-                                 17 14.14 18.18 21.02 
-                                 12 17.77 5.82 21.02 
-                                 7 14.14 2 9.27 
-                                 8.91 8.26 12 2"></polygon>
-            `;
-
-            starGroup.appendChild(star);
+        if (!response.ok) {
+            const err = await response.json();
+            throw err;
         }
+
+        showAlert('success', 'Prescription created successfully');
+        document.getElementById('prescForm').reset();
+
+    } catch (error) {
+        console.error(error);
+        showAlert('error', 'Failed to create prescription');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Prescription';
     }
+});
 
-    function loadDoctorData() {
-        document.getElementById('doctorName').textContent =
-            `Dr. ${mockDoctor.firstname} ${mockDoctor.lastname}`;
-
-        document.getElementById('doctorEmail').textContent = mockDoctor.email;
-        document.getElementById('doctorSpecialty').textContent = mockDoctor.specialty;
-        document.getElementById('doctorExperience').textContent =
-            `${mockDoctor.experience} years experience`;
-
-        document.getElementById('avatarPlaceholder').textContent =
-            mockDoctor.firstname.charAt(0);
-
-        const stats = generateRandomStats();
-        document.getElementById('statAppointments').textContent = stats.appointments;
-        document.getElementById('statPatients').textContent = stats.patients;
-        document.getElementById('statReviews').textContent = stats.reviews;
-        document.getElementById('statRating').textContent = stats.rating;
-
-        renderStarRating(stats.rating);
-    }
-
-    // Simulate API loading
-    setTimeout(() => {
-        loadingState.style.display = 'none';
-        contentContainer.style.display = 'block';
-        loadDoctorData();
-    }, 1000);
+/* ==========================
+   INIT
+========================== */
+document.addEventListener('DOMContentLoaded', fetchAppointments);
 </script>
 </body>
 </html>

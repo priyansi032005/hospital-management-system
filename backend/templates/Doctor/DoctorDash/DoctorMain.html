@@ -2,9 +2,10 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Doctor Dashboard</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <style>
@@ -510,6 +511,17 @@
                     </svg>
                     <span>Appointments</span>
                 </a>
+                <a href="/doctor/prescriptions" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>Prescriptions</span>
+                </a>
+
                 <a href="/doctor/patientlist/" class="nav-item">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -544,6 +556,10 @@
 
             <main class="content-wrapper">
                 <div class="content-inner">
+                    <h1 id="welcomeText" style="font-size:1.5rem;font-weight:700;margin-bottom:1rem;">
+                        Welcome, Doctor
+                    </h1>
+
                     <!-- Loading State -->
                     <div id="loadingState" class="loading-container">
                         <div class="spinner"></div>
@@ -558,7 +574,7 @@
                     </div>
 
                     <!-- Content Container -->
-                    <div id="contentContainer" style="display: none;">
+                    <div id="contentContainer" style="display:none">
                         <!-- Doctor Profile Card -->
                         <div class="profile-card">
                             <div class="profile-header"></div>
@@ -570,8 +586,8 @@
                                         </div>
                                         <div class="profile-details">
                                             <div class="profile-header-row">
-                                                <h2 class="profile-name" id="doctorName">Loading...</h2>
-                                                <div class="specialty-badge">
+                                                <h2 class="profile-name" id="doctorName">-</h2>
+                                                <div class="specialty-badge" id="doctorSpecialty">
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                         stroke-width="2" style="width: 1rem; height: 1rem;">
                                                         <circle cx="12" cy="8" r="7"></circle>
@@ -692,9 +708,11 @@
                                         <line x1="8" y1="2" x2="8" y2="6"></line>
                                         <line x1="3" y1="10" x2="21" y2="10"></line>
                                     </svg>
-                                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                                    <h3
+                                        style="font-size: 1.125rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
                                         No Schedule Available</h3>
-                                    <p style="color: #6b7280;">Your schedule will appear here once you set up your availability.</p>
+                                    <p style="color: #6b7280;">Your schedule will appear here once you set up your
+                                        availability.</p>
                                 </div>
                             </div>
                         </div>
@@ -703,131 +721,180 @@
             </main>
         </div>
     </div>
-<script>
-const API_CONFIG = {
-    BASE_URL: 'http://127.0.0.1:8000/api/doctors/',
-    ENDPOINTS: {
-        DOCTOR_PROFILE: 'profile/'
-    },
-    TIMEOUT: 10000
-};
+    <script>
+        /* =====================================================
+           CONFIGURATION
+        ===================================================== */
+        const API_CONFIG = {
+            BASE_URL: "http://127.0.0.1:8000/api/doctors/",
+            ENDPOINTS: {
+                PROFILE: "profile/"
+            },
+            AUTH: {
+                REFRESH_URL: "http://127.0.0.1:8000/api/token/refresh/"
+            },
+            TIMEOUT: 10000
+        };
 
-/* ===========================
-   DOM ELEMENTS
-=========================== */
-const elements = {
-    sidebar: document.getElementById('sidebar'),
-    menuToggle: document.getElementById('menuToggle'),
-    closeSidebar: document.getElementById('closeSidebar'),
+        /* =====================================================
+           DOM ELEMENTS
+        ===================================================== */
+        const elements = {
+            sidebar: document.getElementById("sidebar"),
+            menuToggle: document.getElementById("menuToggle"),
+            closeSidebar: document.getElementById("closeSidebar"),
 
-    loadingState: document.getElementById('loadingState'),
-    errorState: document.getElementById('errorState'),
-    errorMessage: document.getElementById('errorMessage'),
-    contentContainer: document.getElementById('contentContainer'),
+            loadingState: document.getElementById("loadingState"),
+            errorState: document.getElementById("errorState"),
+            errorMessage: document.getElementById("errorMessage"),
+            contentContainer: document.getElementById("contentContainer"),
 
-    doctorName: document.getElementById('doctorName'),
-    doctorEmail: document.getElementById('doctorEmail'),
-    doctorSpecialty: document.getElementById('doctorSpecialty'),
-    doctorExperience: document.getElementById('doctorExperience'),
-    avatarPlaceholder: document.getElementById('avatarPlaceholder')
-};
+            welcomeText: document.getElementById("welcomeText"),
+            doctorName: document.getElementById("doctorName"),
+            doctorEmail: document.getElementById("doctorEmail"),
+            doctorSpecialty: document.getElementById("doctorSpecialty"),
+            doctorExperience: document.getElementById("doctorExperience"),
+            avatarPlaceholder: document.getElementById("avatarPlaceholder")
+        };
 
-/* ===========================
-   FETCH UTILITY
-=========================== */
-async function fetchWithTimeout(url) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
+        /* =====================================================
+           AUTH FETCH (WITH AUTO REFRESH)
+        ===================================================== */
+        async function fetchWithAuth(url, options = {}, isRetry = false) {
+            const accessToken = localStorage.getItem("access");
+            if (!accessToken) {
+                throw new Error("Access token missing");
+            }
 
-    try {
-        const response = await fetch(url, {
-            credentials: 'include',
-            signal: controller.signal
-        });
+            const fetchOptions = {
+                ...options,
+                headers: {
+                    ...(options.headers || {}),
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-Type": "application/json"
+                }
+            };
 
-        clearTimeout(timeout);
+            const response = await fetch(url, fetchOptions);
 
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+            // If access token expired → try refresh ONCE
+            if (response.status === 401 && !isRetry) {
+                const refreshToken = localStorage.getItem("refresh");
+                if (!refreshToken) throw new Error("Refresh token missing");
+
+                const refreshResponse = await fetch(API_CONFIG.AUTH.REFRESH_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ refresh: refreshToken })
+                });
+
+                if (!refreshResponse.ok) {
+                    throw new Error("Session expired");
+                }
+
+                const refreshData = await refreshResponse.json();
+
+                // Save new tokens
+                localStorage.setItem("access", refreshData.access);
+                if (refreshData.refresh) {
+                    localStorage.setItem("refresh", refreshData.refresh);
+                }
+                if (refreshData.role) {
+                    localStorage.setItem("role", refreshData.role);
+                }
+
+                // Retry original request ONCE
+                return fetchWithAuth(url, options, true);
+            }
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error ${response.status}`);
+            }
+
+            return await response.json();
         }
 
-        return await response.json();
-    } catch (error) {
-        clearTimeout(timeout);
-        throw error;
-    }
-}
+        /* =====================================================
+           API CALL
+        ===================================================== */
+        async function fetchDoctorProfile() {
+            const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.PROFILE;
+            return await fetchWithAuth(url);
+        }
 
-/* ===========================
-   API CALL
-=========================== */
-async function fetchDoctorProfile() {
-    const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.DOCTOR_PROFILE;
-    return await fetchWithTimeout(url);
-}
+        /* =====================================================
+           UI RENDER
+        ===================================================== */
+        function renderDoctorProfile(data) {
+            if (!elements.welcomeText || !elements.doctorName) {
+                console.error("Required dashboard DOM elements missing");
+                return;
+            }
 
-/* ===========================
-   UI RENDER
-=========================== */
-function renderDoctorProfile(data) {
-    elements.doctorName.textContent = data.name || 'Doctor';
-    elements.doctorEmail.textContent = data.email || '-';
-    elements.doctorSpecialty.textContent = data.specialization || '-';
-    elements.doctorExperience.textContent =
-        `${data.experience_years || 0} Years Experience`;
+            elements.welcomeText.textContent = `Welcome, Dr. ${data.name || "Doctor"}`;
+            elements.doctorName.textContent = data.name || "-";
+            elements.doctorEmail.textContent = data.email || "-";
+            elements.doctorSpecialty.textContent = data.specialization || "-";
+            elements.doctorExperience.textContent =
+                `${data.experience_years || 0} Years Experience`;
 
-    const firstLetter = data.name
-        ? data.name.charAt(0).toUpperCase()
-        : 'D';
+            elements.avatarPlaceholder.textContent =
+                data.name ? data.name.charAt(0).toUpperCase() : "D";
+        }
 
-    elements.avatarPlaceholder.textContent = firstLetter;
-}
+        /* =====================================================
+           ERROR HANDLING
+        ===================================================== */
+        function showError(message) {
+            if (elements.loadingState) elements.loadingState.style.display = "none";
+            if (elements.contentContainer) elements.contentContainer.style.display = "none";
+            if (elements.errorState) elements.errorState.style.display = "block";
+            if (elements.errorMessage) elements.errorMessage.textContent = message;
+        }
 
-/* ===========================
-   ERROR HANDLING
-=========================== */
-function showError(message) {
-    elements.loadingState.style.display = 'none';
-    elements.contentContainer.style.display = 'none';
-    elements.errorState.style.display = 'block';
-    elements.errorMessage.textContent = message;
-}
+        /* =====================================================
+           INITIAL LOAD
+        ===================================================== */
+        async function loadDashboard() {
+            try {
+                elements.loadingState.style.display = "flex";
+                elements.errorState.style.display = "none";
 
-/* ===========================
-   INITIAL LOAD
-=========================== */
-async function loadDashboard() {
-    try {
-        elements.loadingState.style.display = 'flex';
-        elements.errorState.style.display = 'none';
+                const profile = await fetchDoctorProfile();
+                renderDoctorProfile(profile);
 
-        const profile = await fetchDoctorProfile();
-        renderDoctorProfile(profile);
+                elements.loadingState.style.display = "none";
+                elements.contentContainer.style.display = "block";
 
-        elements.loadingState.style.display = 'none';
-        elements.contentContainer.style.display = 'block';
+            } catch (error) {
+                console.error("Dashboard error:", error);
+                showError("Session expired. Please login again.");
+                // Optional redirect:
+                // window.location.href = "/login.html";
+            }
+        }
 
-    } catch (error) {
-        showError('Unable to load doctor profile.');
-        console.error(error);
-    }
-}
+        /* =====================================================
+           SIDEBAR HANDLERS
+        ===================================================== */
+        if (elements.menuToggle && elements.sidebar) {
+            elements.menuToggle.addEventListener("click", () => {
+                elements.sidebar.classList.add("open");
+            });
+        }
 
-/* ===========================
-   SIDEBAR HANDLERS
-=========================== */
-elements.menuToggle.addEventListener('click', () => {
-    elements.sidebar.classList.add('open');
-});
+        if (elements.closeSidebar && elements.sidebar) {
+            elements.closeSidebar.addEventListener("click", () => {
+                elements.sidebar.classList.remove("open");
+            });
+        }
 
-elements.closeSidebar.addEventListener('click', () => {
-    elements.sidebar.classList.remove('open');
-});
+        /* =====================================================
+           START APP
+        ===================================================== */
+        document.addEventListener("DOMContentLoaded", loadDashboard);
+    </script>
 
-/* ===========================
-   START APP
-=========================== */
-document.addEventListener('DOMContentLoaded', loadDashboard);
-</script>
 </body>
+
 </html>

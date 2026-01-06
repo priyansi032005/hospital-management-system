@@ -4,6 +4,7 @@ from rest_framework import status, permissions
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import RegisterSerializer
+from django.http import JsonResponse
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -26,7 +27,10 @@ class LoginView(APIView):
         user = authenticate(username=username, password=password)
 
         if user is None:
-            return Response({"error": "Invalid credentials"}, status=401)
+            return Response(
+                {"error": "Invalid credentials"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
         refresh = RefreshToken.for_user(user)
 
@@ -34,4 +38,5 @@ class LoginView(APIView):
             "access": str(refresh.access_token),
             "refresh": str(refresh),
             "role": user.role
-        })
+        }, status=status.HTTP_200_OK)
+

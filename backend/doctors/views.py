@@ -3,9 +3,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from .models import Doctor
+from patients.models import Patient
 from .serializers import DoctorSerializer
+from patients.serializers import PatientSerializer
 from .permissions import IsDoctor
-
+ 
 from appointments.models import Appointment
 from appointments.serializers import AppointmentSerializer
 
@@ -76,3 +78,13 @@ class DoctorDashboardView(APIView):
             "approved": appointments.filter(status="APPROVED").count(),
             "cancelled": appointments.filter(status="CANCELLED").count(),
         })
+
+class DoctorPatientListView(generics.ListAPIView):
+    serializer_class = PatientSerializer
+    permission_classes = [permissions.IsAuthenticated, IsDoctor]
+
+    def get_queryset(self):
+        return Patient.objects.filter(
+            appointment__doctor__user=self.request.user
+        ).distinct()
+

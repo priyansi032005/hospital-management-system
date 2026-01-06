@@ -537,7 +537,6 @@
       <nav>
         <a href="/patient/dashboard/" class="active">Dashboard</a>
         <a href="/patient/appointments/">Appointments</a>
-        <a href="#">Medical Records</a>
         <a href="/patient/profile/">Profile</a>
       </nav>
     </aside>
@@ -693,7 +692,7 @@
             <div id="insuranceDetails">
               <p class="detail-line"><span class="detail-label">Provider:</span> <span id="insuranceProvider">Not
                   specified</span></p>
-              <p class="detail-line"><span class="detail-label">Policy #:</span> <span id="policyNumber">Not
+              <p class="detail-line"><span class="detail-label">Policy :</span> <span id="policyNumber">Not
                   specified</span></p>
               <p class="detail-line"><span class="detail-label">Valid:</span> <span id="policyDates">Not
                   specified</span></p>
@@ -729,12 +728,12 @@
       </div>
     </div>
   </div>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     // ==================== API CONFIGURATION ====================
-    // Replace this URL with your actual API endpoint
     const API_CONFIG = {
       profileEndpoint: 'http://127.0.0.1:8000/api/patient/profile/',
-      authToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY3MjkyMjU4LCJpYXQiOjE3NjcyODg2NTgsImp0aSI6IjAxMzQ4OTgyM2FmYTQ1YzFhNGEyZWU5MmUzNGQzYjQ2IiwidXNlcl9pZCI6IjEyIn0.6I5CyRQSl2Ptdm_2IIr5S6IbLlYoKkRb5gj03ZmfuPA'  // Set authentication token here if required (e.g., 'your-token-here')
     };
 
     // ==================== DOM ELEMENT REFERENCES ====================
@@ -746,229 +745,129 @@
     const sidebarOverlay = document.getElementById('sidebarOverlay');
 
     // ==================== UTILITY FUNCTIONS ====================
-
-    /**
-     * Format date string to localized date format
-     * @param {string} dateStr - Date string to format
-     * @returns {string} Formatted date or 'Not specified'
-     */
     function formatDate(dateStr) {
       if (!dateStr) return 'Not specified';
-      try {
-        return new Date(dateStr).toLocaleDateString();
-      } catch (e) {
-        return 'Invalid date';
-      }
+      return new Date(dateStr).toLocaleDateString();
     }
 
-    /**
-     * Convert array of items into HTML unordered list
-     * @param {Array} items - Array of items to render
-     * @returns {string} HTML string of list or 'None'
-     */
-
     function renderListItems(items) {
-      // If null or undefined
       if (!items) return 'None';
-
-      // If backend sends string (very common)
-      if (typeof items === 'string') {
-        return items;
-      }
-
-      // If backend sends object instead of array
-      if (!Array.isArray(items)) {
-        console.error('Expected array but got:', items);
-        return 'None';
-      }
-
-      // If array is empty
-      if (items.length === 0) return 'None';
+      if (typeof items === 'string') return items;
+      if (!Array.isArray(items) || items.length === 0) return 'None';
 
       const ul = document.createElement('ul');
-
       items.forEach(item => {
         const li = document.createElement('li');
         li.textContent = item;
         ul.appendChild(li);
       });
-
       return ul.outerHTML;
     }
 
-
-    // ==================== POPULATE UI WITH DATA ====================
-
-    /**
-     * Populate all profile data into the UI
-     * @param {Object} data - Profile data object from API
-     */
+    // ==================== POPULATE PROFILE ====================
     function populateProfile(data) {
-      // ========== Profile Image ==========
-      // Use provided image or generate avatar with initials
-      if (data.profileImage) {
-        document.getElementById('profileImage').src = data.profileImage;
-      } else if (data.username) {
-        document.getElementById('profileImage').src =
-          `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username)}&size=128&background=0d9488&color=fff`;
-      }
-
-      // ========== Basic Profile Info ==========
-      document.getElementById('profileName').textContent = data.username || 'Not specified';
+      console.log("Populating profile with data:", data);
+      document.getElementById('profileName').textContent = data.name || 'Not specified';
       document.getElementById('profileEmail').textContent = data.email || 'Not specified';
 
-      // Show contact number if available
-      if (data.contact) {
-        document.getElementById('contactItem').style.display = 'flex';
-        document.getElementById('profileContact').textContent = data.contact;
-      }
-
-      // Show address if available
-      if (data.address) {
-        document.getElementById('addressItem').style.display = 'flex';
-        document.getElementById('profileAddress').textContent = data.address;
-      }
-
-      // Display member since date
-      document.getElementById('memberSince').textContent =
-        `Member since ${formatDate(data.createdAt)}`;
-
-      // ========== Personal Information ==========
       document.getElementById('gender').textContent = data.gender || 'Not specified';
-      document.getElementById('age').textContent =
-        data.age ? `${data.age} years` : 'Not specified';
+      document.getElementById('age').textContent = data.age ? `${data.age} years` : 'Not specified';
 
-      // ========== Health Summary ==========
-      document.getElementById('healthStatus').textContent =
-        data.healthStatus || 'Not specified';
-      document.getElementById('bloodType').textContent =
-        data.bloodType || 'Not specified';
+      document.getElementById('healthStatus').textContent = data.health_status || 'Not specified';
+      document.getElementById('bloodType').textContent = data.blood_group || 'Not specified';
+
+      document.getElementById('allergies').innerHTML = renderListItems(data.allergies);
+      document.getElementById('chronicConditions').innerHTML = renderListItems(data.chronic_conditions);
+      document.getElementById('medications').innerHTML = renderListItems(data.current_medications);
+
       document.getElementById('insurance').textContent =
-        data.insuranceProvider || 'Not specified';
-      document.getElementById('emergencyContact').textContent =
-        data.emergencyContactName || 'Not specified';
+        data.insurance_provider || 'Not specified';
 
-      // ========== Detailed Health Information ==========
-      // Render lists for allergies, conditions, and medications
-      document.getElementById('allergies').innerHTML =
-        renderListItems(data.allergies);
-      document.getElementById('chronicConditions').innerHTML =
-        renderListItems(data.chronicConditions);
-      document.getElementById('medications').innerHTML =
-        renderListItems(data.medicationHistory);
-
-      // ========== Insurance Details ==========
       document.getElementById('insuranceProvider').textContent =
-        data.insuranceProvider || 'Not specified';
+        data.insurance_provider || 'Not specified';
+
       document.getElementById('policyNumber').textContent =
-        data.policyNumber || 'Not specified';
+        data.insurance_policy_number || 'Not specified';
+
       document.getElementById('policyDates').textContent =
-        `${formatDate(data.policyStartDate)} - ${formatDate(data.policyEndDate)}`;
+        data.created_at
+          ? new Date(data.created_at).toLocaleDateString()
+          : 'Not specified';
 
-      // ========== Emergency Contact Details ==========
+      document.getElementById('emergencyContact').textContent =
+        data.emergency_contact_name || 'Not specified';
+
       document.getElementById('emergencyName').textContent =
-        data.emergencyContactName || 'Not specified';
+        data.emergency_contact_name || 'Not specified';
+
       document.getElementById('emergencyPhone').textContent =
-        data.emergencyContactNumber || 'Not specified';
+        data.emergency_contact_phone || 'Not specified';
 
-      // ========== Optional: Family Medical History ==========
-      // Only display if data exists
-      if (data.familyMedicalHistory) {
-        document.getElementById('familyHistoryBox').style.display = 'block';
-        document.getElementById('familyHistory').textContent =
-          data.familyMedicalHistory;
-      }
-
-      // ========== Optional: Additional Notes ==========
-      // Only display if data exists
-      if (data.additionalNotes) {
-        document.getElementById('additionalNotesBox').style.display = 'block';
-        document.getElementById('additionalNotes').textContent =
-          data.additionalNotes;
-      }
-
-      // ========== Last Updated Timestamp ==========
-      document.getElementById('lastUpdated').textContent =
-        new Date().toLocaleString();
+      document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
     }
 
-    // ==================== API COMMUNICATION ====================
-
-    /**
-     * Fetch data from API endpoint
-     * @param {string} url - API endpoint URL
-     * @returns {Promise<Object>} Parsed JSON response
-     * @throws {Error} If request fails
-     */
+    // ==================== API FETCH ====================
     async function fetchData(url) {
-      const headers = {
-        'Content-Type': 'application/json'
-      };
+      const token = localStorage.getItem('access');
 
-      // Add authorization header if token is configured
-      if (API_CONFIG.authToken) {
-        headers['Authorization'] = `Bearer ${API_CONFIG.authToken}`;
+      if (!token) {
+        alert("Session expired. Please login again.");
+        window.location.href = "/login/";
+        return;
       }
 
-      const response = await fetch(url, { headers });
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-      // Check if response is successful
+      if (response.status === 401) {
+        localStorage.clear();
+        alert("Session expired. Please login again.");
+        window.location.href = "/login/";
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      return response.json();
     }
 
-    // ==================== MAIN LOAD FUNCTION ====================
-
-    /**
-     * Load profile data from API and populate UI
-     * Handles loading states and error display
-     */
+    // ==================== LOAD PROFILE ====================
     async function loadProfileData() {
       try {
-        // ========== Show Loading State ==========
-        errorContainer.classList.remove('active');
         loading.style.display = 'flex';
         app.style.display = 'none';
 
-        // ========== Fetch Profile Data ==========
-        const profileData = await fetchData(API_CONFIG.profileEndpoint);
+        const data = await fetchData(API_CONFIG.profileEndpoint);
+        if (!data) return;
 
-        // ========== Populate UI with Data ==========
-        populateProfile(profileData);
+        populateProfile(data);
 
-        // ========== Show Application ==========
         loading.style.display = 'none';
         app.style.display = 'flex';
-
       } catch (error) {
-        // ========== Handle Errors ==========
-        console.error('Error loading profile:', error);
-
-        // Show error state to user
         loading.style.display = 'none';
-        errorMessage.textContent =
-          `Failed to load profile data: ${error.message}`;
         errorContainer.classList.add('active');
+        errorMessage.textContent = error.message;
+        console.error(error);
       }
     }
 
-    // ==================== EVENT LISTENERS ====================
-
-    /**
-     * Sidebar overlay click - close sidebar on mobile
-     */
+    // ==================== SIDEBAR ====================
     sidebarOverlay.addEventListener('click', () => {
       sidebar.classList.remove('open');
       sidebarOverlay.classList.remove('active');
     });
 
-    // ==================== INITIALIZE APPLICATION ====================
-    // Load profile data when page loads
+    // ==================== INIT ====================
     loadProfileData();
   </script>
+
 </body>
 
 </html>

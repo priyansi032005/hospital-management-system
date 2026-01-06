@@ -26,7 +26,7 @@ def login_page(request):
             return render(request, "login.html", {
                 "error": "Server error. Please try again later."
             })
-
+        print(response.json())
         if response.status_code == 200:
             data = response.json()
 

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Appointments - Patient Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -337,7 +339,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .loading-text {
@@ -609,16 +613,20 @@
         }
     </style>
 </head>
+
 <body>
+
     <!-- Sidebar -->
-     <aside class="sidebar" id="sidebar">
-      <h2 style="font-size: 1.5rem; font-weight: 700; color: #0d9488; margin-bottom: 24px;">patient portal</h2>
-      <nav>
-        <a href="/patient/dashboard/" style="display: block; padding: 12px; color: #0d9488; background: #f0fdfa; border-radius: 8px; margin-bottom: 8px; text-decoration: none; font-weight: 500;">Dashboard</a>
-        <a href="/patient/appointments/" style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Appointments</a>
-        <a href="#" style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Medical Records</a>
-        <a href="/patient/profile/" style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Profile</a>
-      </nav>
+    <aside class="sidebar" id="sidebar">
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: #0d9488; margin-bottom: 24px;">patient portal</h2>
+        <nav>
+            <a href="/patient/dashboard/"
+                style="display: block; padding: 12px; color: #0d9488; background: #f0fdfa; border-radius: 8px; margin-bottom: 8px; text-decoration: none; font-weight: 500;">Dashboard</a>
+            <a href="/patient/appointments/"
+                style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Appointments</a>
+            <a href="/patient/profile/"
+                style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Profile</a>
+        </nav>
     </aside>
 
     <!-- Overlay -->
@@ -632,7 +640,8 @@
                 <div class="header-left">
                     <div class="header-title-group">
                         <button class="menu-btn" onclick="toggleSidebar()">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                                stroke-width="2">
                                 <line x1="3" y1="12" x2="21" y2="12"></line>
                                 <line x1="3" y1="6" x2="21" y2="6"></line>
                                 <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -641,7 +650,8 @@
                         <h1 class="page-title">My Appointments</h1>
                     </div>
                     <button class="mobile-add-btn" onclick="openModal()">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
@@ -654,16 +664,12 @@
                             <circle cx="11" cy="11" r="8"></circle>
                             <path d="m21 21-4.35-4.35"></path>
                         </svg>
-                        <input 
-                            type="text" 
-                            class="search-input" 
-                            placeholder="Search doctors..."
-                            id="searchInput"
-                            oninput="filterAppointments()"
-                        >
+                        <input type="text" class="search-input" placeholder="Search doctors..." id="searchInput"
+                            oninput="filterAppointments()">
                     </div>
                     <button type="button" class="add-btn" onclick="window.location.href='/patient/appointments/add/'">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
@@ -714,210 +720,218 @@
                     </svg>
                 </button>
             </div>
-            <p class="modal-text">Appointment booking form would go here. This is a placeholder for the modal content.</p>
+            <p class="modal-text">Appointment booking form would go here. This is a placeholder for the modal content.
+            </p>
         </div>
     </div>
-<script>
-/* ------------------ DATA ------------------ */
 
-let allAppointments = [
-    {
-        id: 1,
-        doctorName: "Sarah Johnson",
-        type: "General Consultation",
-        organizationName: "City Medical Center",
-        date: "2024-12-30T10:00:00",
-        startTime: "2024-12-30T10:00:00",
-        status: "BOOKED",
-        online: true
-    },
-    {
-        id: 2,
-        doctorName: "Michael Chen",
-        type: "Cardiology Checkup",
-        organizationName: "Heart Care Clinic",
-        date: "2024-12-31T14:30:00",
-        startTime: "2024-12-31T14:30:00",
-        status: "Confirmed",
-        online: false
-    },
-    {
-        id: 3,
-        doctorName: "Emily Rodriguez",
-        type: "Dental Examination",
-        organizationName: "Smile Dental",
-        date: "2025-01-02T09:00:00",
-        startTime: "2025-01-02T09:00:00",
-        status: "Pending",
-        online: false
-    },
-    {
-        id: 4,
-        doctorName: "David Williams",
-        type: "Physical Therapy",
-        organizationName: "Online Consultation",
-        date: "2025-01-03T11:00:00",
-        startTime: "2025-01-03T11:00:00",
-        status: "BOOKED",
-        online: true
-    },
-    {
-        id: 5,
-        doctorName: "Lisa Anderson",
-        type: "Dermatology",
-        organizationName: "Skin Health Center",
-        date: "2024-12-28T15:00:00",
-        startTime: "2024-12-28T15:00:00",
-        status: "Completed",
-        online: false
-    }
-];
+    <script>
+        /* ==================== API CONFIGURATION ==================== */
+        const API_CONFIG = {
+            profileEndpoint: 'http://127.0.0.1:8000/api/patient/profile/',
+            appointmentsEndpoint: 'http://127.0.0.1:8000/api/patient/appointments/',
+            doctorsEndpoint: 'http://127.0.0.1:8000/api/patient/doctors/'
+        };
 
-/* ------------------ SIDEBAR ------------------ */
+        /* ==================== SIDEBAR FUNCTIONS ==================== */
+        function toggleSidebar() {
+            document.getElementById('sidebar')?.classList.toggle('open');
+            document.getElementById('overlay')?.classList.toggle('active');
+        }
 
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('active');
-}
+        function closeSidebar() {
+            document.getElementById('sidebar')?.classList.remove('open');
+            document.getElementById('overlay')?.classList.remove('active');
+        }
 
-function closeSidebar() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('active');
-}
+        /* ==================== UTILITY FUNCTIONS ==================== */
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            return new Date(dateStr).toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
 
-window.addEventListener('resize', () => {
-    if (window.innerWidth >= 1024) closeSidebar();
-});
+        function formatTime(dateStr) {
+            if (!dateStr) return '--:--';
+            return new Date(dateStr).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
 
-/* ------------------ HELPERS ------------------ */
+        function getStatusClass(status) {
+            const map = {
+                scheduled: 'status-scheduled',
+                booked: 'status-booked',
+                confirmed: 'status-confirmed',
+                pending: 'status-pending',
+                cancelled: 'status-cancelled',
+                completed: 'status-completed'
+            };
 
-function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-}
+            return map[(status || '').toLowerCase()] || 'status-pending';
+        }
 
-function formatTime(dateString) {
-    return new Date(dateString).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-    });
-}
+        /* ==================== AUTH FETCH ==================== */
+        async function fetchData(url) {
+            const token = localStorage.getItem('access');
 
-function getStatusClass(status) {
-    const map = {
-        BOOKED: 'status-booked',
-        Confirmed: 'status-confirmed',
-        Pending: 'status-pending',
-        Cancelled: 'status-cancelled',
-        Completed: 'status-completed'
-    };
-    return map[status] || 'status-scheduled';
-}
+            if (!token) {
+                alert('Session expired. Please login again.');
+                window.location.href = '/login/';
+                return;
+            }
 
-function isEligibleForVideoCall(app) {
-    return app.status === 'BOOKED' && app.online;
-}
+            const res = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
 
-/* ------------------ RENDER ------------------ */
+            if (res.status === 401) {
+                localStorage.clear();
+                alert('Session expired. Please login again.');
+                window.location.href = '/login/';
+                return;
+            }
 
-function renderAppointments(appointments) {
-    const grid = document.getElementById('appointmentsGrid');
-    const empty = document.getElementById('emptyState');
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+            }
 
-    grid.innerHTML = '';
+            return res.json();
+        }
 
-    if (appointments.length === 0) {
-        grid.style.display = 'none';
-        empty.style.display = 'block';
-        return;
-    }
+        /* ==================== LOAD DOCTORS ==================== */
+        async function loadDoctors() {
+            try {
+                const doctors = await fetchData(API_CONFIG.doctorsEndpoint);
+                console.log("Doctors List:", doctors);
+                return doctors;
+            } catch (err) {
+                console.error("Failed to load doctors", err);
+                return [];
+            }
+        }
 
-    empty.style.display = 'none';
-    grid.style.display = 'grid';
+        /* ==================== RENDER APPOINTMENTS ==================== */
 
-    appointments.forEach(app => {
-        const joinBtn = isEligibleForVideoCall(app)
-            ? `<button class="join-btn" onclick="handleJoinMeeting(${app.id})">
-                Join Now
-              </button>`
-            : '';
+        /* ==================== RENDER APPOINTMENTS ==================== */
+        async function renderAppointments(appointments) {
+            const grid = document.getElementById('appointmentsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const loadingState = document.getElementById('loadingState');
 
-        const card = document.createElement('div');
-        card.className = 'appointment-card';
-        card.innerHTML = `
-            <div class="card-content">
-                <div class="card-header">
-                    <div class="card-icon">👨‍⚕️</div>
-                    <div>
-                        <h3 class="card-title">Dr. ${app.doctorName}</h3>
-                        <p class="card-subtitle">${app.type}</p>
-                    </div>
-                </div>
+            loadingState.style.display = 'none';
 
-                <div class="card-details">
-                    <div class="detail-row">🏥 ${app.organizationName}</div>
-                    <div class="detail-row">📅 ${formatDate(app.date)}</div>
-                    <div class="detail-row">⏰ ${formatTime(app.startTime)}</div>
-                </div>
+            if (!appointments || appointments.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
 
-                <div class="card-footer">
-                    <span class="status-badge ${getStatusClass(app.status)}">
-                        ${app.status}
-                    </span>
-                    ${joinBtn}
-                </div>
+            // Fetch doctors once
+            const doctors = await loadDoctors();
+            // Map doctor IDs to their details
+            const doctorMap = {};
+            doctors.forEach(doc => {
+                doctorMap[doc.id] = {
+                    name: doc.username || 'N/A',
+                    specialization: doc.specialization || 'General Practice'
+                };
+            });
+
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            grid.innerHTML = appointments.map(apt => {
+                const doctorInfo = doctorMap[apt.doctor] || { name: 'N/A', specialization: 'General Practice' };
+                const doctorName = doctorInfo.name;
+                const specialization = doctorInfo.specialization;
+
+                const dateObj = new Date(apt.appointment_date);
+                const date = dateObj.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                const time = dateObj.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+
+                return `
+      <div class="appointment-card">
+        <div class="card-content">
+          <div class="card-header">
+            <div class="card-icon">
+              🩺
             </div>
-        `;
+            <div>
+              <h3 class="card-title">Dr. ${doctorName}</h3>
+              <p class="card-subtitle">${specialization}</p>
+            </div>
+          </div>
 
-        grid.appendChild(card);
-    });
-}
+          <div class="card-details">
+            <div class="detail-row">
+              <span>${date}</span>
+            </div>
+            <div class="detail-row">
+              <span>${time}</span>
+            </div>
+          </div>
 
-/* ------------------ SEARCH ------------------ */
+          <div class="card-footer">
+            <span class="status-badge ${getStatusClass(apt.status)}">
+              ${apt.status}
+            </span>
+          </div>
+        </div>
+      </div>
+    `;
+            }).join('');
+        }
 
-function filterAppointments() {
-    const q = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = allAppointments.filter(a =>
-        a.doctorName.toLowerCase().includes(q) ||
-        a.type.toLowerCase().includes(q)
-    );
-    renderAppointments(filtered);
-}
 
-/* ------------------ VIDEO CALL ------------------ */
+        /* ==================== LOAD APPOINTMENTS ==================== */
+        async function loadAppointments() {
+            const loadingState = document.getElementById('loadingState');
+            const grid = document.getElementById('appointmentsGrid');
+            const emptyState = document.getElementById('emptyState');
 
-function handleJoinMeeting(id) {
-    alert(`Joining video consultation for appointment #${id}`);
-    // window.location.href = `/video/${id}`;
-}
+            try {
+                loadingState.style.display = 'flex';
+                grid.style.display = 'none';
+                emptyState.style.display = 'none';
 
-/* ------------------ MODAL ------------------ */
+                const appointments = await fetchData(API_CONFIG.appointmentsEndpoint);
+                if (!appointments) return;
 
-function openModal() {
-    document.getElementById('appointmentModal').style.display = 'flex';
-}
+                renderAppointments(appointments);
+            } catch (err) {
+                console.error(err);
+                loadingState.style.display = 'none';
+                emptyState.style.display = 'block';
+            }
+        }
 
-function closeModal() {
-    document.getElementById('appointmentModal').style.display = 'none';
-}
-
-/* ------------------ INIT ------------------ */
-
-function init() {
-    document.getElementById('loadingState').style.display = 'block';
-
-    setTimeout(() => {
-        document.getElementById('loadingState').style.display = 'none';
-        renderAppointments(allAppointments);
-    }, 800);
-}
-
-init();
-</script>
+        /* ==================== INIT ==================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAppointments();
+            loadDoctors(); // optional: for dropdown / booking page
+        });
+    </script>
 </body>
+
 </html>
