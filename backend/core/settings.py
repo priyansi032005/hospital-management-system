@@ -147,6 +147,30 @@ ALLOWED_HOSTS = [
     "127.0.0.1"
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "https://hospital-management-system-23.onrender.com",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    'authorization',
+    'content-type',
+    'accept',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

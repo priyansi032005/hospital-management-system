@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 import requests
 
-BASE_URL = getattr(settings, "BASE_URL", "http://127.0.0.1:8000")
+BASE_URL = getattr(settings, "BASE_URL", "https://hospital-management-system-23.onrender.com")
 
 API_LOGIN_URL = f"{BASE_URL}/api/login/"
 API_REGISTER_URL = f"{BASE_URL}/api/register/"

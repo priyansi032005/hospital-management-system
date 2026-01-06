@@ -783,9 +783,9 @@
   <script>
     // ==================== API CONFIGURATION ====================
     const API_CONFIG = {
-      profileEndpoint: 'http://127.0.0.1:8000/api/patient/profile/',
-      appointmentsEndpoint: 'http://127.0.0.1:8000/api/patient/appointments/',
-      tokenRefreshEndpoint: 'http://127.0.0.1:8000/api/token/refresh/', // JWT refresh endpoint
+      profileEndpoint: 'https://hospital-management-system-23.onrender.com/api/patient/profile/',
+      appointmentsEndpoint: 'https://hospital-management-system-23.onrender.com/api/patient/appointments/',
+      tokenRefreshEndpoint: 'https://hospital-management-system-23.onrender.com/api/token/refresh/', // JWT refresh endpoint
       timeout: 10000
     };
 
@@ -849,7 +849,7 @@
         }
 
         const refreshResponse = await fetch(
-          "http://127.0.0.1:8000/api/token/refresh/",
+          "https://hospital-management-system-23.onrender.com/api/token/refresh/",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
