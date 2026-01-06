@@ -52,9 +52,11 @@ INSTALLED_APPS = [
     'doctors',
     'prescriptions',
     'medical_files',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
