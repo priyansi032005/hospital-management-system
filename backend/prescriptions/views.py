@@ -1,23 +1,33 @@
+# prescriptions/views.py
 from rest_framework import generics, permissions
 from .models import Prescription
 from .serializers import PrescriptionSerializer
 from doctors.permissions import IsDoctor
-from patients.permissions import IsPatient
 from appointments.models import Appointment
+from doctors.models import Doctor
+from patients.models import Patient
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 
-# 🔹 DOCTOR: CREATE PRESCRIPTION
 class CreatePrescriptionView(generics.CreateAPIView):
+    queryset = Prescription.objects.all()
     serializer_class = PrescriptionSerializer
-    permission_classes = [permissions.IsAuthenticated, IsDoctor]
+    permission_classes = [IsAuthenticated, IsDoctor]
 
     def perform_create(self, serializer):
-        appointment = Appointment.objects.get(
-            id=self.request.data.get("appointment")
-        )
+        appointment = serializer.validated_data["appointment"]
+
+        try:
+            doctor = Doctor.objects.get(user=appointment.doctor.user)
+            patient = Patient.objects.get(user=appointment.patient.user)
+        except (Doctor.DoesNotExist, Patient.DoesNotExist):
+            raise ValidationError("Doctor or Patient profile not found")
+
         serializer.save(
-            doctor=self.request.user,
-            patient=appointment.patient
+            doctor=doctor,
+            patient=patient
         )
+
 
 # 🔹 DOCTOR: VIEW HIS PRESCRIPTIONS
 class DoctorPrescriptionListView(generics.ListAPIView):
@@ -30,7 +40,7 @@ class DoctorPrescriptionListView(generics.ListAPIView):
 # 🔹 PATIENT: VIEW PRESCRIPTIONS
 class PatientPrescriptionListView(generics.ListAPIView):
     serializer_class = PrescriptionSerializer
-    permission_classes = [permissions.IsAuthenticated, IsPatient]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Prescription.objects.filter(patient=self.request.user)

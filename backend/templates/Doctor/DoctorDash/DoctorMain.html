@@ -796,6 +796,7 @@
 
                 // Save new tokens
                 localStorage.setItem("access", refreshData.access);
+                console.log("Access token refreshed");
                 if (refreshData.refresh) {
                     localStorage.setItem("refresh", refreshData.refresh);
                 }
@@ -826,21 +827,24 @@
            UI RENDER
         ===================================================== */
         function renderDoctorProfile(data) {
-            if (!elements.welcomeText || !elements.doctorName) {
-                console.error("Required dashboard DOM elements missing");
-                return;
-            }
+            console.log("Doctor Profile Data:", data);
 
-            elements.welcomeText.textContent = `Welcome, Dr. ${data.name || "Doctor"}`;
-            elements.doctorName.textContent = data.name || "-";
-            elements.doctorEmail.textContent = data.email || "-";
+            // Fallback values
+            const doctorName = "Doctor";
+            const doctorEmail = "-";
+
+            // UI bindings
+            elements.welcomeText.textContent = `Welcome, Dr. ${doctorName}`;
+            console.log(doctorName);
+            elements.doctorName.textContent = doctorName;
+            elements.doctorEmail.textContent = doctorEmail;
             elements.doctorSpecialty.textContent = data.specialization || "-";
             elements.doctorExperience.textContent =
-                `${data.experience_years || 0} Years Experience`;
+                `${data.experience_years ?? 0} Years Experience`;
 
-            elements.avatarPlaceholder.textContent =
-                data.name ? data.name.charAt(0).toUpperCase() : "D";
+            elements.avatarPlaceholder.textContent = "D";
         }
+
 
         /* =====================================================
            ERROR HANDLING

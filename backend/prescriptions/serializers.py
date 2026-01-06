@@ -1,8 +1,24 @@
 from rest_framework import serializers
 from .models import Prescription
 
+
 class PrescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prescription
-        fields = "__all__"
-        read_only_fields = ['doctor', 'patient']
+        fields = [
+            "id",
+            "appointment",
+            "doctor",
+            "patient",
+            "medicines",
+            "instructions",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "doctor",
+            "patient",
+            "created_at",
+            "updated_at",
+        ]

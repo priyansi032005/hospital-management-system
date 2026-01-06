@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Prescription - Doctor Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -393,6 +395,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Overlay -->
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -430,16 +433,6 @@
                 <span>Appointments</span>
             </a>
 
-            <a href="/doctor/patients" class="menu-item">
-                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-                <span>Patients</span>
-            </a>
-
             <a href="/doctor/prescriptions" class="menu-item active">
                 <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -451,10 +444,22 @@
                 <span>Prescriptions</span>
             </a>
 
+            <a href="/doctor/patients" class="menu-item">
+                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span>Patients</span>
+            </a>
+
             <a href="/doctor/settings" class="menu-item">
                 <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    </path>
                 </svg>
                 <span>Settings</span>
             </a>
@@ -512,7 +517,7 @@
                         <!-- Appointment Selection -->
                         <div class="form-section">
                             <h2 class="section-title">Appointment Details</h2>
-                            
+
                             <div class="form-group">
                                 <label class="form-label" for="appointment">
                                     Select Appointment <span class="required">*</span>
@@ -520,7 +525,8 @@
                                 <select id="appointment" class="form-select" required>
                                     <option value="">Loading appointments...</option>
                                 </select>
-                                <p class="form-help">Choose the appointment for which you want to create a prescription</p>
+                                <p class="form-help">Choose the appointment for which you want to create a prescription
+                                </p>
                             </div>
 
                             <!-- Patient Info Display -->
@@ -543,30 +549,25 @@
                         <!-- Prescription Details -->
                         <div class="form-section">
                             <h2 class="section-title">Prescription Details</h2>
-                            
+
                             <div class="form-group">
                                 <label class="form-label" for="medicines">
                                     Medicines <span class="required">*</span>
                                 </label>
-                                <textarea 
-                                    id="medicines" 
-                                    class="form-textarea" 
+                                <textarea id="medicines" class="form-textarea"
                                     placeholder="e.g., Azithromycin 500mg - 3 times/day&#10;Paracetamol 650mg - 2 times/day"
-                                    required
-                                ></textarea>
-                                <p class="form-help">List all medicines with dosage and frequency. Use a new line for each medicine.</p>
+                                    required></textarea>
+                                <p class="form-help">List all medicines with dosage and frequency. Use a new line for
+                                    each medicine.</p>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label" for="instructions">
                                     Instructions <span class="required">*</span>
                                 </label>
-                                <textarea 
-                                    id="instructions" 
-                                    class="form-textarea" 
+                                <textarea id="instructions" class="form-textarea"
                                     placeholder="e.g., Take before food and take with warm water. Complete the full course even if symptoms improve."
-                                    required
-                                ></textarea>
+                                    required></textarea>
                                 <p class="form-help">Provide detailed instructions for the patient</p>
                             </div>
                         </div>
@@ -574,14 +575,16 @@
                         <!-- Form Actions -->
                         <div class="button-group">
                             <button type="submit" class="btn btn-primary" id="submitBtn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                 </svg>
                                 Create Prescription
                             </button>
                             <button type="button" class="btn btn-secondary" onclick="resetForm()">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
                                     <polyline points="1 4 1 10 7 10"></polyline>
                                     <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
                                 </svg>
@@ -594,190 +597,201 @@
         </div>
     </div>
 
-  <script>
-/* ==========================
-   CONFIG
-========================== */
-const API_BASE_URL = 'http://127.0.0.1:8000';
+    <script>
+        /* ==========================
+           CONFIG
+        ========================== */
+        const API_BASE_URL = 'http://127.0.0.1:8000';
 
-const API_ENDPOINTS = {
-    appointments: `${API_BASE_URL}/api/doctors/appointments/`,
-    patients: `${API_BASE_URL}/api/doctors/patients/`,
-    createPrescription: `${API_BASE_URL}/api/prescriptions/`
-};
+        const API_ENDPOINTS = {
+            appointments: `${API_BASE_URL}/api/doctors/appointments/`,
+            patients: `${API_BASE_URL}/api/doctors/patients/`,
+            createPrescription: `${API_BASE_URL}/api/prescriptions/doctor/create/`
+        };
 
-let appointmentsData = [];
+        let appointmentsData = [];
 
-/* ==========================
-   AUTH TOKEN
-========================== */
-function getAuthToken() {
-    return localStorage.getItem('access_token'); // MANUAL TOKEN FOR NOW
-}
+        /* ==========================
+           AUTH TOKEN
+        ========================== */
+        function getAuthToken() {
+            return localStorage.getItem('access'); // MANUAL TOKEN FOR NOW
+        }
 
-/* ==========================
-   SIDEBAR
-========================== */
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('active');
-}
+        /* ==========================
+           SIDEBAR
+        ========================== */
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('active');
+        }
 
-function closeSidebar() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('active');
-}
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('overlay').classList.remove('active');
+        }
 
-window.addEventListener('resize', () => {
-    if (window.innerWidth >= 768) closeSidebar();
-});
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) closeSidebar();
+        });
 
-/* ==========================
-   ALERTS
-========================== */
-function showAlert(type, message) {
-    const successAlert = document.getElementById('successAlert');
-    const errorAlert = document.getElementById('errorAlert');
+        /* ==========================
+           ALERTS
+        ========================== */
+        function showAlert(type, message) {
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
 
-    if (type === 'success') {
-        document.getElementById('successMessage').textContent = message;
-        successAlert.classList.remove('hidden');
-        errorAlert.classList.add('hidden');
-        setTimeout(() => successAlert.classList.add('hidden'), 4000);
-    } else {
-        document.getElementById('errorMessage').textContent = message;
-        errorAlert.classList.remove('hidden');
-        successAlert.classList.add('hidden');
-    }
+            if (type === 'success') {
+                document.getElementById('successMessage').textContent = message;
+                successAlert.classList.remove('hidden');
+                errorAlert.classList.add('hidden');
+                setTimeout(() => successAlert.classList.add('hidden'), 4000);
+            } else {
+                document.getElementById('errorMessage').textContent = message;
+                errorAlert.classList.remove('hidden');
+                successAlert.classList.add('hidden');
+            }
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-/* ==========================
-   FETCH APPOINTMENTS
-========================== */
-async function fetchAppointments() {
-    const token = getAuthToken();
-    if (!token) {
-        showAlert('error', 'Please login again');
-        return;
-    }
+        /* ==========================
+           FETCH APPOINTMENTS
+        ========================== */
+        async function fetchAppointments() {
+            const token = getAuthToken();
+            console.log('Fetching appointments with token:', token);
 
-    try {
-        const response = await fetch(API_ENDPOINTS.appointments, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+            if (!token) {
+                showAlert('error', 'Please login again');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_ENDPOINTS.appointments, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch appointments');
+
+                const data = await response.json();
+                appointmentsData = data;
+                populateAppointments(appointmentsData);
+
+            } catch (error) {
+                console.error(error);
+                showAlert('error', 'Unable to load appointments');
+            }
+        }
+
+        /* ==========================
+           POPULATE APPOINTMENTS
+        ========================== */
+        function populateAppointments(appointments) {
+            const select = document.getElementById('appointment');
+            select.innerHTML = `<option value="">Select Appointment</option>`;
+
+            appointments.forEach(appt => {
+                const option = document.createElement('option');
+                option.value = appt.id;
+                option.textContent = `#${appt.id} - ${appt.patient_name} (${appt.date})`;
+                option.dataset.data = JSON.stringify(appt);
+                select.appendChild(option);
+            });
+        }
+
+        /* ==========================
+           APPOINTMENT CHANGE
+        ========================== */
+        document.getElementById('appointment').addEventListener('change', e => {
+            const selected = e.target.selectedOptions[0];
+            const box = document.getElementById('patientInfoBox');
+
+            if (!selected || !selected.dataset.data) {
+                box.classList.add('hidden');
+                return;
+            }
+
+            const data = JSON.parse(selected.dataset.data);
+
+            document.getElementById('patientName').textContent = data.patient_name || 'N/A';
+            // document.getElementById('patientEmail').textContent = data.patient_email || 'N/A';
+            document.getElementById('appointmentDate').textContent = data.appointment_date || 'N/A';
+
+            box.classList.remove('hidden');
+        });
+
+        /* ==========================
+           SUBMIT PRESCRIPTION
+        ========================== */
+        document.getElementById('prescForm').addEventListener('submit', async e => {
+            e.preventDefault();
+
+            const token = getAuthToken();
+            if (!token) {
+                showAlert('error', 'Login required');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+
+            try {
+                const appointmentSelect = document.getElementById('appointment');
+                const selectedOption = appointmentSelect.selectedOptions[0];
+                const appointmentData = JSON.parse(selectedOption.dataset.data);
+
+                const payload = {
+                    appointment: appointmentData.id,
+                    patient: appointmentData.patient,
+                    medicines: document.getElementById('medicines').value.trim(),
+                    instructions: document.getElementById('instructions').value.trim()
+                };
+
+                const response = await fetch(API_ENDPOINTS.createPrescription, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw err;
+                }
+
+                showAlert('success', 'Prescription created successfully');
+                document.getElementById('prescForm').reset();
+
+            } catch (error) {
+                console.error(error);
+                showAlert('error', 'Failed to create prescription');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Prescription';
             }
         });
 
-        if (!response.ok) throw new Error('Failed to fetch appointments');
-
-        const data = await response.json();
-        appointmentsData = data;
-        populateAppointments(appointmentsData);
-
-    } catch (error) {
-        console.error(error);
-        showAlert('error', 'Unable to load appointments');
-    }
-}
-
-/* ==========================
-   POPULATE APPOINTMENTS
-========================== */
-function populateAppointments(appointments) {
-    const select = document.getElementById('appointment');
-    select.innerHTML = `<option value="">Select Appointment</option>`;
-
-    appointments.forEach(appt => {
-        const option = document.createElement('option');
-        option.value = appt.id;
-        option.textContent = `#${appt.id} - ${appt.patient_name} (${appt.date})`;
-        option.dataset.data = JSON.stringify(appt);
-        select.appendChild(option);
-    });
-}
-
-/* ==========================
-   APPOINTMENT CHANGE
-========================== */
-document.getElementById('appointment').addEventListener('change', e => {
-    const selected = e.target.selectedOptions[0];
-    const box = document.getElementById('patientInfoBox');
-
-    if (!selected || !selected.dataset.data) {
-        box.classList.add('hidden');
-        return;
-    }
-
-    const data = JSON.parse(selected.dataset.data);
-
-    document.getElementById('patientName').textContent = data.patient_name || 'N/A';
-    document.getElementById('patientEmail').textContent = data.patient_email || 'N/A';
-    document.getElementById('appointmentDate').textContent = data.date || 'N/A';
-
-    box.classList.remove('hidden');
-});
-
-/* ==========================
-   SUBMIT PRESCRIPTION
-========================== */
-document.getElementById('prescForm').addEventListener('submit', async e => {
-    e.preventDefault();
-
-    const token = getAuthToken();
-    if (!token) {
-        showAlert('error', 'Login required');
-        return;
-    }
-
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Creating...';
-
-    try {
-        const appointmentSelect = document.getElementById('appointment');
-        const selectedOption = appointmentSelect.selectedOptions[0];
-        const appointmentData = JSON.parse(selectedOption.dataset.data);
-
-        const payload = {
-            appointment: appointmentData.id,
-            patient: appointmentData.patient,
-            medicines: document.getElementById('medicines').value.trim(),
-            instructions: document.getElementById('instructions').value.trim()
-        };
-
-        const response = await fetch(API_ENDPOINTS.createPrescription, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
+        /* ==========================
+           INIT
+        ========================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = getAuthToken();
+            if (!token) {
+                showAlert('error', 'Please login again');
+                return;
+            }
+            fetchAppointments();
         });
-
-        if (!response.ok) {
-            const err = await response.json();
-            throw err;
-        }
-
-        showAlert('success', 'Prescription created successfully');
-        document.getElementById('prescForm').reset();
-
-    } catch (error) {
-        console.error(error);
-        showAlert('error', 'Failed to create prescription');
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Create Prescription';
-    }
-});
-
-/* ==========================
-   INIT
-========================== */
-document.addEventListener('DOMContentLoaded', fetchAppointments);
-</script>
+    </script>
 </body>
+
 </html>

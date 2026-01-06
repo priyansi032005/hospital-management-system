@@ -512,186 +512,198 @@
     </main>
 
     <div class="toast" id="toast">Settings saved successfully!</div>
+<script>
+    /* =====================================================
+       CONFIG
+    ===================================================== */
+    const API_CONFIG = {
+        BASE_URL: "http://127.0.0.1:8000/api/doctors/",
+        TIMEOUT: 10000,
+        ENDPOINTS: {
+            PROFILE: "profile/"
+        },
+        AUTH: {
+            REFRESH_URL: "http://127.0.0.1:8000/api/token/refresh/"
+        }
+    };
 
-    <script>
-        /* =====================================================
-           CONFIG
-        ===================================================== */
-        const API_CONFIG = {
-            BASE_URL: "http://127.0.0.1:8000/api/doctor/profile/",
-            TIMEOUT: 10000
+    /* =====================================================
+       FETCH WITH JWT + AUTO REFRESH
+    ===================================================== */
+    async function fetchWithAuth(url, options = {}, isRetry = false) {
+        const accessToken = localStorage.getItem("access");
+        if (!accessToken) throw new Error("Access token missing");
+
+        const fetchOptions = {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${accessToken}`,
+                ...(options.headers || {})
+            }
         };
 
-        /* =====================================================
-           GET JWT TOKEN
-        ===================================================== */
-        function getAccessToken() {
-            return localStorage.getItem("access_token");
-        }
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
+        fetchOptions.signal = controller.signal;
 
-        /* =====================================================
-           FETCH WITH JWT + TIMEOUT
-        ===================================================== */
-        async function fetchWithAuth(url, options = {}) {
-            const token = getAccessToken();
+        try {
+            const response = await fetch(url, fetchOptions);
+            clearTimeout(timeout);
 
-            if (!token) {
-                showToast("Authentication required. Please login again.", true);
-                throw new Error("No access token found");
-            }
+            // If access token expired → try refresh ONCE
+            if (response.status === 401 && !isRetry) {
+                const refreshToken = localStorage.getItem("refresh");
+                if (!refreshToken) throw new Error("Refresh token missing");
 
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
-
-            try {
-                const response = await fetch(url, {
-                    ...options,
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                        ...(options.headers || {})
-                    },
-                    signal: controller.signal
+                const refreshResponse = await fetch(API_CONFIG.AUTH.REFRESH_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ refresh: refreshToken })
                 });
 
-                clearTimeout(timeout);
+                if (!refreshResponse.ok) throw new Error("Session expired");
 
-                if (response.status === 401) {
-                    showToast("Session expired. Please login again.", true);
-                    localStorage.removeItem("access_token");
-                    throw new Error("Unauthorized");
-                }
+                const refreshData = await refreshResponse.json();
+                localStorage.setItem("access", refreshData.access);
 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
+                if (refreshData.refresh) localStorage.setItem("refresh", refreshData.refresh);
 
-                return await response.json();
-            } catch (error) {
-                clearTimeout(timeout);
-                throw error;
+                // Retry original request once
+                return fetchWithAuth(url, options, true);
             }
-        }
 
-        /* =====================================================
-           LOAD DOCTOR DATA (GET)
-        ===================================================== */
-        async function loadDoctorData() {
-            try {
-                const data = await fetchWithAuth(API_CONFIG.BASE_URL);
-                populateForm(data);
-            } catch (error) {
-                console.error(error);
-                showToast("Failed to load profile", true);
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.detail || `HTTP Error ${response.status}`);
             }
+
+            return await response.json();
+
+        } catch (err) {
+            clearTimeout(timeout);
+            throw err;
         }
+    }
 
-        /* =====================================================
-           POPULATE FORM
-        ===================================================== */
-        function populateForm(data) {
-            document.getElementById("name").value = data.name || "";
-            document.getElementById("specialization").value = data.specialization || "";
-            document.getElementById("experience_years").value = data.experience_years || "";
-            document.getElementById("phone").value = data.phone || "";
+    /* =====================================================
+       FETCH DOCTOR PROFILE
+    ===================================================== */
+    async function fetchDoctorProfile() {
+        const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.PROFILE;
+        return await fetchWithAuth(url);
+    }
 
-            updateDisplay(data);
+    /* =====================================================
+       RENDER DOCTOR PROFILE
+    ===================================================== */
+    function renderDoctorProfile(data) {
+        console.log("Doctor Profile Data:", data);
+
+        const name = data.user?.username || "Doctor";
+        const email = data.user?.email || "-";
+
+        // Fill form fields
+        if (document.getElementById("name")) document.getElementById("name").value = name;
+        if (document.getElementById("specialization")) document.getElementById("specialization").value = data.specialization || "";
+        if (document.getElementById("experience_years")) document.getElementById("experience_years").value = data.experience_years || "";
+        if (document.getElementById("phone")) document.getElementById("phone").value = data.phone || "";
+
+        // Update UI display
+        if (document.getElementById("displayName")) document.getElementById("displayName").textContent = name;
+        if (document.getElementById("displayEmail")) document.getElementById("displayEmail").textContent = email;
+        if (document.getElementById("displaySpecialty")) document.getElementById("displaySpecialty").textContent = data.specialization || "-";
+        if (document.getElementById("displayExperience")) document.getElementById("displayExperience").textContent =
+            `${data.experience_years || 0} Years Experience`;
+
+        if (document.getElementById("profileImage")) {
+            const initials = name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+            document.getElementById("profileImage").textContent = initials;
         }
+    }
 
-        /* =====================================================
-           UPDATE DISPLAY
-        ===================================================== */
-        function updateDisplay(data) {
-            document.getElementById("displayName").textContent =
-                data.name || "Doctor Name";
-            document.getElementById("displaySpecialty").textContent =
-                data.specialization || "Specialization";
-            document.getElementById("displayPhone").textContent =
-                data.phone || "Phone";
-            document.getElementById("displayExperience").textContent =
-                `${data.experience_years || 0} years experience`;
-
-            const nameParts = (data.name || "D").split(" ");
-            const initials =
-                nameParts.length > 1
-                    ? nameParts[0][0] + nameParts[1][0]
-                    : nameParts[0][0];
-
-            document.getElementById("profileImage").textContent =
-                initials.toUpperCase();
-        }
-
-        /* =====================================================
-           SAVE SETTINGS (PUT)
-        ===================================================== */
+    /* =====================================================
+       SAVE DOCTOR SETTINGS (PUT)
+    ===================================================== */
+    if (document.getElementById("settingsForm")) {
+    
         document.getElementById("settingsForm").addEventListener("submit", async function (e) {
-            e.preventDefault();
+    e.preventDefault();
 
-            const formData = {
-                name: document.getElementById("name").value,
-                specialization: document.getElementById("specialization").value,
-                experience_years: parseInt(
-                    document.getElementById("experience_years").value || 0
-                ),
-                phone: document.getElementById("phone").value
-            };
+    const formData = {
+        name: document.getElementById("name").value,
+        specialization: document.getElementById("specialization").value,
+        experience_years: parseInt(document.getElementById("experience_years").value || 0),
+        phone: document.getElementById("phone").value,
+        bio: document.getElementById("bio") ? document.getElementById("bio").value : ""
+    };
 
-            try {
-                const updatedData = await fetchWithAuth(API_CONFIG.BASE_URL, {
-                    method: "PUT",
-                    body: JSON.stringify(formData)
-                });
-
-                updateDisplay(updatedData);
-                showToast("Settings saved successfully!");
-            } catch (error) {
-                console.error(error);
-                showToast("Error saving settings", true);
-            }
+    try {
+        const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.PROFILE;
+        const updatedData = await fetchWithAuth(url, {
+            method: "PUT",
+            body: JSON.stringify(formData)
         });
 
-        /* =====================================================
-           TOAST
-        ===================================================== */
-        function showToast(message, isError = false) {
-            const toast = document.getElementById("toast");
-            toast.textContent = message;
-            toast.style.background = isError ? "#ef4444" : "#14b8a6";
-            toast.classList.add("show");
+        renderDoctorProfile(updatedData);
+        showToast("Settings saved successfully!");
+    } catch (error) {
+        console.error(error);
+        showToast("Error saving settings: " + error.message, true);
+    }
+});
 
-            setTimeout(() => {
-                toast.classList.remove("show");
-            }, 3000);
-        }
+    }
 
-        /* =====================================================
-           SIDEBAR
-        ===================================================== */
-        function toggleSidebar() {
-            document.getElementById("sidebar").classList.toggle("open");
-            document.getElementById("overlay").classList.toggle("active");
-        }
+    /* =====================================================
+       TOAST
+    ===================================================== */
+    function showToast(message, isError = false) {
+        const toast = document.getElementById("toast");
+        if (!toast) return;
+        toast.textContent = message;
+        toast.style.background = isError ? "#ef4444" : "#14b8a6";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 3000);
+    }
 
-        function closeSidebar() {
-            document.getElementById("sidebar").classList.remove("open");
-            document.getElementById("overlay").classList.remove("active");
-        }
+    /* =====================================================
+       SIDEBAR HANDLERS
+    ===================================================== */
+    function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+        document.getElementById("overlay").classList.toggle("active");
+    }
 
-        document.querySelectorAll(".menu-item").forEach(item => {
-            item.addEventListener("click", () => {
-                if (window.innerWidth < 768) closeSidebar();
-            });
+    function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("overlay").classList.remove("active");
+    }
+
+    document.querySelectorAll(".menu-item").forEach(item => {
+        item.addEventListener("click", () => {
+            if (window.innerWidth < 768) closeSidebar();
         });
+    });
 
-        window.addEventListener("resize", () => {
-            if (window.innerWidth >= 768) closeSidebar();
-        });
+    window.addEventListener("resize", () => {
+        if (window.innerWidth >= 768) closeSidebar();
+    });
 
-        /* =====================================================
-           START
-        ===================================================== */
-        document.addEventListener("DOMContentLoaded", loadDoctorData);
-    </script>
-</body>
-
-</html>
+    /* =====================================================
+       INIT
+    ===================================================== */
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            const profile = await fetchDoctorProfile();
+            renderDoctorProfile(profile);
+        } catch (err) {
+            console.error("Error loading dashboard:", err);
+            showToast("Session expired. Please login again.", true);
+            // Optional redirect to login
+            // window.location.href = "/login.html";
+        }
+    });
+</script>
+</body>     
+</html> 
