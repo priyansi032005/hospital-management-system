@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 import requests
 
 BASE_URL = getattr(settings, "BASE_URL", "https://hospital-management-system-23.onrender.com")
@@ -81,10 +80,7 @@ def logout_page(request):
     return redirect("/login/")
 
 
-@login_required
 def doctor_dashboard(request):
-    if request.user.role != 'DOCTOR':
-        return redirect('patient_dashboard')
     return render(request, "Doctor/DoctorDash/DoctorMain.html")
 
 
@@ -109,10 +105,7 @@ def doctor_patient_list(request):
     return render(request, "Doctor/DoctorPatientList.html")
 
 
-@login_required
 def patient_dashboard(request):
-    if request.user.role != 'PATIENT':
-        return redirect('doctor_dashboard')
     return render(request, "Patient/PatientDash/PatientDash.html")
 
 def patient_appointment_list(request):

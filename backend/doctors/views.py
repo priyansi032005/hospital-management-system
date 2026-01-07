@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError, NotFound
+from rest_framework.exceptions import ValidationError
 from .models import Doctor
 from patients.models import Patient
 from .serializers import DoctorSerializer
@@ -27,10 +27,7 @@ class DoctorProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsDoctor]
 
     def get_object(self):
-        try:
-            return Doctor.objects.get(user=self.request.user)
-        except Doctor.DoesNotExist:
-            raise NotFound("Doctor profile not found")
+        return Doctor.objects.get(user=self.request.user)
 
 
 class DoctorAppointmentsView(generics.ListAPIView):
