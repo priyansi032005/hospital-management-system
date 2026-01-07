@@ -116,4 +116,3 @@ def appointment_schedular(request):
 
 def patient_profile(request):
     return render(request, "Patient/PatientProfile/PatientProfile.html")
-
