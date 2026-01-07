@@ -781,6 +781,15 @@
 
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
+    // ==================== ROLE VERIFICATION ====================
+    (function() {
+      const userRole = localStorage.getItem("role");
+      if (userRole !== "PATIENT") {
+        window.location.href = "/doctor/dashboard/";
+        return;
+      }
+    })();
+
     // ==================== API CONFIGURATION ====================
     const API_CONFIG = {
       profileEndpoint: 'https://hospital-management-system-23.onrender.com/api/patient/profile/',

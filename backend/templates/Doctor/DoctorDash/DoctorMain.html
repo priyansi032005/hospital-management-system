@@ -723,6 +723,17 @@
     </div>
     <script>
         /* =====================================================
+           ROLE VERIFICATION
+        ===================================================== */
+        (function() {
+            const userRole = localStorage.getItem("role");
+            if (userRole !== "DOCTOR") {
+                window.location.href = "/patient/dashboard/";
+                return;
+            }
+        })();
+
+        /* =====================================================
            CONFIGURATION
         ===================================================== */
         const API_CONFIG = {

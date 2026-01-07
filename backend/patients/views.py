@@ -71,7 +71,7 @@ class PatientAppointmentsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, IsPatient]
 
     def get_queryset(self):
-        patient = Patient.objects.get(user=self.request.user)
+        patient, _ = Patient.objects.get_or_create(user=self.request.user)
         return Appointment.objects.filter(patient=patient)
 
 
@@ -80,7 +80,7 @@ class PatientAppointmentDetailView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated, IsPatient]
 
     def get_queryset(self):
-        patient = Patient.objects.get(user=self.request.user)
+        patient, _ = Patient.objects.get_or_create(user=self.request.user)
         return Appointment.objects.filter(patient=patient)
 
 
@@ -119,7 +119,7 @@ class PatientDashboardView(APIView):
     permission_classes = [IsAuthenticated, IsPatient]
 
     def get(self, request):
-        patient = Patient.objects.get(user=request.user)
+        patient, _ = Patient.objects.get_or_create(user=request.user)
         appointments = Appointment.objects.filter(patient=patient)
 
         return Response({
@@ -128,5 +128,3 @@ class PatientDashboardView(APIView):
             "approved": appointments.filter(status="APPROVED").count(),
             "cancelled": appointments.filter(status="CANCELLED").count(),
         })
-
-

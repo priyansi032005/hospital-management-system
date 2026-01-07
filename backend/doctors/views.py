@@ -27,7 +27,15 @@ class DoctorProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsDoctor]
 
     def get_object(self):
-        return Doctor.objects.get(user=self.request.user)
+        doctor, _ = Doctor.objects.get_or_create(
+            user=self.request.user,
+            defaults={
+                'specialization': '',
+                'experience_years': 0,
+                'phone': ''
+            }
+        )
+        return doctor
 
 
 class DoctorAppointmentsView(generics.ListAPIView):

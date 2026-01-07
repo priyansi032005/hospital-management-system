@@ -35,7 +35,7 @@ class DoctorPrescriptionListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated, IsDoctor]
 
     def get_queryset(self):
-        return Prescription.objects.filter(doctor=self.request.user)
+        return Prescription.objects.filter(doctor__user=self.request.user)
 
 # 🔹 PATIENT: VIEW PRESCRIPTIONS
 class PatientPrescriptionListView(generics.ListAPIView):
@@ -43,4 +43,5 @@ class PatientPrescriptionListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Prescription.objects.filter(patient=self.request.user)
+        return Prescription.objects.filter(patient__user=self.request.user)
+
