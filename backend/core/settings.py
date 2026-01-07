@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-2el5^z#r^c2up@4^u@js@rprcd8rod*xr_fbpp6c+qsx&fcge1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["hospital-management-system-23.onrender.com"]
+# ALLOWED_HOSTS = ["hospital-management-system-23.onrender.com"]
 
 
 
@@ -53,19 +53,19 @@ INSTALLED_APPS = [
     'doctors',
     'prescriptions',
     'medical_files',
-    'corsheaders',
+    # 'corsheaders',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    # 'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "whitenoise.middleware.WhiteNoiseMiddleware", 
+    # "whitenoise.middleware.WhiteNoiseMiddleware", 
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -92,10 +92,14 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL', default='postgresql://postgres:Ppb@2005@localhost:5432/medical_db'),
-        conn_max_age=600,
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'medical_db',
+        'USER': 'postgres',
+        'PASSWORD': 'Ppb@2005',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
 }
 
 
@@ -143,35 +147,35 @@ SIMPLE_JWT = {
 }
 
 ALLOWED_HOSTS = [
-    ".onrender.com",
+    # ".onrender.com",
     "localhost",
     "127.0.0.1"
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "https://hospital-management-system-23.onrender.com",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "https://hospital-management-system-23.onrender.com",
+# ]
 
-CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_HEADERS = [
-    'authorization',
-    'content-type',
-    'accept',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
+# CORS_ALLOW_HEADERS = [
+#     'authorization',
+#     'content-type',
+#     'accept',
+#     'origin',
+#     'user-agent',
+#     'x-csrftoken',
+#     'x-requested-with',
+# ]
 
-CORS_ALLOW_METHODS = [
-    'GET',
-    'POST',
-    'PUT',
-    'PATCH',
-    'DELETE',
-    'OPTIONS',
-]
+# CORS_ALLOW_METHODS = [
+#     'GET',
+#     'POST',
+#     'PUT',
+#     'PATCH',
+#     'DELETE',
+#     'OPTIONS',
+# ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -188,7 +192,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
