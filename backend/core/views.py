@@ -81,7 +81,10 @@ def logout_page(request):
     return redirect("/login/")
 
 
+@login_required
 def doctor_dashboard(request):
+    if request.user.role != 'DOCTOR':
+        return redirect('patient_dashboard')
     return render(request, "Doctor/DoctorDash/DoctorMain.html")
 
 
