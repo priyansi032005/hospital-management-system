@@ -11,7 +11,7 @@ document.getElementById("login-form").addEventListener("submit", async function 
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
         });
-*
+
         const data = await response.json();
         console.log("Response Data:", data);
 
@@ -25,7 +25,6 @@ document.getElementById("login-form").addEventListener("submit", async function 
         console.log("Access Token:", data.access);
         localStorage.setItem("refresh", data.refresh);
         console.log("Refresh Token:", data.refresh);
-        localStorage.setItem("role", data.role);
         console.log("User Role:", data.role);
 
         // Redirect to dashboard
