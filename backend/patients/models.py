@@ -14,7 +14,7 @@ class Patient(models.Model):
     age = models.IntegerField(null=True, blank=True)
     gender = models.CharField(max_length=10, blank=True)
     phone = models.CharField(max_length=15, blank=True)
-    address = models.TextField(blank=True, null=True)
+    address = models.TextField(blank=True)
 
     # Health Summary
     blood_group = models.CharField(max_length=5, blank=True)
