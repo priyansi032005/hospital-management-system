@@ -723,26 +723,15 @@
     </div>
     <script>
         /* =====================================================
-           ROLE VERIFICATION
-        ===================================================== */
-        (function() {
-            const userRole = localStorage.getItem("role");
-            if (userRole !== "DOCTOR") {
-                window.location.href = "/patient/dashboard/";
-                return;
-            }
-        })();
-
-        /* =====================================================
            CONFIGURATION
         ===================================================== */
         const API_CONFIG = {
-            BASE_URL: " http://127.0.0.1:8000/api/doctors/",
+            BASE_URL: "https://hospital-management-system-23.onrender.com/api/doctors/",
             ENDPOINTS: {
                 PROFILE: "profile/"
             },
             AUTH: {
-                REFRESH_URL: " http://127.0.0.1:8000/api/token/refresh/"
+                REFRESH_URL: "https://hospital-management-system-23.onrender.com/api/token/refresh/"
             },
             TIMEOUT: 10000
         };

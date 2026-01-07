@@ -733,7 +733,7 @@ async function fetchDoctors() {
 
     try {
         const res = await fetch(
-            " http://127.0.0.1:8000/api/patient/doctors/",
+            "https://hospital-management-system-23.onrender.com/api/patient/doctors/",
             { headers: getAuthHeaders() }
         );
 
@@ -773,7 +773,7 @@ async function bookAppointment() {
 
     try {
         const res = await fetch(
-            " http://127.0.0.1:8000/api/patient/appointments/create/",
+            "https://hospital-management-system-23.onrender.com/api/patient/appointments/create/",
             {
                 method: "POST",
                 headers: getAuthHeaders(),
