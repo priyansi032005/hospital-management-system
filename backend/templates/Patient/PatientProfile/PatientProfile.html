@@ -761,7 +761,7 @@
       
       // Basic info (non-editable)
       document.getElementById('profileName').textContent = data.name || 'Not specified';
-      document.getElementById("profileEmail").innerText = data.email;
+      document.getElementById("profileEmail").innerText = data.email || 'Not specified';
       console.log("Profile email set to:", data.email);
       document.getElementById('memberSince').textContent = data.created_at 
         ? `Member since ${new Date(data.created_at).toLocaleDateString()}`

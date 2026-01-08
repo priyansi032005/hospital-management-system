@@ -752,7 +752,7 @@
             <div class="card">
               <div class="card-header">
                 <div>
-                  <h3>Upcoming Appointments</h3>
+                  <h3>Your Appointments</h3>
                   <p>Your scheduled visits</p>
                 </div>
               </div>
@@ -902,10 +902,11 @@
     // ==================== RENDER FUNCTIONS ====================
     function renderUserProfile(profileData) {
       const userName =
-        profileData.username ||
-        profileData.user?.username ||
+        profileData.name ||
+        profileData.user?.name ||
         profileData.email ||
         'User';
+        console.log("Determined userName as:", userName);
       const userId = profileData.id || 'N/A';
       const initial = getInitials(userName);
       console.log("Rendering user profile for:", userName);
@@ -918,8 +919,8 @@
       document.getElementById('heroAvatar').textContent = initial;
       document.getElementById('patientId').textContent = userId;
 
-      document.getElementById('bloodType').textContent = profileData.bloodType || 'Not specified';
-      document.getElementById('insuranceProvider').textContent = profileData.insuranceProvider || 'Not specified';
+      document.getElementById('bloodType').textContent = profileData.blood_group || 'Not specified';
+      document.getElementById('insuranceProvider').textContent = profileData.insurance_provider || 'Not specified';
     }
 
     function renderAppointments(appointments) {
@@ -959,6 +960,42 @@
       lucide.createIcons();
     }
 
+
+    function renderEmergencyInfo(profileData) {
+  const infoList = document.getElementById("infoList");
+
+  const emergencyName =
+    profileData.emergency_contact_name || "Not provided";
+
+  const emergencyPhone =
+    profileData.emergency_contact_phone || "Not provided";
+
+  infoList.innerHTML = `
+    <div class="info-item">
+      <div class="info-icon">
+        <i data-lucide="user"></i>
+      </div>
+      <div class="info-content">
+        <h4>Emergency Contact Name</h4>
+        <p>${emergencyName}</p>
+      </div>
+    </div>
+
+    <div class="info-item">
+      <div class="info-icon">
+        <i data-lucide="phone"></i>
+      </div>
+      <div class="info-content">
+        <h4>Emergency Contact Phone</h4>
+        <p>${emergencyPhone}</p>
+      </div>
+    </div>
+  `;
+
+  lucide.createIcons(); // IMPORTANT for icons
+}
+
+
     // ==================== INITIALIZATION ====================
     async function initDashboard() {
       try {
@@ -973,6 +1010,8 @@
 
         renderUserProfile(profileData);
         renderAppointments(appointmentsData);
+        renderEmergencyInfo(profileData);
+        console.log("Dashboard data loaded successfully.");
 
         loading.style.display = 'none';
         app.style.display = 'block';

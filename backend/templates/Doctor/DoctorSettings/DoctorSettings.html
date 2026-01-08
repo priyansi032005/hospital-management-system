@@ -208,6 +208,15 @@
             margin-bottom: 0.5rem;
         }
 
+        .profile-bio {
+            font-size: 0.95rem;
+            color: #4b5563;
+            margin: 0.25rem 0 0.75rem 0;
+            line-height: 1.4;
+            max-width: 600px;
+        }
+
+
         .profile-specialty {
             display: inline-block;
             background: #d1fae5;
@@ -443,6 +452,7 @@
 
                     <div class="profile-info">
                         <h2 class="profile-name" id="displayName"></h2>
+                        <p id="displayBio" class="profile-bio"></p>
                         <span class="profile-specialty" id="displaySpecialty"></span>
                         <div class="profile-stats">
                             <div class="stat-item">
@@ -512,198 +522,205 @@
     </main>
 
     <div class="toast" id="toast">Settings saved successfully!</div>
-<script>
-    /* =====================================================
-       CONFIG
-    ===================================================== */
-    const API_CONFIG = {
-        BASE_URL: "http://127.0.0.1:8000/api/doctors/",
-        TIMEOUT: 10000,
-        ENDPOINTS: {
-            PROFILE: "profile/"
-        },
-        AUTH: {
-            REFRESH_URL: "http://127.0.0.1:8000/api/token/refresh/"
-        }
-    };
-
-    /* =====================================================
-       FETCH WITH JWT + AUTO REFRESH
-    ===================================================== */
-    async function fetchWithAuth(url, options = {}, isRetry = false) {
-        const accessToken = localStorage.getItem("access");
-        if (!accessToken) throw new Error("Access token missing");
-
-        const fetchOptions = {
-            ...options,
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${accessToken}`,
-                ...(options.headers || {})
+    <script>
+        /* =====================================================
+           CONFIG
+        ===================================================== */
+        const API_CONFIG = {
+            BASE_URL: "http://127.0.0.1:8000/api/doctors/",
+            TIMEOUT: 10000,
+            ENDPOINTS: {
+                PROFILE: "profile/"
+            },
+            AUTH: {
+                REFRESH_URL: "http://127.0.0.1:8000/api/token/refresh/"
             }
         };
 
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
-        fetchOptions.signal = controller.signal;
+        /* =====================================================
+           FETCH WITH JWT + AUTO REFRESH
+        ===================================================== */
+        async function fetchWithAuth(url, options = {}, isRetry = false) {
+            const accessToken = localStorage.getItem("access");
+            if (!accessToken) throw new Error("Access token missing");
 
-        try {
-            const response = await fetch(url, fetchOptions);
-            clearTimeout(timeout);
+            const fetchOptions = {
+                ...options,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`,
+                    ...(options.headers || {})
+                }
+            };
 
-            // If access token expired → try refresh ONCE
-            if (response.status === 401 && !isRetry) {
-                const refreshToken = localStorage.getItem("refresh");
-                if (!refreshToken) throw new Error("Refresh token missing");
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
+            fetchOptions.signal = controller.signal;
 
-                const refreshResponse = await fetch(API_CONFIG.AUTH.REFRESH_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ refresh: refreshToken })
-                });
+            try {
+                const response = await fetch(url, fetchOptions);
+                clearTimeout(timeout);
 
-                if (!refreshResponse.ok) throw new Error("Session expired");
+                // If access token expired → try refresh ONCE
+                if (response.status === 401 && !isRetry) {
+                    const refreshToken = localStorage.getItem("refresh");
+                    if (!refreshToken) throw new Error("Refresh token missing");
 
-                const refreshData = await refreshResponse.json();
-                localStorage.setItem("access", refreshData.access);
+                    const refreshResponse = await fetch(API_CONFIG.AUTH.REFRESH_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ refresh: refreshToken })
+                    });
 
-                if (refreshData.refresh) localStorage.setItem("refresh", refreshData.refresh);
+                    if (!refreshResponse.ok) throw new Error("Session expired");
 
-                // Retry original request once
-                return fetchWithAuth(url, options, true);
+                    const refreshData = await refreshResponse.json();
+                    localStorage.setItem("access", refreshData.access);
+
+                    if (refreshData.refresh) localStorage.setItem("refresh", refreshData.refresh);
+
+                    // Retry original request once
+                    return fetchWithAuth(url, options, true);
+                }
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || `HTTP Error ${response.status}`);
+                }
+
+                return await response.json();
+
+            } catch (err) {
+                clearTimeout(timeout);
+                throw err;
             }
+        }
 
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.detail || `HTTP Error ${response.status}`);
+        /* =====================================================
+           FETCH DOCTOR PROFILE
+        ===================================================== */
+        async function fetchDoctorProfile() {
+            const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.PROFILE;
+            return await fetchWithAuth(url);
+        }
+
+        /* =====================================================
+           RENDER DOCTOR PROFILE
+        ===================================================== */
+        function renderDoctorProfile(data) {
+            console.log("Doctor Profile Data:", data);
+
+            const name = data.user?.username || "Doctor";
+            const email = data.user?.email || "-";
+
+            // Fill form fields
+            if (document.getElementById("name")) document.getElementById("name").value = name;
+            if (document.getElementById("specialization")) document.getElementById("specialization").value = data.specialization || "";
+            if (document.getElementById("experience_years")) document.getElementById("experience_years").value = data.experience_years || "";
+            if (document.getElementById("phone")) document.getElementById("phone").value = data.phone || "";
+
+            // Update UI display
+            if (document.getElementById("displayName")) document.getElementById("displayName").textContent = name;
+            if (document.getElementById("displayEmail")) document.getElementById("displayEmail").textContent = email;
+            if (document.getElementById("displaySpecialty")) document.getElementById("displaySpecialty").textContent = data.specialization || "-";
+            if (document.getElementById("displayExperience")) document.getElementById("displayExperience").textContent =
+                `${data.experience_years || 0} Years Experience`;
+            if (document.getElementById("displayPhone")) {
+                document.getElementById("displayPhone").textContent = data.phone || "-";
             }
-
-            return await response.json();
-
-        } catch (err) {
-            clearTimeout(timeout);
-            throw err;
+            console.log("phone field: ", data.phone);
+            if(document.getElementById("displayBio")) {
+                document.getElementById("displayBio").textContent = data.bio || "No bio available.";
+            }
+            if (document.getElementById("profileImage")) {
+                const initials = name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+                document.getElementById("profileImage").textContent = initials;
+            }
         }
-    }
 
-    /* =====================================================
-       FETCH DOCTOR PROFILE
-    ===================================================== */
-    async function fetchDoctorProfile() {
-        const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.PROFILE;
-        return await fetchWithAuth(url);
-    }
+        /* =====================================================
+           SAVE DOCTOR SETTINGS (PUT)
+        ===================================================== */
+        if (document.getElementById("settingsForm")) {
 
-    /* =====================================================
-       RENDER DOCTOR PROFILE
-    ===================================================== */
-    function renderDoctorProfile(data) {
-        console.log("Doctor Profile Data:", data);
+            document.getElementById("settingsForm").addEventListener("submit", async function (e) {
+                e.preventDefault();
 
-        const name = data.user?.username || "Doctor";
-        const email = data.user?.email || "-";
+                const formData = {
+                    name: document.getElementById("name").value,
+                    specialization: document.getElementById("specialization").value,
+                    experience_years: parseInt(document.getElementById("experience_years").value || 0),
+                    phone: document.getElementById("phone").value,
+                    bio: document.getElementById("bio") ? document.getElementById("bio").value : ""
+                };
 
-        // Fill form fields
-        if (document.getElementById("name")) document.getElementById("name").value = name;
-        if (document.getElementById("specialization")) document.getElementById("specialization").value = data.specialization || "";
-        if (document.getElementById("experience_years")) document.getElementById("experience_years").value = data.experience_years || "";
-        if (document.getElementById("phone")) document.getElementById("phone").value = data.phone || "";
+                try {
+                    const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.PROFILE;
+                    const updatedData = await fetchWithAuth(url, {
+                        method: "PUT",
+                        body: JSON.stringify(formData)
+                    });
 
-        // Update UI display
-        if (document.getElementById("displayName")) document.getElementById("displayName").textContent = name;
-        if (document.getElementById("displayEmail")) document.getElementById("displayEmail").textContent = email;
-        if (document.getElementById("displaySpecialty")) document.getElementById("displaySpecialty").textContent = data.specialization || "-";
-        if (document.getElementById("displayExperience")) document.getElementById("displayExperience").textContent =
-            `${data.experience_years || 0} Years Experience`;
+                    renderDoctorProfile(updatedData);
+                    showToast("Settings saved successfully!");
+                } catch (error) {
+                    console.error(error);
+                    showToast("Error saving settings: " + error.message, true);
+                }
+            });
 
-        if (document.getElementById("profileImage")) {
-            const initials = name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
-            document.getElementById("profileImage").textContent = initials;
         }
-    }
 
-    /* =====================================================
-       SAVE DOCTOR SETTINGS (PUT)
-    ===================================================== */
-    if (document.getElementById("settingsForm")) {
-    
-        document.getElementById("settingsForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
+        /* =====================================================
+           TOAST
+        ===================================================== */
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("toast");
+            if (!toast) return;
+            toast.textContent = message;
+            toast.style.background = isError ? "#ef4444" : "#14b8a6";
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3000);
+        }
 
-    const formData = {
-        name: document.getElementById("name").value,
-        specialization: document.getElementById("specialization").value,
-        experience_years: parseInt(document.getElementById("experience_years").value || 0),
-        phone: document.getElementById("phone").value,
-        bio: document.getElementById("bio") ? document.getElementById("bio").value : ""
-    };
+        /* =====================================================
+           SIDEBAR HANDLERS
+        ===================================================== */
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("open");
+            document.getElementById("overlay").classList.toggle("active");
+        }
 
-    try {
-        const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.PROFILE;
-        const updatedData = await fetchWithAuth(url, {
-            method: "PUT",
-            body: JSON.stringify(formData)
+        function closeSidebar() {
+            document.getElementById("sidebar").classList.remove("open");
+            document.getElementById("overlay").classList.remove("active");
+        }
+
+        document.querySelectorAll(".menu-item").forEach(item => {
+            item.addEventListener("click", () => {
+                if (window.innerWidth < 768) closeSidebar();
+            });
         });
 
-        renderDoctorProfile(updatedData);
-        showToast("Settings saved successfully!");
-    } catch (error) {
-        console.error(error);
-        showToast("Error saving settings: " + error.message, true);
-    }
-});
-
-    }
-
-    /* =====================================================
-       TOAST
-    ===================================================== */
-    function showToast(message, isError = false) {
-        const toast = document.getElementById("toast");
-        if (!toast) return;
-        toast.textContent = message;
-        toast.style.background = isError ? "#ef4444" : "#14b8a6";
-        toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 3000);
-    }
-
-    /* =====================================================
-       SIDEBAR HANDLERS
-    ===================================================== */
-    function toggleSidebar() {
-        document.getElementById("sidebar").classList.toggle("open");
-        document.getElementById("overlay").classList.toggle("active");
-    }
-
-    function closeSidebar() {
-        document.getElementById("sidebar").classList.remove("open");
-        document.getElementById("overlay").classList.remove("active");
-    }
-
-    document.querySelectorAll(".menu-item").forEach(item => {
-        item.addEventListener("click", () => {
-            if (window.innerWidth < 768) closeSidebar();
+        window.addEventListener("resize", () => {
+            if (window.innerWidth >= 768) closeSidebar();
         });
-    });
 
-    window.addEventListener("resize", () => {
-        if (window.innerWidth >= 768) closeSidebar();
-    });
+        /* =====================================================
+           INIT
+        ===================================================== */
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const profile = await fetchDoctorProfile();
+                renderDoctorProfile(profile);
+            } catch (err) {
+                console.error("Error loading dashboard:", err);
+                showToast("Session expired. Please login again.", true);
+                // Optional redirect to login
+                // window.location.href = "/login.html";
+            }
+        });
+    </script>
+</body>
 
-    /* =====================================================
-       INIT
-    ===================================================== */
-    document.addEventListener("DOMContentLoaded", async () => {
-        try {
-            const profile = await fetchDoctorProfile();
-            renderDoctorProfile(profile);
-        } catch (err) {
-            console.error("Error loading dashboard:", err);
-            showToast("Session expired. Please login again.", true);
-            // Optional redirect to login
-            // window.location.href = "/login.html";
-        }
-    });
-</script>
-</body>     
-</html> 
+</html>

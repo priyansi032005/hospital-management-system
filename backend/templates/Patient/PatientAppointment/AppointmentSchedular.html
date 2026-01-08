@@ -475,6 +475,15 @@
                                 <label for="isOnline">Online Appointment</label>
                             </div>
                         </div>
+
+                        <!-- Time Slot -->
+                        <div class="form-section">
+                            <label for="timeSlot">Time Slot<span class="required">*</span></label>
+                            <select id="timeSlot">
+                                <option value="">Select time slot</option>
+                            </select>
+                        </div>
+
                     </div>
 
                     <!-- Available Slots Section -->
@@ -516,6 +525,11 @@
                                 <span class="label">Appointment Type</span>
                                 <span class="value" id="summaryType">Offline</span>
                             </div>
+                            <div class="summary-item">
+                                <span class="label">Time Slot</span>
+                                <span class="value" id="summaryTimeSlot">-</span>
+                            </div>
+
                         </div>
                     </div>
 
@@ -557,6 +571,48 @@
         const dateInput = document.getElementById("date");
         const bookButton = document.getElementById("bookButton");
 
+        const summaryName = document.getElementById("summaryName");
+        const summaryPhone = document.getElementById("summaryPhone");
+        const summarySpecialty = document.getElementById("summarySpecialty");
+        const summaryDoctor = document.getElementById("summaryDoctor");
+        const summaryDate = document.getElementById("summaryDate");
+        const summaryType = document.getElementById("summaryType");
+        const patientNameInput = document.getElementById("patientName");
+        const patientPhoneInput = document.getElementById("patientPhone");
+        const isOnlineCheckbox = document.getElementById("isOnline");
+        const timeSlotSelect = document.getElementById("timeSlot");
+        const summaryTimeSlot = document.getElementById("summaryTimeSlot");
+
+        timeSlotSelect.addEventListener("change", () => {
+            summaryTimeSlot.textContent = timeSlotSelect.value || "-";
+        });
+
+
+        patientNameInput.addEventListener("input", () => {
+            summaryName.textContent = patientNameInput.value || "-";
+        });
+
+        patientPhoneInput.addEventListener("input", () => {
+            summaryPhone.textContent = patientPhoneInput.value || "-";
+        });
+
+        specialty.addEventListener("change", () => {
+            summarySpecialty.textContent = specialty.value || "-";
+        });
+
+        doctorSelect.addEventListener("change", () => {
+            summaryDoctor.textContent = doctorSelect.selectedOptions[0]?.text || "-";
+        });
+
+        dateInput.addEventListener("change", () => {
+            summaryDate.textContent = dateInput.value || "-";
+        });
+
+        isOnlineCheckbox.addEventListener("change", () => {
+            summaryType.textContent = isOnlineCheckbox.checked ? "Online" : "Offline";
+        });
+
+
         /* ================= DATE LIMIT ================= */
         dateInput.min = new Date().toISOString().split("T")[0];
 
@@ -565,7 +621,9 @@
 
         doctorSelect.addEventListener("change", () => {
             dateInput.disabled = !doctorSelect.value;
+            generateTimeSlots();
         });
+        dateInput.addEventListener("change", generateTimeSlots);
 
         bookButton.addEventListener("click", bookAppointment);
 
@@ -605,6 +663,39 @@
             }
         }
 
+        function formatTime(hour, min) {
+            const h = hour.toString().padStart(2, "0");
+            return `${h}:${min}`;
+        }
+
+        function generateTimeSlots() {
+            const timeSlotSelect = document.getElementById("timeSlot");
+            timeSlotSelect.innerHTML = '<option value="">Select time slot</option>';
+
+            if (!doctorSelect.value || !dateInput.value) {
+                timeSlotSelect.disabled = true;
+                return;
+            }
+
+            for (let hour = 9; hour < 17; hour++) {
+                ["00", "30"].forEach(min => {
+                    const start = formatTime(hour, min);
+                    const endMin = min === "00" ? "30" : "00";
+                    const endHourVal = min === "00" ? hour : hour + 1;
+                    const end = formatTime(endHourVal, endMin);
+
+                    const slot = `${start} - ${end}`;
+                    const opt = document.createElement("option");
+                    opt.value = slot;
+                    opt.textContent = slot;
+                    timeSlotSelect.appendChild(opt);
+                });
+            }
+
+            timeSlotSelect.disabled = false;
+        }
+
+
         /* ================= BOOK APPOINTMENT ================= */
         async function bookAppointment() {
             if (!doctorSelect.value || !dateInput.value) {
@@ -617,8 +708,13 @@
 
             const payload = {
                 doctor: Number(doctorSelect.value),
-                appointment_date: appointmentDateTime
+                appointment_date: dateInput.value,
+                patient_name: document.getElementById("patientName").value,
+                phone_number: document.getElementById("patientPhone").value,
+                appointment_type: isOnlineCheckbox.checked ? "Online" : "Offline",
+                time_slot: document.getElementById("timeSlot").value
             };
+
 
             try {
                 const res = await fetch("http://127.0.0.1:8000/api/patient/appointments/create/",

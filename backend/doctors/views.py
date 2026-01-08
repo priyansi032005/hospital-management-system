@@ -87,12 +87,12 @@ class DoctorDashboardView(APIView):
             "cancelled": appointments.filter(status="CANCELLED").count(),
         })
 
+
 class DoctorPatientListView(generics.ListAPIView):
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated, IsDoctor]
 
     def get_queryset(self):
         return Patient.objects.filter(
-            appointment__doctor__user=self.request.user
+            appointments__doctor__user=self.request.user
         ).distinct()
-

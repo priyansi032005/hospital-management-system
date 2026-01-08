@@ -519,7 +519,7 @@
         </div>
 
         <nav class="menu-container">
-            <a href="/doctor/dashboard/" class="menu-item" data-page="dashboard">
+            <a href="/doctor/dashboard/" class="menu-item">
                 <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"></rect>
                     <rect x="14" y="3" width="7" height="7"></rect>
@@ -529,7 +529,7 @@
                 <span>Dashboard</span>
             </a>
 
-            <a href="/doctor/appointments" class="menu-item active" data-page="appointments">
+            <a href="/doctor/appointments" class="menu-item active">
                 <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -538,7 +538,7 @@
                 </svg>
                 <span>Appointments</span>
             </a>
-            
+
             <a href="/doctor/prescriptions" class="menu-item active">
                 <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -551,7 +551,7 @@
             </a>
 
 
-            <a href="/doctor/patientlist/" class="menu-item" data-page="patients">
+            <a href="/doctor/patientlist/" class="menu-item">
                 <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="9" cy="7" r="4"></circle>
@@ -561,7 +561,7 @@
                 <span>Patients</span>
             </a>
 
-            <a href="/doctor/settings" class="menu-item" data-page="settings">
+            <a href="/doctor/settings" class="menu-item">
                 <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="3"></circle>
                     <path d="M12 1v6m0 6v6m0-6h6m-6 0H6"></path>
@@ -903,8 +903,13 @@
         /* ================= PAGE SWITCH ================= */
         document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', e => {
+
+                if (!item.dataset.page) {
+                    return;
+                }
                 e.preventDefault();
                 switchPage(item.dataset.page);
+
                 if (window.innerWidth < 768) closeSidebar();
             });
         });
@@ -930,7 +935,7 @@
             const pageElement = document.getElementById(`${page}Page`);
             if (!pageElement) {
                 console.error(` Missing page container: ${page}Page`);
-                return;   
+                return;
             }
 
             pageElement.style.display = 'block';

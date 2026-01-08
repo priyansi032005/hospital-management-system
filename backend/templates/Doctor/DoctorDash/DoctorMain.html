@@ -629,7 +629,7 @@
                             <div class="stat-card">
                                 <div class="stat-content">
                                     <div class="stat-info">
-                                        <p class="stat-label">Today's Appointments</p>
+                                        <p class="stat-label">Total Appointments</p>
                                         <h3 class="stat-value" id="statAppointments">0</h3>
                                     </div>
                                     <div class="stat-icon-wrapper bg-blue-50">
@@ -647,7 +647,7 @@
                             <div class="stat-card">
                                 <div class="stat-content">
                                     <div class="stat-info">
-                                        <p class="stat-label">Total Patients</p>
+                                        <p class="stat-label">Approved Appointments</p>
                                         <h3 class="stat-value" id="statPatients">0</h3>
                                     </div>
                                     <div class="stat-icon-wrapper bg-green-50">
@@ -725,7 +725,7 @@
         /* =====================================================
            ROLE VERIFICATION
         ===================================================== */
-        (function() {
+        (function () {
             const userRole = localStorage.getItem("role");
             console.log("User Role:", userRole);
             if (userRole !== "DOCTOR") {
@@ -740,7 +740,8 @@
         const API_CONFIG = {
             BASE_URL: "http://127.0.0.1:8000/api/doctors/",
             ENDPOINTS: {
-                PROFILE: "profile/"
+                PROFILE: "profile/",
+                DASHBOARD: "dashboard/"
             },
             AUTH: {
                 REFRESH_URL: "http://127.0.0.1:8000/api/token/refresh/"
@@ -766,7 +767,12 @@
             doctorEmail: document.getElementById("doctorEmail"),
             doctorSpecialty: document.getElementById("doctorSpecialty"),
             doctorExperience: document.getElementById("doctorExperience"),
-            avatarPlaceholder: document.getElementById("avatarPlaceholder")
+            avatarPlaceholder: document.getElementById("avatarPlaceholder"),
+
+            statAppointments: document.getElementById("statAppointments"),
+            statPatients: document.getElementById("statPatients"),
+            statPending: document.getElementById("statPending"),
+            statCancelled: document.getElementById("statCancelled"),
         };
 
         /* =====================================================
@@ -828,6 +834,29 @@
             return await response.json();
         }
 
+
+        async function fetchDoctorDashboard() {
+            const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.DASHBOARD;
+            return await fetchWithAuth(url);
+        }
+
+        function renderDashboardStats(data) {
+            console.log("Dashboard Stats:", data);
+
+            elements.statAppointments.textContent =
+                data.total_appointments ?? 0;
+
+            elements.statPatients.textContent =
+                data.approved ?? 0;
+
+            elements.statPending.textContent =
+                data.pending ?? 0;
+
+            elements.statCancelled.textContent =
+                data.cancelled ?? 0;
+        }
+
+
         /* =====================================================
            API CALL
         ===================================================== */
@@ -842,21 +871,24 @@
         function renderDoctorProfile(data) {
             console.log("Doctor Profile Data:", data);
 
-            // Fallback values
-            const doctorName = "Doctor";
-            const doctorEmail = "-";
+            // Get username safely
+            const doctorName = data.name || "Doctor";
+            console.log("Doctor Name:", doctorName);
 
-            // UI bindings
+            // Welcome text
             elements.welcomeText.textContent = `Welcome, Dr. ${doctorName}`;
-            console.log(doctorName);
-            elements.doctorName.textContent = doctorName;
-            elements.doctorEmail.textContent = doctorEmail;
+
+            // Profile details
+            elements.doctorName.textContent = `Dr. ${doctorName}`;
+            elements.doctorEmail.textContent = data.email || "-";
             elements.doctorSpecialty.textContent = data.specialization || "-";
             elements.doctorExperience.textContent =
                 `${data.experience_years ?? 0} Years Experience`;
 
-            elements.avatarPlaceholder.textContent = "D";
+            // Avatar first letter
+            elements.avatarPlaceholder.textContent = doctorName.charAt(0).toUpperCase();
         }
+
 
 
         /* =====================================================
@@ -877,8 +909,13 @@
                 elements.loadingState.style.display = "flex";
                 elements.errorState.style.display = "none";
 
-                const profile = await fetchDoctorProfile();
+                const [profile, dashboard] = await Promise.all([
+                    fetchDoctorProfile(),
+                    fetchDoctorDashboard()
+                ]);
                 renderDoctorProfile(profile);
+                renderDashboardStats(dashboard);
+
 
                 elements.loadingState.style.display = "none";
                 elements.contentContainer.style.display = "block";
