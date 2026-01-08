@@ -542,6 +542,7 @@
         ===================================================== */
         async function fetchWithAuth(url, options = {}, isRetry = false) {
             const accessToken = localStorage.getItem("access");
+            console.log("Using access token:", accessToken);
             if (!accessToken) throw new Error("Access token missing");
 
             const fetchOptions = {

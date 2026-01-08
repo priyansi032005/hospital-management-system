@@ -641,6 +641,7 @@
                     "http://127.0.0.1:8000/api/patient/doctors/",
                     { headers: getAuthHeaders() }
                 );
+                console.log(res);
                 console.log("Fetch Doctors Response Status:", res.status);
 
                 if (!res.ok) throw new Error("Failed to load doctors");
@@ -714,6 +715,8 @@
                 appointment_type: isOnlineCheckbox.checked ? "Online" : "Offline",
                 time_slot: document.getElementById("timeSlot").value
             };
+
+            console.log("Booking Payload:", payload);
 
 
             try {
