@@ -1,0 +1,25 @@
+.page-container {
+    padding: 30px;
+}
+
+h2 {
+    color: #48B3AF;
+    margin-bottom: 25px;
+}
+
+.report-box {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.report-box h4 {
+    color: #48B3AF;
+    margin-bottom: 10px;
+}
+
+.report-box p {
+    color: #444;
+}

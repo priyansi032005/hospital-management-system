@@ -478,8 +478,10 @@
                 </svg>
                 <span>Appointments</span>
             </a>
-            <a href="/doctor/prescriptions/" class="menu-item"> 
-                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+
+            <a href="/doctor/prescriptions" class="menu-item active">
+                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
                     <line x1="16" y1="13" x2="8" y2="13"></line>
                     <line x1="16" y1="17" x2="8" y2="17"></line>
@@ -587,8 +589,9 @@
 
     <script>
 /* ==================== CONFIG ==================== */
-const API_BASE_URL = 'https://hospital-management-system-23.onrender.com';
+const API_BASE_URL = 'http://127.0.0.1:8000';
 const API_ENDPOINT = `${API_BASE_URL}/api/doctors/patients/`;
+console.log("API Endpoint:", API_ENDPOINT);
 const REFRESH_ENDPOINT = `${API_BASE_URL}/api/token/refresh/`;
 
 /* ==================== SIDEBAR FUNCTIONS ==================== */
@@ -625,6 +628,7 @@ window.addEventListener('resize', () => {
 /* ==================== AUTH FETCH FUNCTION ==================== */
 async function fetchWithAuth(url, options = {}, retry = false) {
     let accessToken = localStorage.getItem('access');
+    console.log("Fetching with Access Token:", accessToken);
     if (!accessToken) throw new Error('Access token missing. Please login.');
 
     const res = await fetch(url, {
@@ -639,6 +643,7 @@ async function fetchWithAuth(url, options = {}, retry = false) {
     // If token expired → refresh
     if (res.status === 401 && !retry) {
         const refreshToken = localStorage.getItem('refresh');
+        console.log("Access token expired, attempting to refresh...", refreshToken);
         if (!refreshToken) throw new Error('Session expired. Please login again.');
 
         const refreshRes = await fetch(REFRESH_ENDPOINT, {
@@ -678,6 +683,7 @@ async function fetchPatients() {
 
     try {
         const patients = await fetchWithAuth(API_ENDPOINT);
+        console.log("Fetched Patients:", patients);
 
         loadingState.style.display = 'none';
 

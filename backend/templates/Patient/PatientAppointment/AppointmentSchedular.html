@@ -530,278 +530,128 @@
             </div>
         </div>
     </div>
-<!-- <script>
-/* ================= JWT HELPER ================= */
-function getAuthHeaders() {
-    const token = localStorage.getItem("access");
-    if (!token) {
-        alert("Session expired. Please login again.");
-        window.location.href = "/login/";
-        throw new Error("No token");
-    }
-    return {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-    };
-}
-
-/* ================= MODAL AUTO OPEN ================= */
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("appointmentModal").classList.add("active");
-});
-
-/* ================= STATE ================= */
-const state = {
-    specialty: "",
-    doctor: "",
-    date: ""
-};
-
-/* ================= DOM ELEMENTS ================= */
-const specialty = document.getElementById("specialty");
-const doctor = document.getElementById("doctor");
-const dateInput = document.getElementById("date");
-const patientName = document.getElementById("patientName");
-const patientPhone = document.getElementById("patientPhone");
-const bookButton = document.getElementById("bookButton");
-const isOnlineCheckbox = document.getElementById("isOnline");
-
-/* ================= DATE LIMIT ================= */
-dateInput.min = new Date().toISOString().split("T")[0];
-
-/* ================= EVENTS ================= */
-specialty.addEventListener("change", fetchDoctors);
-
-doctor.addEventListener("change", () => {
-    if (doctor.value) {
-        dateInput.disabled = false;
-        dateInput.focus();
-        dateInput.showPicker?.(); // open calendar
-    } else {
-        dateInput.disabled = true;
-        dateInput.value = "";
-    }
-});
-
-dateInput.addEventListener("change", () => {
-    state.date = dateInput.value;
-});
-
-bookButton.addEventListener("click", bookAppointment);
-
-/* ================= FETCH DOCTORS ================= */
-async function fetchDoctors() {
-    state.specialty = specialty.value;
-
-    doctor.innerHTML = '<option value="">Select a doctor...</option>';
-    doctor.disabled = true;
-    dateInput.disabled = true;
-    dateInput.value = "";
-
-    if (!state.specialty) return;
-
-    try {
-        const res = await fetch(
-            "https://hospital-management-system-23.onrender.com/api/patient/doctors/",
-            { headers: getAuthHeaders() }
-        );
-
-        if (!res.ok) throw new Error("Failed to load doctors");
-
-        const doctors = await res.json();
-
-        if (!Array.isArray(doctors) || doctors.length === 0) {
-            alert("No doctors available for this specialty");
-            return;
+    <script>
+        /* ================= JWT HELPER ================= */
+        function getAuthHeaders() {
+            const token = localStorage.getItem("access");
+            console.log("Using Access Token:", token);
+            if (!token) {
+                alert("Session expired. Please login again.");
+                window.location.href = "/login/";
+                throw new Error("No token");
+            }
+            return {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            };
         }
 
-        doctors.forEach(d => {
-            const opt = document.createElement("option");
-            opt.value = d.id;
-            opt.textContent = `${d.firstname} ${d.lastname}`;
-            doctor.appendChild(opt);
+        /* ================= AUTO OPEN MODAL ================= */
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("appointmentModal")?.classList.add("active");
         });
 
-        doctor.disabled = false;
+        /* ================= DOM ELEMENTS ================= */
+        const specialty = document.getElementById("specialty");
+        const doctorSelect = document.getElementById("doctor");
+        const dateInput = document.getElementById("date");
+        const bookButton = document.getElementById("bookButton");
 
-    } catch (err) {
-        console.error(err);
-        alert("Error loading doctors");
-    }
-}
+        /* ================= DATE LIMIT ================= */
+        dateInput.min = new Date().toISOString().split("T")[0];
 
-/* ================= BOOK APPOINTMENT ================= */
-async function bookAppointment() {
-    if (!specialty.value || !doctor.value || !dateInput.value) {
-        alert("Please select Specialty, Doctor and Date");
-        return;
-    }
+        /* ================= EVENTS ================= */
+        specialty.addEventListener("change", fetchDoctors);
 
-    if (!patientName.value.trim() || !patientPhone.value.trim()) {
-        alert("Please enter patient name and phone number");
-        return;
-    }
-
-    const payload = {
-        specialty: specialty.value,
-        doctor: doctor.value,
-        date: dateInput.value,
-        patient_name: patientName.value,
-        patient_phone: patientPhone.value,
-        appointment_type: isOnlineCheckbox.checked ? "online" : "offline"
-    };
-
-    try {
-        const res = await fetch(
-            "https://hospital-management-system-23.onrender.com/api/patient/appointments/create/",
-            {
-                method: "POST",
-                headers: getAuthHeaders(),
-                body: JSON.stringify(payload)
-            }
-        );
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            alert(data.detail || "Booking failed");
-            return;
-        }
-
-        alert("✅ Appointment booked successfully");
-        window.location.href = "/patient/appointments/";
-
-    } catch (err) {
-        console.error(err);
-        alert("Server error. Try again later.");
-    }
-}
-
-/* ================= CLOSE MODAL ================= */
-function closeModal() {
-    window.location.href = "/patient/appointments/";
-}
-</script>
- -->
-
- <script>
-/* ================= JWT HELPER ================= */
-function getAuthHeaders() {
-    const token = localStorage.getItem("access");
-    if (!token) {
-        alert("Session expired. Please login again.");
-        window.location.href = "/login/";
-        throw new Error("No token");
-    }
-    return {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-    };
-}
-
-/* ================= AUTO OPEN MODAL ================= */
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("appointmentModal")?.classList.add("active");
-});
-
-/* ================= DOM ELEMENTS ================= */
-const specialty = document.getElementById("specialty");
-const doctorSelect = document.getElementById("doctor");
-const dateInput = document.getElementById("date");
-const bookButton = document.getElementById("bookButton");
-
-/* ================= DATE LIMIT ================= */
-dateInput.min = new Date().toISOString().split("T")[0];
-
-/* ================= EVENTS ================= */
-specialty.addEventListener("change", fetchDoctors);
-
-doctorSelect.addEventListener("change", () => {
-    dateInput.disabled = !doctorSelect.value;
-});
-
-bookButton.addEventListener("click", bookAppointment);
-
-/* ================= FETCH DOCTORS ================= */
-async function fetchDoctors() {
-    doctorSelect.innerHTML = '<option value="">Select a doctor...</option>';
-    doctorSelect.disabled = true;
-    dateInput.disabled = true;
-    dateInput.value = "";
-
-    if (!specialty.value) return;
-
-    try {
-        const res = await fetch(
-            "https://hospital-management-system-23.onrender.com/api/patient/doctors/",
-            { headers: getAuthHeaders() }
-        );
-
-        if (!res.ok) throw new Error("Failed to load doctors");
-
-        const doctors = await res.json();
-
-        doctors.forEach(d => {
-            const opt = document.createElement("option");
-            opt.value = d.id;
-            opt.textContent = `${d.firstname} ${d.lastname}`;
-            doctorSelect.appendChild(opt);
+        doctorSelect.addEventListener("change", () => {
+            dateInput.disabled = !doctorSelect.value;
         });
 
-        doctorSelect.disabled = false;
+        bookButton.addEventListener("click", bookAppointment);
 
-    } catch (err) {
-        console.error(err);
-        alert("Error loading doctors");
-    }
-}
+        /* ================= FETCH DOCTORS ================= */
+        async function fetchDoctors() {
+            doctorSelect.innerHTML = '<option value="">Select a doctor...</option>';
+            doctorSelect.disabled = true;
+            dateInput.disabled = true;
+            dateInput.value = "";
 
-/* ================= BOOK APPOINTMENT ================= */
-async function bookAppointment() {
-    if (!doctorSelect.value || !dateInput.value) {
-        alert("Please select doctor and date");
-        return;
-    }
+            if (!specialty.value) return;
 
-    /* Convert date → ISO datetime (10:30 AM default) */
-    const appointmentDateTime = new Date(`${dateInput.value}T10:30:00Z`).toISOString();
+            try {
+                const res = await fetch(
+                    "http://127.0.0.1:8000/api/patient/doctors/",
+                    { headers: getAuthHeaders() }
+                );
+                console.log("Fetch Doctors Response Status:", res.status);
 
-    const payload = {
-        doctor: Number(doctorSelect.value),
-        appointment_date: appointmentDateTime
-    };
+                if (!res.ok) throw new Error("Failed to load doctors");
 
-    try {
-        const res = await fetch(
-            "https://hospital-management-system-23.onrender.com/api/patient/appointments/create/",
-            {
-                method: "POST",
-                headers: getAuthHeaders(),
-                body: JSON.stringify(payload)
+                const doctors = await res.json();
+                console.log("Fetched Doctors:", doctors);
+
+                doctors.forEach(d => {
+                    const opt = document.createElement("option");
+                    opt.value = d.id;
+                    opt.textContent = d.username;
+                    doctorSelect.appendChild(opt);
+                });
+
+                doctorSelect.disabled = false;
+
+            } catch (err) {
+                console.error(err);
+                alert("Error loading doctors");
             }
-        );
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            alert(JSON.stringify(data));
-            return;
         }
 
-        alert("✅ Appointment booked successfully");
-        window.location.href = "/patient/appointments/";
+        /* ================= BOOK APPOINTMENT ================= */
+        async function bookAppointment() {
+            if (!doctorSelect.value || !dateInput.value) {
+                alert("Please select doctor and date");
+                return;
+            }
 
-    } catch (err) {
-        console.error(err);
-        alert("Server error. Try again later.");
-    }
-}
+            /* Convert date → ISO datetime (10:30 AM default) */
+            const appointmentDateTime = dateInput.value;
 
-/* ================= CLOSE MODAL ================= */
-function closeModal() {
-    window.location.href = "/patient/appointments/";
-}
-</script>
+            const payload = {
+                doctor: Number(doctorSelect.value),
+                appointment_date: appointmentDateTime
+            };
+
+            try {
+                const res = await fetch("http://127.0.0.1:8000/api/patient/appointments/create/",
+                    {
+                        method: "POST",
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify(payload)
+                    }
+                );
+                console.log("Booking Response Status:", res.status);
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alert(JSON.stringify(data));
+                    return;
+                }
+
+                alert("✅ Appointment booked successfully");
+                window.location.href = "/patient/appointments/";
+
+            } catch (err) {
+                console.error(err);
+                alert("Server error. Try again later.");
+            }
+        }
+
+        /* ================= CLOSE MODAL ================= */
+        function closeModal() {
+            window.location.href = "/patient/appointments/";
+        }
+    </script>
 
 </body>
+
 </html>

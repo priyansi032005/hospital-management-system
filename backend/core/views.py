@@ -1,10 +1,12 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 import requests
+from django.contrib.auth import login
+from accounts.models import User
 
-BASE_URL = getattr(settings, "BASE_URL", "https://hospital-management-system-23.onrender.com")
+
+BASE_URL = getattr(settings, "BASE_URL", "http://127.0.0.1:8000")
 
 API_LOGIN_URL = f"{BASE_URL}/api/login/"
 API_REGISTER_URL = f"{BASE_URL}/api/register/"
@@ -15,64 +17,10 @@ def home(request):
 
 
 def login_page(request):
-    if request.method == "POST":
-        payload = {
-            "username": request.POST.get("username"),
-            "password": request.POST.get("password"),
-        }
-
-        try:
-            response = requests.post(API_LOGIN_URL, json=payload, timeout=5)
-        except requests.exceptions.RequestException as e:
-            return render(request, "login.html", {
-                "error": "Server error. Please try again later."
-            })
-        print(response.json())
-        if response.status_code == 200:
-            data = response.json()
-
-            request.session["access"] = data.get("access")
-            request.session["refresh"] = data.get("refresh")
-            request.session["role"] = data.get("role")
-
-            role = data.get("role")
-
-            if role == "DOCTOR":
-                return redirect("/doctor/dashboard/")
-            elif role == "PATIENT":
-                return redirect("/patient/dashboard/")
-            else:
-                return redirect("/admin/")
-
-        return render(request, "login.html", {
-            "error": "Invalid credentials"
-        })
-
     return render(request, "login.html")
 
 
 def register_page(request):
-    if request.method == "POST":
-        payload = {
-            "username": request.POST.get("username"),
-            "password": request.POST.get("password"),
-            "role": request.POST.get("role"),
-        }
-
-        try:
-            response = requests.post(API_REGISTER_URL, json=payload, timeout=5)
-        except requests.exceptions.RequestException:
-            return render(request, "register.html", {
-                "error": "Server error. Please try again later."
-            })
-
-        if response.status_code == 201:
-            return redirect("/login/")
-
-        return render(request, "register.html", {
-            "error": "Registration failed"
-        })
-
     return render(request, "register.html")
 
 
@@ -81,12 +29,8 @@ def logout_page(request):
     return redirect("/login/")
 
 
-@login_required
 def doctor_dashboard(request):
-    if request.user.role != 'DOCTOR':
-        return redirect('patient_dashboard')
     return render(request, "Doctor/DoctorDash/DoctorMain.html")
-
 
 def appointment_list(request):
     return render(request, "Doctor/DoctorAppointment/appointment_list.html")
@@ -108,11 +52,7 @@ def doctor_settings(request):
 def doctor_patient_list(request):
     return render(request, "Doctor/DoctorPatientList.html")
 
-
-@login_required
 def patient_dashboard(request):
-    if request.user.role != 'PATIENT':
-        return redirect('doctor_dashboard')
     return render(request, "Patient/PatientDash/PatientDash.html")
 
 def patient_appointment_list(request):

@@ -727,6 +727,7 @@
         ===================================================== */
         (function() {
             const userRole = localStorage.getItem("role");
+            console.log("User Role:", userRole);
             if (userRole !== "DOCTOR") {
                 window.location.href = "/patient/dashboard/";
                 return;
@@ -737,12 +738,12 @@
            CONFIGURATION
         ===================================================== */
         const API_CONFIG = {
-            BASE_URL: "https://hospital-management-system-23.onrender.com/api/doctors/",
+            BASE_URL: "http://127.0.0.1:8000/api/doctors/",
             ENDPOINTS: {
                 PROFILE: "profile/"
             },
             AUTH: {
-                REFRESH_URL: "https://hospital-management-system-23.onrender.com/api/token/refresh/"
+                REFRESH_URL: "http://127.0.0.1:8000/api/token/refresh/"
             },
             TIMEOUT: 10000
         };
@@ -773,6 +774,7 @@
         ===================================================== */
         async function fetchWithAuth(url, options = {}, isRetry = false) {
             const accessToken = localStorage.getItem("access");
+            console.log("Using Access Token:", accessToken);
             if (!accessToken) {
                 throw new Error("Access token missing");
             }

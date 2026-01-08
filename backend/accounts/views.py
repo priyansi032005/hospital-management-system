@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import RegisterSerializer
 from django.http import JsonResponse
+from rest_framework.permissions import AllowAny
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
