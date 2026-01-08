@@ -63,3 +63,6 @@ def appointment_schedular(request):
 
 def patient_profile(request):
     return render(request, "Patient/PatientProfile/PatientProfile.html")
+
+def patient_prescription(request):
+    return render(request, "Patient/PatientPrescription/PatientPrescription.html")

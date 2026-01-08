@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Prescriptions</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f9fafb;
+            margin: 0;
+        }
+
+        /* Layout */
+        .main-container {
+            margin-left: 0;
+        }
+
+        .menu-btn {
+            font-size: 1.6rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-right: 12px;
+        }
+
+        /* Header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        /* ==================== SIDEBAR STYLES ==================== */
+        .sidebar {
+            position: fixed;
+            left: -256px;
+            /* Hidden by default on mobile */
+            top: 0;
+            width: 256px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+            z-index: 30;
+            padding: 20px;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        /* Sidebar overlay for mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            z-index: 20;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            width: 260px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 12px 10px 38px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            stroke: #9ca3af;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        /* Header */
+        .page-header {
+            padding: 20px 24px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Content */
+        .content {
+            padding: 24px;
+        }
+
+        /* Grid */
+        .prescription-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .card p {
+            margin: 4px 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .empty-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: #9ca3af;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .empty-state h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #111827;
+        }
+
+        .empty-state p {
+            margin-top: 6px;
+            font-size: 0.9rem;
+        }
+
+
+        /* Status */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            background: #ecfeff;
+            color: #0f766e;
+            margin-top: 8px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #6b7280;
+        }
+
+        /* Empty */
+        .empty {
+            text-align: center;
+            padding: 60px;
+            color: #6b7280;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .detail-row {
+            margin-bottom: 8px;
+        }
+
+        .label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* ==================== RESPONSIVE DESIGN ==================== */
+
+        /* Desktop */
+        @media (min-width: 1024px) {
+            .sidebar {
+                left: 0;
+            }
+
+            .main-container {
+                margin-left: 256px;
+            }
+
+            .menu-btn {
+                display: none;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 1023px) {
+            .sidebar {
+                left: -256px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: #0d9488; margin-bottom: 24px;">patient portal</h2>
+        <nav>
+            <a href="/patient/dashboard/"
+                style="display: block; padding: 12px; color: #0d9488; background: #f0fdfa; border-radius: 8px; margin-bottom: 8px; text-decoration: none; font-weight: 500;">Dashboard</a>
+            <a href="/patient/appointments/"
+                style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Appointments</a>
+            <a href="/patient/prescriptions/"
+                style="display:block;padding:12px;background:#f0fdfa;color:#0d9488;border-radius:8px;margin-bottom:8px;text-decoration:none;font-weight:500;">
+                Prescriptions
+            </a>
+            <a href="/patient/profile/"
+                style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Profile</a>
+        </nav>
+    </aside>
+
+
+    <div class="main-container">
+        <header class="page-header">
+            <h1 class="page-title">My Prescriptions</h1>
+
+            <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" placeholder="Search prescriptions..." />
+            </div>
+        </header>
+
+
+        <main class="content">
+            <div id="empty" class="empty-state" style="display:none;">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
+
+                <h3>No prescriptions found</h3>
+                <p>Your prescriptions will appear here once issued by a doctor</p>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Prescription Details</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        const API_URL = "http://127.0.0.1:8000/api/prescriptions/patient/";
+
+        function getAuthHeaders() {
+            const token = localStorage.getItem("access");
+            return {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            };
+        }
+
+        const sidebar = document.getElementById("sidebar");
+        const sidebarOverlay = document.getElementById("sidebarOverlay");
+        const menuBtn = document.getElementById("menuBtn");
+
+        if (menuBtn) {
+            menuBtn.addEventListener("click", () => {
+                sidebar.classList.add("open");
+                sidebarOverlay.classList.add("active");
+            });
+        }
+
+        sidebarOverlay.addEventListener("click", () => {
+            sidebar.classList.remove("open");
+            sidebarOverlay.classList.remove("active");
+        });
+
+        lucide.createIcons();
+
+        async function loadPrescriptions() {
+            try {
+                const res = await fetch(API_URL, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!res.ok) throw new Error("Failed");
+
+                const data = await res.json();
+                renderPrescriptions(data);
+            } catch (err) {
+                console.error(err);
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("empty").style.display = "block";
+            }
+        }
+
+        function renderPrescriptions(list) {
+            const grid = document.getElementById("grid");
+            const loading = document.getElementById("loading");
+            const empty = document.getElementById("empty");
+
+            loading.style.display = "none";
+
+            if (!list || list.length === 0) {
+                empty.style.display = "block";
+                return;
+            }
+
+            grid.innerHTML = list.map(p => `
+                <div class="card" onclick='openModal(${JSON.stringify(p)})'>
+                    <h3>Dr. ${p.doctor_name || "Doctor"}</h3>
+                    <p>Date: ${new Date(p.created_at).toLocaleDateString()}</p>
+                    <span class="badge">${p.status || "Issued"}</span>
+                </div>
+            `).join("");
+        }
+
+        function openModal(p) {
+            const modal = document.getElementById("modal");
+            const body = document.getElementById("modalBody");
+
+            body.innerHTML = `
+                <div class="detail-row"><span class="label">Doctor:</span> Dr. ${p.doctor_name}</div>
+                <div class="detail-row"><span class="label">Date:</span> ${new Date(p.created_at).toLocaleString()}</div>
+                <div class="detail-row"><span class="label">Diagnosis:</span> ${p.diagnosis || "-"}</div>
+                <div class="detail-row"><span class="label">Medicines:</span><br>${p.medicines || "-"}</div>
+                <div class="detail-row"><span class="label">Notes:</span> ${p.notes || "-"}</div>
+            `;
+
+            modal.style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+
+        document.addEventListener("DOMContentLoaded", loadPrescriptions);
+    </script>
+</body>
+
+</html>
