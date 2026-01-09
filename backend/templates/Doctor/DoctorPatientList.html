@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -212,9 +213,12 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 1;
             }
+
             50% {
                 opacity: 0.5;
             }
@@ -442,6 +446,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Overlay -->
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -478,8 +483,17 @@
                 </svg>
                 <span>Appointments</span>
             </a>
-
-            <a href="/doctor/prescriptions/" class="menu-item">
+            <a href="/doctor/prescriptions/add/" class="menu-item">
+                <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span>Add Prescriptions</span>
+            </a>
+            <a href="/doctor/prescriptionlist/" class="menu-item">
                 <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
@@ -588,138 +602,138 @@
     </div>
 
     <script>
-/* ==================== CONFIG ==================== */
-const API_BASE_URL = 'http://127.0.0.1:8000';
-const API_ENDPOINT = `${API_BASE_URL}/api/doctors/patients/`;
-console.log("API Endpoint:", API_ENDPOINT);
-const REFRESH_ENDPOINT = `${API_BASE_URL}/api/token/refresh/`;
+        /* ==================== CONFIG ==================== */
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        const API_ENDPOINT = `${API_BASE_URL}/api/doctors/patients/`;
+        console.log("API Endpoint:", API_ENDPOINT);
+        const REFRESH_ENDPOINT = `${API_BASE_URL}/api/token/refresh/`;
 
-/* ==================== SIDEBAR FUNCTIONS ==================== */
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
+        /* ==================== SIDEBAR FUNCTIONS ==================== */
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
 
-    if (!sidebar || !overlay) return;
+            if (!sidebar || !overlay) return;
 
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('active');
-}
-
-function closeSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-
-    if (!sidebar || !overlay) return;
-
-    sidebar.classList.remove('open');
-    overlay.classList.remove('active');
-}
-
-document.querySelectorAll('.menu-item').forEach(item => {
-    item.addEventListener('click', () => {
-        if (window.innerWidth < 768) closeSidebar();
-    });
-});
-
-window.addEventListener('resize', () => {
-    if (window.innerWidth >= 768) closeSidebar();
-});
-
-/* ==================== AUTH FETCH FUNCTION ==================== */
-async function fetchWithAuth(url, options = {}, retry = false) {
-    let accessToken = localStorage.getItem('access');
-    console.log("Fetching with Access Token:", accessToken);
-    if (!accessToken) throw new Error('Access token missing. Please login.');
-
-    const res = await fetch(url, {
-        ...options,
-        headers: {
-            ...(options.headers || {}),
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
         }
-    });
 
-    // If token expired → refresh
-    if (res.status === 401 && !retry) {
-        const refreshToken = localStorage.getItem('refresh');
-        console.log("Access token expired, attempting to refresh...", refreshToken);
-        if (!refreshToken) throw new Error('Session expired. Please login again.');
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
 
-        const refreshRes = await fetch(REFRESH_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refresh: refreshToken })
+            if (!sidebar || !overlay) return;
+
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth < 768) closeSidebar();
+            });
         });
 
-        if (!refreshRes.ok) throw new Error('Refresh token expired. Please login again.');
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) closeSidebar();
+        });
 
-        const refreshData = await refreshRes.json();
-        localStorage.setItem('access', refreshData.access);
-        if (refreshData.refresh) localStorage.setItem('refresh', refreshData.refresh);
+        /* ==================== AUTH FETCH FUNCTION ==================== */
+        async function fetchWithAuth(url, options = {}, retry = false) {
+            let accessToken = localStorage.getItem('access');
+            console.log("Fetching with Access Token:", accessToken);
+            if (!accessToken) throw new Error('Access token missing. Please login.');
 
-        return fetchWithAuth(url, options, true);
-    }
+            const res = await fetch(url, {
+                ...options,
+                headers: {
+                    ...(options.headers || {}),
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
 
-    if (!res.ok) {
-        if (res.status === 403) throw new Error('Forbidden – not a doctor');
-        throw new Error(`Error ${res.status}`);
-    }
+            // If token expired → refresh
+            if (res.status === 401 && !retry) {
+                const refreshToken = localStorage.getItem('refresh');
+                console.log("Access token expired, attempting to refresh...", refreshToken);
+                if (!refreshToken) throw new Error('Session expired. Please login again.');
 
-    return await res.json();
-}
+                const refreshRes = await fetch(REFRESH_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refresh: refreshToken })
+                });
 
-/* ==================== FETCH PATIENTS ==================== */
-async function fetchPatients() {
-    const loadingState = document.getElementById('loadingState');
-    const errorState = document.getElementById('errorState');
-    const emptyState = document.getElementById('emptyState');
-    const tableContainer = document.getElementById('tableContainer');
+                if (!refreshRes.ok) throw new Error('Refresh token expired. Please login again.');
 
-    loadingState.style.display = 'block';
-    errorState.style.display = 'none';
-    emptyState.style.display = 'none';
-    tableContainer.style.display = 'none';
+                const refreshData = await refreshRes.json();
+                localStorage.setItem('access', refreshData.access);
+                if (refreshData.refresh) localStorage.setItem('refresh', refreshData.refresh);
 
-    try {
-        const patients = await fetchWithAuth(API_ENDPOINT);
-        console.log("Fetched Patients:", patients);
+                return fetchWithAuth(url, options, true);
+            }
 
-        loadingState.style.display = 'none';
+            if (!res.ok) {
+                if (res.status === 403) throw new Error('Forbidden – not a doctor');
+                throw new Error(`Error ${res.status}`);
+            }
 
-        if (!Array.isArray(patients) || patients.length === 0) {
-            emptyState.style.display = 'block';
-            return;
+            return await res.json();
         }
 
-        tableContainer.style.display = 'block';
-        renderPatients(patients);
+        /* ==================== FETCH PATIENTS ==================== */
+        async function fetchPatients() {
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const emptyState = document.getElementById('emptyState');
+            const tableContainer = document.getElementById('tableContainer');
 
-    } catch (error) {
-        console.error(error);
-        loadingState.style.display = 'none';
-        errorState.style.display = 'block';
-        document.getElementById('errorMessage').textContent = error.message;
-    }
-}
+            loadingState.style.display = 'block';
+            errorState.style.display = 'none';
+            emptyState.style.display = 'none';
+            tableContainer.style.display = 'none';
 
-/* ==================== RENDER PATIENTS ==================== */
-function renderPatients(patients) {
-    const tableBody = document.getElementById('patientTableBody');
-    const mobileCards = document.getElementById('mobileCards');
+            try {
+                const patients = await fetchWithAuth(API_ENDPOINT);
+                console.log("Fetched Patients:", patients);
 
-    tableBody.innerHTML = '';
-    mobileCards.innerHTML = '';
+                loadingState.style.display = 'none';
 
-    patients.forEach(patient => {
-        const name = patient.name || patient.full_name || patient.user?.username || 'Unknown';
-        const email = patient.email || patient.user?.email || 'N/A';
-        const appointmentCount = patient.appointment_count || 0;
-        const initials = getInitials(name);
+                if (!Array.isArray(patients) || patients.length === 0) {
+                    emptyState.style.display = 'block';
+                    return;
+                }
 
-        // Table Row
-        const row = document.createElement('tr');
-        row.innerHTML = `
+                tableContainer.style.display = 'block';
+                renderPatients(patients);
+
+            } catch (error) {
+                console.error(error);
+                loadingState.style.display = 'none';
+                errorState.style.display = 'block';
+                document.getElementById('errorMessage').textContent = error.message;
+            }
+        }
+
+        /* ==================== RENDER PATIENTS ==================== */
+        function renderPatients(patients) {
+            const tableBody = document.getElementById('patientTableBody');
+            const mobileCards = document.getElementById('mobileCards');
+
+            tableBody.innerHTML = '';
+            mobileCards.innerHTML = '';
+
+            patients.forEach(patient => {
+                const name = patient.name || patient.full_name || patient.user?.username || 'Unknown';
+                const email = patient.email || patient.user?.email || 'N/A';
+                const appointmentCount = patient.appointment_count || 0;
+                const initials = getInitials(name);
+
+                // Table Row
+                const row = document.createElement('tr');
+                row.innerHTML = `
             <td>
                 <div class="patient-cell">
                     <div class="avatar">${initials}</div>
@@ -738,12 +752,12 @@ function renderPatients(patients) {
                 <span class="badge badge-green">Active</span>
             </td>
         `;
-        tableBody.appendChild(row);
+                tableBody.appendChild(row);
 
-        // Mobile Card
-        const card = document.createElement('div');
-        card.className = 'mobile-card';
-        card.innerHTML = `
+                // Mobile Card
+                const card = document.createElement('div');
+                card.className = 'mobile-card';
+                card.innerHTML = `
             <div class="mobile-card-header">
                 <div class="avatar">${initials}</div>
                 <div>
@@ -758,27 +772,28 @@ function renderPatients(patients) {
                 <span class="badge badge-green">Active</span>
             </div>
         `;
-        mobileCards.appendChild(card);
-    });
-}
+                mobileCards.appendChild(card);
+            });
+        }
 
-/* ==================== HELPERS ==================== */
-function getInitials(name) {
-    const parts = name.trim().split(' ');
-    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    return name[0].toUpperCase();
-}
+        /* ==================== HELPERS ==================== */
+        function getInitials(name) {
+            const parts = name.trim().split(' ');
+            if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            return name[0].toUpperCase();
+        }
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
-/* ==================== INIT ==================== */
-window.addEventListener('DOMContentLoaded', () => {
-    fetchPatients();
-});
-</script>
+        /* ==================== INIT ==================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchPatients();
+        });
+    </script>
 </body>
+
 </html>

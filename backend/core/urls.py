@@ -14,12 +14,13 @@ from .views import (
     doctor_sidebar,
     doctor_settings,
     doctor_patient_list,
-    # doctor_prescription_list,
     patient_appointment_list,
     appointment_schedular,
     patient_dashboard,
     patient_profile,
     patient_prescription,
+    doctor_prescription_list,
+
 )
 
 urlpatterns = [
@@ -31,12 +32,12 @@ urlpatterns = [
     path("logout/", logout_page, name="logout"),
     path("doctor/appointments/", appointment_list, name="appointment_list"),
     path("doctor/dashboard/", doctor_dashboard, name="doctor_dashboard"),
-    path("doctor/prescriptions/", prescription_list, name="prescription_list"),
+    path("doctor/prescriptions/add/", prescription_list, name="prescription_list"),
     path("doctor/prescriptions/<int:prescription_id>/pdf/", prescriptionPDF_view, name="prescription_pdf"),
     path("doctor/sidebar/", doctor_sidebar, name="doctor_sidebar"),
     path("doctor/settings/", doctor_settings, name="doctor_settings"),
     path("doctor/patientlist/", doctor_patient_list, name="doctor_patient_list"),
-    # path("doctor/prescriptionlist/", doctor_prescription_list, name="doctor_prescription_list"),
+    path("doctor/prescriptionlist/", doctor_prescription_list, name="doctor_prescription_list"),
 
     path("patient/dashboard/", patient_dashboard, name="patient_dashboard"),
     path("patient/appointments/", patient_appointment_list, name="patient_appointment_list"),

@@ -52,6 +52,11 @@ def doctor_settings(request):
 def doctor_patient_list(request):
     return render(request, "Doctor/DoctorPatientList.html")
 
+def doctor_prescription_list(request):
+    return render(request, "Doctor/DoctorDash/PrescriptionList.html")
+
+
+
 def patient_dashboard(request):
     return render(request, "Patient/PatientDash/PatientDash.html")
 
@@ -66,3 +71,4 @@ def patient_profile(request):
 
 def patient_prescription(request):
     return render(request, "Patient/PatientPrescription/PatientPrescription.html")
+
