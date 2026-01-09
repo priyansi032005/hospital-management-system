@@ -50,20 +50,38 @@ class DoctorListView(generics.ListAPIView):
         return Doctor.objects.filter(is_available=True)
 
 
+# class CreateAppointmentView(generics.CreateAPIView):
+#     serializer_class = AppointmentSerializer
+#     permission_classes = [IsAuthenticated, IsPatient]
+
+#     def perform_create(self, serializer):
+#         try:
+#             patient = Patient.objects.get(user=self.request.user)
+#         except Patient.DoesNotExist:
+#             raise ValidationError("Patient profile does not exist")
+
+#         serializer.save(
+#             patient=patient,
+#             status="PENDING"
+#         )
+
+
 class CreateAppointmentView(generics.CreateAPIView):
     serializer_class = AppointmentSerializer
     permission_classes = [IsAuthenticated, IsPatient]
 
     def perform_create(self, serializer):
-        try:
-            patient = Patient.objects.get(user=self.request.user)
-        except Patient.DoesNotExist:
-            raise ValidationError("Patient profile does not exist")
+        patient = self.request.user.patient_profile
+
+        doctor_id = self.request.data.get("doctor")
+        doctor = Doctor.objects.get(id=doctor_id, is_available=True)
 
         serializer.save(
             patient=patient,
+            doctor=doctor,
             status="PENDING"
         )
+
 
 
 class PatientAppointmentsView(generics.ListAPIView):

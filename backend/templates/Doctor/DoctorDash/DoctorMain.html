@@ -557,7 +557,7 @@
             <main class="content-wrapper">
                 <div class="content-inner">
                     <h1 id="welcomeText" style="font-size:1.5rem;font-weight:700;margin-bottom:1rem;">
-                        Welcome, Doctor
+                        Welcome !!!
                     </h1>
 
                     <!-- Loading State -->
@@ -587,7 +587,7 @@
                                         <div class="profile-details">
                                             <div class="profile-header-row">
                                                 <h2 class="profile-name" id="doctorName">-</h2>
-                                                <div class="specialty-badge" id="doctorSpecialty">
+                                                <div class="specialty-badge">
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                         stroke-width="2" style="width: 1rem; height: 1rem;">
                                                         <circle cx="12" cy="8" r="7"></circle>
@@ -699,8 +699,10 @@
                         <!-- Schedule Section -->
                         <div class="schedule-section">
                             <h2 class="section-title">Your Schedule</h2>
-                            <div class="schedule-card">
-                                <div class="schedule-placeholder">
+
+                            <div class="schedule-card" id="scheduleCard">
+                                <!-- Default placeholder (will be replaced if appointments exist) -->
+                                <div class="schedule-placeholder" id="schedulePlaceholder">
                                     <svg class="schedule-placeholder-icon" viewBox="0 0 24 24" fill="none"
                                         stroke="currentColor" stroke-width="2">
                                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -708,14 +710,12 @@
                                         <line x1="8" y1="2" x2="8" y2="6"></line>
                                         <line x1="3" y1="10" x2="21" y2="10"></line>
                                     </svg>
-                                    <h3
-                                        style="font-size: 1.125rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
-                                        No Schedule Available</h3>
-                                    <p style="color: #6b7280;">Your schedule will appear here once you set up your
-                                        availability.</p>
+                                    <h3>No Schedule Available</h3>
+                                    <p>Your schedule will appear here once you set up your availability.</p>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </main>
@@ -723,25 +723,26 @@
     </div>
     <script>
         /* =====================================================
-           ROLE VERIFICATION
+        ROLE VERIFICATION
         ===================================================== */
         (function () {
             const userRole = localStorage.getItem("role");
             console.log("User Role:", userRole);
-            if (userRole !== "DOCTOR") {
-                window.location.href = "/patient/dashboard/";
+            if (userRole == "DOCTOR") {
+                window.location.href = "/doctor/dashboard/";
                 return;
             }
         })();
 
         /* =====================================================
-           CONFIGURATION
+        CONFIGURATION
         ===================================================== */
         const API_CONFIG = {
             BASE_URL: "http://127.0.0.1:8000/api/doctors/",
             ENDPOINTS: {
                 PROFILE: "profile/",
-                DASHBOARD: "dashboard/"
+                DASHBOARD: "dashboard/",
+                APPOINTMENTS: "appointments/",
             },
             AUTH: {
                 REFRESH_URL: "http://127.0.0.1:8000/api/token/refresh/"
@@ -750,7 +751,7 @@
         };
 
         /* =====================================================
-           DOM ELEMENTS
+        DOM ELEMENTS
         ===================================================== */
         const elements = {
             sidebar: document.getElementById("sidebar"),
@@ -776,7 +777,7 @@
         };
 
         /* =====================================================
-           AUTH FETCH (WITH AUTO REFRESH)
+        AUTH FETCH (WITH AUTO REFRESH)
         ===================================================== */
         async function fetchWithAuth(url, options = {}, isRetry = false) {
             const accessToken = localStorage.getItem("access");
@@ -858,7 +859,7 @@
 
 
         /* =====================================================
-           API CALL
+        API CALL
         ===================================================== */
         async function fetchDoctorProfile() {
             const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.PROFILE;
@@ -866,13 +867,13 @@
         }
 
         /* =====================================================
-           UI RENDER
+        UI RENDER
         ===================================================== */
         function renderDoctorProfile(data) {
             console.log("Doctor Profile Data:", data);
 
             // Get username safely
-            const doctorName = data.name || "Doctor";
+            const doctorName = data.username || "Doctor";
             console.log("Doctor Name:", doctorName);
 
             // Welcome text
@@ -890,9 +891,41 @@
         }
 
 
+        async function fetchDoctorAppointments() {
+            const url = API_CONFIG.BASE_URL + API_CONFIG.ENDPOINTS.APPOINTMENTS;
+            return await fetchWithAuth(url);
+        }
+
+        function renderSchedule(appointments) {
+            const scheduleCard = document.getElementById("scheduleCard");
+
+            if (!appointments || appointments.length === 0) {
+                // Keep default placeholder
+                return;
+            }
+
+            // Replace placeholder with appointments
+            scheduleCard.innerHTML = appointments.map((apt) => {
+                return `
+      <div class="schedule-item">
+        <div class="schedule-date">
+          ${new Date(apt.appointment_date).toDateString()}
+        </div>
+
+        <div class="schedule-info">
+          <p><strong>Patient:</strong> ${apt.patient_name || "Patient"}</p>
+          <p><strong>Status:</strong> ${apt.status}</p>
+        </div>
+      </div>
+    `;
+            }).join("");
+        }
+
+
+
 
         /* =====================================================
-           ERROR HANDLING
+        ERROR HANDLING
         ===================================================== */
         function showError(message) {
             if (elements.loadingState) elements.loadingState.style.display = "none";
@@ -902,19 +935,21 @@
         }
 
         /* =====================================================
-           INITIAL LOAD
+        INITIAL LOAD
         ===================================================== */
         async function loadDashboard() {
             try {
                 elements.loadingState.style.display = "flex";
                 elements.errorState.style.display = "none";
 
-                const [profile, dashboard] = await Promise.all([
+                const [profile, dashboard, appointments] = await Promise.all([
                     fetchDoctorProfile(),
-                    fetchDoctorDashboard()
+                    fetchDoctorDashboard(),
+                    fetchDoctorAppointments()
                 ]);
                 renderDoctorProfile(profile);
                 renderDashboardStats(dashboard);
+                renderSchedule(appointments);
 
 
                 elements.loadingState.style.display = "none";
@@ -929,7 +964,7 @@
         }
 
         /* =====================================================
-           SIDEBAR HANDLERS
+        SIDEBAR HANDLERS
         ===================================================== */
         if (elements.menuToggle && elements.sidebar) {
             elements.menuToggle.addEventListener("click", () => {
@@ -944,7 +979,7 @@
         }
 
         /* =====================================================
-           START APP
+        START APP
         ===================================================== */
         document.addEventListener("DOMContentLoaded", loadDashboard);
     </script>

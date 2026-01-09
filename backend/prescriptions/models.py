@@ -15,18 +15,6 @@ class Prescription(models.Model):
         related_name="prescription"
     )
 
-    doctor = models.ForeignKey(
-        Doctor,
-        on_delete=models.CASCADE,
-        related_name="doctor_prescriptions"
-    )
-
-    patient = models.ForeignKey(
-        Patient,
-        on_delete=models.CASCADE,
-        related_name="patient_prescriptions"
-    )
-
     medicines = models.TextField()
     instructions = models.TextField()
 

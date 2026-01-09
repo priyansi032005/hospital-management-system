@@ -560,6 +560,7 @@
 
             try {
                 const response = await fetch(url, fetchOptions);
+                console.log("Fetch response status:", response.status);
                 clearTimeout(timeout);
 
                 // If access token expired → try refresh ONCE
@@ -611,8 +612,8 @@
         function renderDoctorProfile(data) {
             console.log("Doctor Profile Data:", data);
 
-            const name = data.user?.username || "Doctor";
-            const email = data.user?.email || "-";
+            const name = data.username || "Doctor";
+            const email = data.email || "-";
 
             // Fill form fields
             if (document.getElementById("name")) document.getElementById("name").value = name;

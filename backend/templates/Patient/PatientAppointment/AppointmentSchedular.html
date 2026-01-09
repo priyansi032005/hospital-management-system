@@ -563,6 +563,8 @@
         /* ================= AUTO OPEN MODAL ================= */
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("appointmentModal")?.classList.add("active");
+            fetchPatientProfile();
+            console.log("Appointment Scheduler Modal Opened");
         });
 
         /* ================= DOM ELEMENTS ================= */
@@ -663,6 +665,35 @@
                 alert("Error loading doctors");
             }
         }
+
+
+        /* ================= FETCH PATIENT PROFILE ================= */
+async function fetchPatientProfile() {
+    try {
+        const res = await fetch(
+            "http://127.0.0.1:8000/api/patient/profile/",
+            { headers: getAuthHeaders() }
+        );
+
+        if (!res.ok) throw new Error("Failed to fetch profile");
+
+        const data = await res.json();
+        console.log("Patient Profile:", data);
+
+        // Autofill inputs
+        patientNameInput.value = data.name || "";
+        patientPhoneInput.value = data.phone || "";
+
+        // Update summary
+        summaryName.textContent = data.name || "-";
+        summaryPhone.textContent = data.phone || "-";
+
+    } catch (err) {
+        console.error(err);
+        alert("Unable to load patient profile");
+    }
+}
+
 
         function formatTime(hour, min) {
             const h = hour.toString().padStart(2, "0");

@@ -17,16 +17,14 @@ class CreatePrescriptionView(generics.CreateAPIView):
     def perform_create(self, serializer):
         appointment = serializer.validated_data["appointment"]
 
-        try:
-            doctor = Doctor.objects.get(user=appointment.doctor.user)
-            patient = Patient.objects.get(user=appointment.patient.user)
-        except (Doctor.DoesNotExist, Patient.DoesNotExist):
-            raise ValidationError("Doctor or Patient profile not found")
+        if appointment.doctor.user != self.request.user:
+            raise ValidationError("You are not allowed to create a prescription for this appointment")
 
-        serializer.save(
-            doctor=doctor,
-            patient=patient
-        )
+        if hasattr(appointment, "prescription"):
+            raise ValidationError("Prescription already exists for this appointment")
+
+        serializer.save()
+
 
 
 # 🔹 DOCTOR: VIEW HIS PRESCRIPTIONS

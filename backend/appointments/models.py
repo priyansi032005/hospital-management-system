@@ -17,24 +17,6 @@ class Appointment(models.Model):
         on_delete=models.CASCADE
     )
 
-    specialty = models.CharField(
-        max_length=100,
-        null=True,
-        blank=True
-    )
-
-    patient_name = models.CharField(
-        max_length=100,
-        null=True,
-        blank=True
-    )
-
-    phone_number = models.CharField(
-        max_length=15,
-        null=True,
-        blank=True
-    )
-
     appointment_date = models.DateField()
 
     time_slot = models.CharField(
