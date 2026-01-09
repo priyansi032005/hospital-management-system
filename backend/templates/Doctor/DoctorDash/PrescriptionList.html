@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f9fafb;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 256px;
+            background: white;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            z-index: 30;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        @media (min-width: 1024px) {
+            .sidebar {
+                transform: translateX(0);
+            }
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #14b8a6;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1rem;
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .close-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        @media (min-width: 1024px) {
+            .close-btn {
+                display: none;
+            }
+        }
+
+        .menu-container {
+            padding: 1rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: #6b7280;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .menu-item:hover {
+            background-color: #f0fdfa;
+            color: #14b8a6;
+        }
+
+        .menu-item.active {
+            background-color: #14b8a6;
+            color: white;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            z-index: 20;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        @media (min-width: 1024px) {
+            .overlay {
+                display: none !important;
+            }
+        }
+
+        /* Main Container */
+        .main-container {
+            min-height: 100vh;
+        }
+
+        @media (min-width: 1024px) {
+            .main-container {
+                padding-left: 256px;
+            }
+        }
+
+        /* Header */
+        .page-header {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1rem 1rem;
+        }
+
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .header-content {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .header-left {
+                width: auto;
+            }
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .menu-btn {
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .menu-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        @media (min-width: 1024px) {
+            .menu-btn {
+                display: none;
+            }
+        }
+
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        @media (min-width: 640px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        .mobile-add-btn {
+            display: inline-flex;
+            padding: 0.5rem;
+            color: #14b8a6;
+            background: none;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .mobile-add-btn:hover {
+            background-color: #f0fdfa;
+        }
+
+        @media (min-width: 640px) {
+            .mobile-add-btn {
+                display: none;
+            }
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .header-actions {
+                width: auto;
+            }
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+        }
+
+        @media (min-width: 640px) {
+            .search-container {
+                width: 256px;
+                flex: none;
+            }
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: #9ca3af;
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+        }
+
+        .add-btn {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: #14b8a6;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.2s;
+        }
+
+        .add-btn:hover {
+            background-color: #0d9488;
+        }
+
+        @media (min-width: 640px) {
+            .add-btn {
+                display: inline-flex;
+            }
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem;
+        }
+
+        /* Loading */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            min-height: 400px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #14b8a6;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: #6b7280;
+        }
+
+        /* Prescriptions Grid */
+        .prescriptions-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 640px) {
+            .prescriptions-grid {
+                gap: 1.5rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .prescriptions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .prescriptions-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Prescription Card */
+        .prescription-card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f3f4f6;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .prescription-card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+
+        .card-content {
+            padding: 1rem 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            padding: 0.5rem;
+            background-color: #f0fdfa;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .prescription-card:hover .card-icon {
+            background-color: #ccfbf1;
+        }
+
+        .icon-svg {
+            width: 24px;
+            height: 24px;
+            color: #14b8a6;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #111827;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .card-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .detail-icon {
+            width: 20px;
+            height: 20px;
+            color: #14b8a6;
+            flex-shrink: 0;
+        }
+
+        .detail-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .dosage-info {
+            background-color: #f0fdfa;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .dosage-text {
+            font-size: 0.875rem;
+            color: #0f766e;
+            font-weight: 500;
+        }
+
+        .card-footer {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 0.375rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid;
+        }
+
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        .status-completed {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border-color: #bfdbfe;
+        }
+
+        .status-expired {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+            border-color: #fde68a;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .empty-icon-wrapper {
+            width: 64px;
+            height: 64px;
+            background-color: #f3f4f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .empty-icon {
+            width: 32px;
+            height: 32px;
+            color: #9ca3af;
+        }
+
+        .empty-title {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-text {
+            color: #6b7280;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .modal-close {
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .modal-close:hover {
+            background-color: #f3f4f6;
+        }
+
+        .modal-text {
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h2>Doctor Portal</h2>
+                <button id="closeSidebar" class="close-btn">&times;</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/doctor/dashboard/" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/doctor/appointments/" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span>Appointments</span>
+                </a>
+                <a href="/doctor/prescriptions/" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>Prescriptions</span>
+                </a>
+
+                <a href="/doctor/patientlist/" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span>Patients</span>
+                </a>
+                <a href="/doctor/settings/" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
+                    </svg>
+                    <span>Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-title-group">
+                        <button class="menu-btn" onclick="toggleSidebar()">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                                stroke-width="2">
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        </button>
+                        <h1 class="page-title">My Prescriptions</h1>
+                    </div>
+                    <button class="mobile-add-btn" onclick="openModal()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="header-actions">
+                    <div class="search-container">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="Search medications..." id="searchInput"
+                            oninput="filterPrescriptions()">
+                    </div>
+                    <button type="button" class="add-btn" onclick="window.location.href='/doctor/prescriptions/'">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span>Add Prescription</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-container" style="display: none;">
+                <div class="spinner"></div>
+                <p class="loading-text">Loading prescriptions...</p>
+            </div>
+
+            <!-- Prescriptions Grid -->
+            <div id="prescriptionsGrid" class="prescriptions-grid" style="display: none;">
+                <!-- Prescriptions will be inserted here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-icon-wrapper">
+                    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                <h3 class="empty-title">No prescriptions found</h3>
+                <p class="empty-text">Try adjusting your search or add a new prescription</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="prescriptionModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Prescription</h2>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <p class="modal-text">Prescription form would go here. This is a placeholder for the modal content.</p>
+        </div>
+    </div>
+
+    <script>
+        /* ==================== API CONFIGURATION ==================== */
+        const API_CONFIG = {
+            profileEndpoint: 'http://127.0.0.1:8000/api/doctors/profile/',
+            prescriptionsEndpoint: 'http://127.0.0.1:8000/api/prescriptions/doctor/',
+            doctorsEndpoint: 'http://127.0.0.1:8000/api/doctors/'
+        };
+        console.log("API Configuration:", API_CONFIG);
+
+        /* ==================== SIDEBAR FUNCTIONS ==================== */
+        function toggleSidebar() {
+            document.getElementById('sidebar')?.classList.toggle('open');
+            document.getElementById('overlay')?.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar')?.classList.remove('open');
+            document.getElementById('overlay')?.classList.remove('active');
+        }
+
+        /* ==================== MODAL FUNCTIONS ==================== */
+        function openModal() {
+            document.getElementById('prescriptionModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('prescriptionModal').style.display = 'none';
+        }
+
+        /* ==================== UTILITY FUNCTIONS ==================== */
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            return new Date(dateStr).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        function getStatusClass(status) {
+            const map = {
+                active: 'status-active',
+                completed: 'status-completed',
+                expired: 'status-expired',
+                pending: 'status-pending'
+            };
+
+            return map[(status || '').toLowerCase()] || 'status-pending';
+        }
+
+        /* ==================== AUTH FETCH ==================== */
+        async function fetchData(url) {
+            const token = localStorage.getItem('access');
+
+            if (!token) {
+                alert('Session expired. Please login again.');
+                window.location.href = '/login/';
+                return;
+            }
+
+            const res = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (res.status === 401) {
+                localStorage.clear();
+                alert('Session expired. Please login again.');
+                window.location.href = '/login/';
+                return;
+            }
+
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+            }
+
+            return res.json();
+        }
+
+        /* ==================== LOAD DOCTORS ==================== */
+        async function loadDoctors() {
+            try {
+                const doctors = await fetchData(API_CONFIG.doctorsEndpoint);
+                console.log("Doctors List:", doctors);
+                return doctors;
+            } catch (err) {
+                console.error("Failed to load doctors", err);
+                return [];
+            }
+        }
+
+        /* ==================== RENDER PRESCRIPTIONS ==================== */
+        async function renderPrescriptions(prescriptions) {
+            const grid = document.getElementById('prescriptionsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const loadingState = document.getElementById('loadingState');
+
+            loadingState.style.display = 'none';
+
+            if (!prescriptions || prescriptions.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            // Fetch doctors once
+            const doctors = await loadDoctors();
+            // Map doctor IDs to their details
+            const doctorMap = {};
+            doctors.forEach(doc => {
+                doctorMap[doc.id] = {
+                    name: doc.username || 'N/A',
+                    specialization: doc.specialization || 'General Practice'
+                };
+            });
+
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            grid.innerHTML = prescriptions.map(rx => {
+                const doctorInfo = doctorMap[rx.doctor] || { name: 'N/A', specialization: 'General Practice' };
+                const doctorName = doctorInfo.name;
+                const specialization = doctorInfo.specialization;
+
+                const issuedDate = formatDate(rx.issued_date);
+                const expiryDate = rx.expiry_date ? formatDate(rx.expiry_date) : 'No expiry';
+
+                return `
+                    <div class="prescription-card">
+                        <div class="card-content">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    💊
+                                </div>
+                                <div>
+                                    <h3 class="card-title">${rx.medication_name || 'Medication'}</h3>
+                                    <p class="card-subtitle">Dr. ${doctorName}</p>
+                                </div>
+                            </div>
+
+                            <div class="card-details">
+                                <div class="detail-row">
+                                    <span>📅 Issued: ${issuedDate}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span>⏰ Expires: ${expiryDate}</span>
+                                </div>
+                                ${rx.dosage ? `
+                                <div class="dosage-info">
+                                    <div class="dosage-text">Dosage: ${rx.dosage}</div>
+                                </div>
+                                ` : ''}
+                                ${rx.instructions ? `
+                                <div class="detail-row">
+                                    <span style="font-size: 0.875rem; color: #6b7280;">${rx.instructions}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+
+                            <div class="card-footer">
+                                <span class="status-badge ${getStatusClass(rx.status)}">
+                                    ${rx.status || 'Active'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /* ==================== FILTER PRESCRIPTIONS ==================== */
+        function filterPrescriptions() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.prescription-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            });
+        }
+
+        /* ==================== LOAD PRESCRIPTIONS ==================== */
+        async function loadPrescriptions() {
+            const loadingState = document.getElementById('loadingState');
+            const grid = document.getElementById('prescriptionsGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            try {
+                loadingState.style.display = 'flex';
+                grid.style.display = 'none';
+                emptyState.style.display = 'none';
+
+                const prescriptions = await fetchData(API_CONFIG.prescriptionsEndpoint);
+                if (!prescriptions) return;
+
+                renderPrescriptions(prescriptions);
+            } catch (err) {
+                console.error(err);
+                loadingState.style.display = 'none';
+                emptyState.style.display = 'block';
+            }
+        }
+
+        /* ==================== INIT ==================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPrescriptions();
+        });
+    </script>
+</body>
+
+</html>

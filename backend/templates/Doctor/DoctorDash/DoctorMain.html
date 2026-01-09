@@ -381,36 +381,43 @@
         }
 
         /* Schedule Section */
-        .schedule-section {
-            margin-top: 1.5rem;
+        /* Appointment Items */
+        .schedule-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s;
         }
 
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 700;
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .schedule-date {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #14b8a6;
+            margin-bottom: 0.75rem;
+        }
+
+        .schedule-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .schedule-info p {
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin: 0;
+        }
+
+        .schedule-info strong {
             color: #1f2937;
-            margin-bottom: 1rem;
-        }
-
-        .schedule-card {
-            background-color: #ffffff;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            padding: 2rem;
-        }
-
-        .schedule-placeholder {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: #6b7280;
-        }
-
-        .schedule-placeholder-icon {
-            width: 4rem;
-            height: 4rem;
-            color: #d1d5db;
-            margin: 0 auto 1rem;
+            font-weight: 600;
         }
 
         /* Mobile Responsive */
@@ -511,7 +518,7 @@
                     </svg>
                     <span>Appointments</span>
                 </a>
-                <a href="/doctor/prescriptions" class="nav-item">
+                <a href="/doctor/prescriptions/" class="nav-item">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
@@ -698,7 +705,7 @@
 
                         <!-- Schedule Section -->
                         <div class="schedule-section">
-                            <h2 class="section-title">Your Schedule</h2>
+                            <h2 class="section-title">Recent Appointments</h2>
 
                             <div class="schedule-card" id="scheduleCard">
                                 <!-- Default placeholder (will be replaced if appointments exist) -->

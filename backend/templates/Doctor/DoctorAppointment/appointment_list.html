@@ -464,6 +464,11 @@
             color: #111827;
         }
 
+        .appointment-actions .page-btn {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+
         /* Page Switcher */
         .page-switcher {
             position: fixed;
@@ -539,7 +544,7 @@
                 <span>Appointments</span>
             </a>
 
-            <a href="/doctor/prescriptions" class="menu-item active">
+            <a href="/doctor/prescriptions" class="menu-item">
                 <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
@@ -968,6 +973,54 @@
             }
         }
 
+
+        async function updateAppointmentStatus(appointmentId, newStatus) {
+            try {
+                await fetchWithAuth(`${API_CONFIG.BASE_URL}appointments/${appointmentId}/`, {
+                    method: "PATCH",
+                    body: JSON.stringify({ status: newStatus })
+                });
+                console.log(`Appointment ${appointmentId} status updated to ${newStatus}`);
+
+                // Refresh appointments list
+                fetchAppointments();
+
+                // Refresh dashboard counts
+                fetchDashboardStats();
+            } catch (err) {
+                alert(`Failed to update status: ${err.message}`);
+            }
+        }
+
+
+        async function fetchDashboardStats() {
+            try {
+                const data = await fetchWithAuth(`${API_CONFIG.BASE_URL}dashboard/`);
+                console.log("Dashboard data:", data);
+
+                // Update dashboard UI
+                document.getElementById('dashboardDoctorName').textContent = doctorInfo?.name || "Doctor";
+
+                // You can create elements for total appointments, pending, approved, cancelled
+                // Example:
+                let statsHtml = `
+            <div class="appointment-card">
+                <h3>Dashboard Stats</h3>
+                <p>Total Appointments: ${data.total_appointments}</p>
+                <p>Pending: ${data.pending}</p>
+                <p>Approved: ${data.approved}</p>
+                <p>Cancelled: ${data.cancelled}</p>
+            </div>
+        `;
+
+                const dashboardPage = document.getElementById('dashboardPage');
+                dashboardPage.innerHTML = dashboardPage.innerHTML + statsHtml;
+
+            } catch (err) {
+                console.error("Dashboard fetch error:", err);
+            }
+        }
+
         /* ================= FILTER ================= */
         function getFilteredAppointments() {
             return appointments.filter(app => {
@@ -1006,35 +1059,43 @@
                 const card = document.createElement('div');
                 card.className = 'appointment-card';
 
+                // Build the card HTML
                 card.innerHTML = `
-            <div class="appointment-header">
-                <div class="appointment-info">
-                    <div class="avatar">
-                        <span>${escapeHtml(app.patient_name?.charAt(0) || 'P')}</span>
-                    </div>
-                    <div class="patient-details">
-                        <h3>${escapeHtml(app.patient_name)}</h3>
-                        <div class="appointment-meta">
-                            <span>${formatDate(app.appointment_date)}</span>
-                            <span>${formatTime(app.appointment_date)}</span>
-                        </div>
+        <div class="appointment-header">
+            <div class="appointment-info">
+                <div class="avatar">
+                    <span>${escapeHtml(app.patient_name?.charAt(0) || 'P')}</span>
+                </div>
+                <div class="patient-details">
+                    <h3>${escapeHtml(app.patient_name)}</h3>
+                    <div class="appointment-meta">
+                        <span>${formatDate(app.appointment_date)}</span>
+                        <span>${formatTime(app.appointment_date)}</span>
                     </div>
                 </div>
-                <span class="status-badge ${getStatusClass(app.status)}">
-                    ${escapeHtml(app.status)}
-                </span>
             </div>
+            <span class="status-badge ${getStatusClass(app.status)}" id="statusBadge-${app.id}">
+                ${escapeHtml(app.status)}
+            </span>
+        </div>
 
-            ${app.reason ? `
-            <div class="appointment-reason">
-                <strong>Reason:</strong> ${escapeHtml(app.reason)}
-            </div>` : ''}
+        ${app.reason ? `
+        <div class="appointment-reason">
+            <strong>Reason:</strong> ${escapeHtml(app.reason)}
+        </div>` : ''}
+
+        <!-- Status update buttons -->
+        <div class="appointment-actions" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+            <button onclick="updateAppointmentStatus(${app.id}, 'completed')" class="page-btn">Complete</button>
+            <button onclick="updateAppointmentStatus(${app.id}, 'pending')" class="page-btn">Pending</button>
+            <button onclick="updateAppointmentStatus(${app.id}, 'cancelled')" class="page-btn">Cancel</button>
+        </div>
         `;
 
                 appointmentsList.appendChild(card);
             });
-
         }
+
 
         /* ================= FETCH PATIENTS ================= */
         async function fetchPatients() {
@@ -1052,6 +1113,7 @@
             if (document.getElementById('appointmentsPage')) {
                 switchPage('appointments');
             }
+            fetchDashboardStats();
         });
 
     </script>
