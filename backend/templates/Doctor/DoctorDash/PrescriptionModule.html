@@ -616,9 +616,9 @@
         const SITE_URL = window.location.origin;
 
         const API_ENDPOINTS = {
-            doctors: `${SITE_URL}/api/doctors/`,
             appointments: `${SITE_URL}/api/doctors/appointments/`,
-            prescriptions: `${SITE_URL}/api/prescriptions/`,
+            patients: `${SITE_URL}/api/doctors/patients/`,
+            createPrescription: `${SITE_URL}/api/prescriptions/doctor/create/`,
             refresh: `${SITE_URL}/api/token/refresh/`
         };
 
@@ -784,7 +784,7 @@
                 showAlert('success', 'Prescription created successfully');
 
                 setTimeout(() => {
-                    window.location.href = '/doctor/prescriptionlists';
+                    window.location.href = '/doctor/prescriptionlist/';
                 }, 1500);
 
 
