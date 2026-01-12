@@ -459,6 +459,7 @@
         opacity: 0;
         transform: translateY(16px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -472,9 +473,12 @@
     }
 
     @keyframes pulse {
-      0%, 100% {
+
+      0%,
+      100% {
         opacity: 1;
       }
+
       50% {
         opacity: 0.5;
       }
@@ -549,10 +553,10 @@
       <nav>
         <a href="/patient/dashboard/" class="active">Dashboard</a>
         <a href="/patient/appointments/">Appointments</a>
-          <a href="/patient/prescriptions/"
-      style="display:block;padding:12px;background:#f0fdfa;color:#0d9488;border-radius:8px;margin-bottom:8px;text-decoration:none;font-weight:500;">
-      Prescriptions
-    </a>
+        <a href="/patient/prescriptions/"
+          style="display:block;padding:12px;background:#f0fdfa;color:#0d9488;border-radius:8px;margin-bottom:8px;text-decoration:none;font-weight:500;">
+          Prescriptions
+        </a>
         <a href="/patient/profile/">Profile</a>
       </nav>
     </aside>
@@ -702,7 +706,8 @@
 
           <div class="health-box">
             <h3>Chronic Conditions</h3>
-            <textarea id="chronicConditions" class="edit-input" placeholder="Enter chronic conditions or 'None'"></textarea>
+            <textarea id="chronicConditions" class="edit-input"
+              placeholder="Enter chronic conditions or 'None'"></textarea>
           </div>
 
           <div class="health-box">
@@ -712,7 +717,8 @@
 
           <div class="health-box">
             <h3>Family Medical History</h3>
-            <textarea id="familyHistory" class="edit-input" placeholder="Enter family medical history or 'None'"></textarea>
+            <textarea id="familyHistory" class="edit-input"
+              placeholder="Enter family medical history or 'None'"></textarea>
           </div>
 
           <div class="health-box">
@@ -728,10 +734,11 @@
 
         <div class="save-button-container">
           <button class="save-button" id="saveButton" onclick="saveProfile()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-              <polyline points="17 21 17 13 7 13 7 21"/>
-              <polyline points="7 3 7 8 15 8"/>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
             </svg>
             Save Changes
           </button>
@@ -747,8 +754,10 @@
   <!-- ==================== JAVASCRIPT ==================== -->
   <script>
     // ==================== API CONFIGURATION ====================
+    const SITE_URL = window.location.origin;
+
     const API_CONFIG = {
-      profileEndpoint: 'http://127.0.0.1:8000/api/patient/profile/',
+      profileEndpoint: `${SITE_URL}/api/patient/profile/`,
     };
 
     // ==================== DOM ELEMENT REFERENCES ====================
@@ -762,18 +771,18 @@
     // ==================== POPULATE PROFILE ====================
     function populateProfile(data) {
       console.log("Populating profile with data:", data);
-      
+
       // Basic info (non-editable)
       document.getElementById('profileName').textContent = data.name || 'Not specified';
       document.getElementById("profileEmail").innerText = data.email || 'Not specified';
       console.log("Profile email set to:", data.email);
-      document.getElementById('memberSince').textContent = data.created_at 
+      document.getElementById('memberSince').textContent = data.created_at
         ? `Member since ${new Date(data.created_at).toLocaleDateString()}`
         : 'Member since N/A';
 
       // Update avatar
       if (data.name) {
-        document.getElementById('profileImage').src = 
+        document.getElementById('profileImage').src =
           `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&size=128&background=0d9488&color=fff`;
       }
 
@@ -782,13 +791,13 @@
       document.getElementById('age').value = data.age || '';
       document.getElementById('phone').value = data.phone || '';
       document.getElementById('address').value = data.address || '';
-      
+
       // Editable fields - Health Summary
       document.getElementById('healthStatus').value = data.health_status || '';
       document.getElementById('bloodType').value = data.blood_group || '';
       document.getElementById('insuranceProvider').value = data.insurance_provider || '';
       document.getElementById('policyNumber').value = data.insurance_policy_number || '';
-      
+
       // Editable fields - Detailed Health Information
       document.getElementById('allergies').value = data.allergies || 'None';
       document.getElementById('chronicConditions').value = data.chronic_conditions || 'None';
@@ -832,7 +841,7 @@
 
       return response.json();
     }
-async function loadProfileData() {
+    async function loadProfileData() {
       try {
         loading.style.display = 'flex';
         errorContainer.classList.remove('active');
@@ -920,6 +929,7 @@ async function loadProfileData() {
 
     // ==================== INITIAL LOAD ====================
     document.addEventListener('DOMContentLoaded', loadProfileData);
-</script>
+  </script>
 </body>
+
 </html>

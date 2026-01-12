@@ -618,10 +618,11 @@
                 style="display: block; padding: 12px; color: #0d9488; background: #f0fdfa; border-radius: 8px; margin-bottom: 8px; text-decoration: none; font-weight: 500;">Dashboard</a>
             <a href="/doctor/appointments/"
                 style="display: block; padding: 12px; color: #6b7280; border-radius: 8px; margin-bottom: 8px; text-decoration: none;">Appointments</a>
-             <a href="/doctor/prescriptions/add/" style="display:block;padding:12px;background:#f0fdfa;color:#0d9488;border-radius:8px;margin-bottom:8px;text-decoration:none;font-weight:500;">
+            <a href="/doctor/prescriptions/add/"
+                style="display:block;padding:12px;background:#f0fdfa;color:#0d9488;border-radius:8px;margin-bottom:8px;text-decoration:none;font-weight:500;">
                 Add Prescriptions
-                </a>
-                <a href="/doctor/prescriptionlist/"
+            </a>
+            <a href="/doctor/prescriptionlist/"
                 style="display:block;padding:12px;background:#f0fdfa;color:#0d9488;border-radius:8px;margin-bottom:8px;text-decoration:none;font-weight:500;">
                 Prescriptions
             </a>
@@ -729,12 +730,14 @@
     </div>
 
     <script>
+        const SITE_URL = window.location.origin;
         /* ==================== API CONFIGURATION ==================== */
         const API_CONFIG = {
-            profileEndpoint: 'http://127.0.0.1:8000/api/doctors/profile/',
-            prescriptionsEndpoint: 'http://127.0.0.1:8000/api/prescriptions/doctor/',
-            doctorsEndpoint: 'http://127.0.0.1:8000/api/doctors/'
+            profileEndpoint: `${SITE_URL}/api/doctors/profile/`,
+            prescriptionsEndpoint: `${SITE_URL}/api/prescriptions/doctor/`,
+            doctorsEndpoint: `${SITE_URL}/api/doctors/`
         };
+
         console.log("API Configuration:", API_CONFIG);
 
         /* ==================== SIDEBAR FUNCTIONS ==================== */
@@ -825,24 +828,24 @@
 
 
         /* ==================== RENDER PRESCRIPTIONS ==================== */
-       async function renderPrescriptions(prescriptions) {
-    const grid = document.getElementById('prescriptionsGrid');
-    const emptyState = document.getElementById('emptyState');
-    const loadingState = document.getElementById('loadingState');
+        async function renderPrescriptions(prescriptions) {
+            const grid = document.getElementById('prescriptionsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const loadingState = document.getElementById('loadingState');
 
-    loadingState.style.display = 'none';
+            loadingState.style.display = 'none';
 
-    if (!prescriptions || prescriptions.length === 0) {
-        grid.style.display = 'none';
-        emptyState.style.display = 'block';
-        return;
-    }
+            if (!prescriptions || prescriptions.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
 
-    grid.style.display = 'grid';
-    emptyState.style.display = 'none';
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
 
-    grid.innerHTML = prescriptions.map(rx => {
-        return `
+            grid.innerHTML = prescriptions.map(rx => {
+                return `
             <div class="prescription-card">
                 <div class="card-content">
                     <div class="card-header">
@@ -879,8 +882,8 @@
                 </div>
             </div>
         `;
-    }).join('');
-}
+            }).join('');
+        }
 
         /* ==================== FILTER PRESCRIPTIONS ==================== */
         function filterPrescriptions() {
@@ -916,7 +919,7 @@
         }
 
         /* ==================== INIT ==================== */
-        document.addEventListener('DOMContentLoaded', async() => {
+        document.addEventListener('DOMContentLoaded', async () => {
             await loadDoctorProfile();
             loadPrescriptions();
         });

@@ -545,6 +545,16 @@
         </div>
     </div>
     <script>
+
+        /* ================= SITE CONFIG ================= */
+        const SITE_URL = window.location.origin;
+
+        const API = {
+            PATIENT_DOCTORS: `${SITE_URL}/api/patient/doctors/`,
+            PATIENT_PROFILE: `${SITE_URL}/api/patient/profile/`,
+            CREATE_APPOINTMENT: `${SITE_URL}/api/patient/appointments/create/`
+        };
+
         /* ================= JWT HELPER ================= */
         function getAuthHeaders() {
             const token = localStorage.getItem("access");
@@ -639,10 +649,10 @@
             if (!specialty.value) return;
 
             try {
-                const res = await fetch(
-                    "http://127.0.0.1:8000/api/patient/doctors/",
-                    { headers: getAuthHeaders() }
-                );
+                const res = await fetch(API.PATIENT_DOCTORS, {
+                    headers: getAuthHeaders()
+                });
+
                 console.log(res);
                 console.log("Fetch Doctors Response Status:", res.status);
 
@@ -668,31 +678,31 @@
 
 
         /* ================= FETCH PATIENT PROFILE ================= */
-async function fetchPatientProfile() {
-    try {
-        const res = await fetch(
-            "http://127.0.0.1:8000/api/patient/profile/",
-            { headers: getAuthHeaders() }
-        );
+        async function fetchPatientProfile() {
+            try {
+                const res = await fetch(API.PATIENT_PROFILE, {
+                    headers: getAuthHeaders()
+                });
 
-        if (!res.ok) throw new Error("Failed to fetch profile");
 
-        const data = await res.json();
-        console.log("Patient Profile:", data);
+                if (!res.ok) throw new Error("Failed to fetch profile");
 
-        // Autofill inputs
-        patientNameInput.value = data.name || "";
-        patientPhoneInput.value = data.phone || "";
+                const data = await res.json();
+                console.log("Patient Profile:", data);
 
-        // Update summary
-        summaryName.textContent = data.name || "-";
-        summaryPhone.textContent = data.phone || "-";
+                // Autofill inputs
+                patientNameInput.value = data.name || "";
+                patientPhoneInput.value = data.phone || "";
 
-    } catch (err) {
-        console.error(err);
-        alert("Unable to load patient profile");
-    }
-}
+                // Update summary
+                summaryName.textContent = data.name || "-";
+                summaryPhone.textContent = data.phone || "-";
+
+            } catch (err) {
+                console.error(err);
+                alert("Unable to load patient profile");
+            }
+        }
 
 
         function formatTime(hour, min) {
@@ -751,13 +761,13 @@ async function fetchPatientProfile() {
 
 
             try {
-                const res = await fetch("http://127.0.0.1:8000/api/patient/appointments/create/",
-                    {
-                        method: "POST",
-                        headers: getAuthHeaders(),
-                        body: JSON.stringify(payload)
-                    }
-                );
+                const res = await fetch(API.CREATE_APPOINTMENT, {
+                    method: "POST",
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(payload)
+                });
+
+
                 console.log("Booking Response Status:", res.status);
 
                 const data = await res.json();

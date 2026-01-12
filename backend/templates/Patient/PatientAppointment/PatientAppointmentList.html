@@ -850,10 +850,12 @@
         let allDoctors = [];
 
         /* ==================== API CONFIGURATION ==================== */
+        const SITE_URL = window.location.origin;
+
         const API_CONFIG = {
-            profileEndpoint: 'http://127.0.0.1:8000/api/patient/profile/',
-            appointmentsEndpoint: 'http://127.0.0.1:8000/api/patient/appointments/',
-            doctorsEndpoint: 'http://127.0.0.1:8000/api/patient/doctors/'
+            profileEndpoint: `${SITE_URL}/api/patient/profile/`,
+            appointmentsEndpoint: `${SITE_URL}/api/patient/appointments/`,
+            doctorsEndpoint: `${SITE_URL}/api/patient/doctors/`
         };
         console.log("API Configuration:", API_CONFIG);
 
@@ -1136,4 +1138,5 @@
         document.addEventListener('DOMContentLoaded', loadAppointments);
     </script>
 </body>
+
 </html>

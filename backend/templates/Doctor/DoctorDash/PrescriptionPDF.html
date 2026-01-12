@@ -1,109 +1,474 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prescription Module</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background-color: #f9fafb; color: #1f2937; }
-        
-        .container { padding: 1rem; min-height: 100vh; }
-        .max-w-7xl { max-width: 1280px; margin: 0 auto; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+
+        .container {
+            padding: 1rem;
+            min-height: 100vh;
+        }
+
+        .max-w-7xl {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
         /* Loading Spinner */
-        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .spinner { width: 3rem; height: 3rem; border: 4px solid #14b8a6; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 4px solid #14b8a6;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         /* Error Message */
-        .error-banner { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
-        
+        .error-banner {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
         /* Header */
-        .header-card { background: #fff; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1rem; margin-bottom: 1.5rem; }
-        .header-title { font-size: 1.5rem; font-weight: 700; color: #1f2937; display: flex; align-items: center; gap: 0.5rem; }
-        .header-subtitle { color: #4b5563; margin-top: 0.25rem; }
-        .header-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
-        
+        .header-card {
+            background: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-subtitle {
+            color: #4b5563;
+            margin-top: 0.25rem;
+        }
+
+        .header-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
         /* Button Styles */
-        .btn { padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; font-family: inherit; font-size: 0.875rem; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
-        .btn-primary { background: #14b8a6; color: #fff; }
-        .btn-primary:hover { background: #0d9488; }
-        .btn-secondary { background: #e5e7eb; color: #374151; }
-        .btn-secondary:hover { background: #d1d5db; }
-        .btn-blue { background: #3b82f6; color: #fff; }
-        .btn-blue:hover { background: #2563eb; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #14b8a6;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #0d9488;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .btn-blue {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .btn-blue:hover {
+            background: #2563eb;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Grid Layout */
-        .grid-container { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-        @media (min-width: 1024px) { .grid-container { grid-template-columns: 1fr 1fr; } }
-        
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .grid-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
         /* Form Card */
-        .form-card { background: #fff; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .form-title { font-size: 1.25rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-        
+        .form-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         /* Form Elements */
-        .form-group { margin-bottom: 1rem; }
-        .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem; }
-        .required { color: #ef4444; }
-        .form-input, .form-textarea, .form-select { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-family: inherit; font-size: 0.875rem; }
-        .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: #14b8a6; box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1); }
-        .form-textarea { resize: vertical; }
-        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-family: inherit;
+            font-size: 0.875rem;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+        }
+
         /* Medicine Card */
-        .medicine-card { padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; background: #f9fafb; margin-bottom: 0.75rem; }
-        .medicine-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
-        .medicine-title { font-size: 0.875rem; font-weight: 500; color: #374151; display: flex; align-items: center; gap: 0.5rem; }
-        .medicine-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
-        @media (min-width: 640px) { .medicine-grid { grid-template-columns: 1fr 1fr; } .medicine-grid-3 { grid-template-columns: repeat(3, 1fr); } }
-        
-        .duration-input { display: flex; }
-        .duration-input input { border-radius: 0.375rem 0 0 0.375rem; border-right: 0; }
-        .duration-input select { border-radius: 0 0.375rem 0.375rem 0; background: #f9fafb; padding: 0.5rem; }
-        
-        .add-medicine-btn { font-size: 0.875rem; color: #14b8a6; cursor: pointer; background: none; border: none; display: flex; align-items: center; gap: 0.25rem; }
-        .add-medicine-btn:hover { color: #0d9488; }
-        
-        .remove-btn { font-size: 0.75rem; color: #ef4444; cursor: pointer; background: none; border: none; display: flex; align-items: center; gap: 0.25rem; }
-        .remove-btn:hover { color: #dc2626; }
-        
+        .medicine-card {
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            background: #f9fafb;
+            margin-bottom: 0.75rem;
+        }
+
+        .medicine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .medicine-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .medicine-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 640px) {
+            .medicine-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .medicine-grid-3 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .duration-input {
+            display: flex;
+        }
+
+        .duration-input input {
+            border-radius: 0.375rem 0 0 0.375rem;
+            border-right: 0;
+        }
+
+        .duration-input select {
+            border-radius: 0 0.375rem 0.375rem 0;
+            background: #f9fafb;
+            padding: 0.5rem;
+        }
+
+        .add-medicine-btn {
+            font-size: 0.875rem;
+            color: #14b8a6;
+            cursor: pointer;
+            background: none;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .add-medicine-btn:hover {
+            color: #0d9488;
+        }
+
+        .remove-btn {
+            font-size: 0.75rem;
+            color: #ef4444;
+            cursor: pointer;
+            background: none;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .remove-btn:hover {
+            color: #dc2626;
+        }
+
         /* Preview Section */
-        .preview-card { background: #fff; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
-        .preview-section { border-bottom: 1px solid #e5e7eb; padding-bottom: 1rem; margin-bottom: 1rem; }
-        .preview-section:last-child { border-bottom: none; }
-        .preview-label { font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem; }
-        .preview-value { font-weight: 500; color: #1f2937; }
-        .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-        .preview-medicine { margin-bottom: 0.75rem; }
-        .preview-medicine-name { font-weight: 500; color: #1f2937; }
-        .preview-medicine-details { font-size: 0.875rem; color: #6b7280; margin-left: 1.25rem; display: flex; flex-wrap: wrap; gap: 1rem; }
-        
-        .signature-area { margin-top: 2.5rem; display: flex; justify-content: flex-end; }
-        .signature-box { text-align: right; }
-        .signature-line { height: 3rem; margin-bottom: 0.25rem; }
-        .signature-name { font-weight: 500; color: #1f2937; border-top: 1px solid #9ca3af; padding-top: 0.25rem; }
-        .signature-title { font-size: 0.875rem; color: #6b7280; }
-        
-        .error-msg { font-size: 0.875rem; color: #ef4444; margin-top: 0.75rem; }
-        .note-text { font-size: 0.75rem; color: #6b7280; font-style: italic; margin-top: 0.25rem; }
-        
-        .mobile-tabs { display: block; margin-bottom: 1rem; }
-        .mobile-tabs-container { display: flex; background: #e5e7eb; padding: 0.25rem; border-radius: 0.5rem; }
-        .mobile-tab-btn { flex: 1; padding: 0.5rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #374151; }
-        .mobile-tab-btn.active { background: #fff; color: #0d9488; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        @media (min-width: 1024px) { .mobile-tabs { display: none; } }
-        
-        .hidden-mobile { display: none; }
-        @media (min-width: 1024px) { .hidden-mobile { display: block; } }
-        .active-mobile { display: block; }
-        @media (min-width: 1024px) { .form-card, .preview-card { display: block !important; } }
-        
-        @media (min-width: 768px) { .header-card { display: flex; justify-content: space-between; align-items: flex-start; } .header-actions { margin-top: 0; } }
+        .preview-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .preview-section {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .preview-section:last-child {
+            border-bottom: none;
+        }
+
+        .preview-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+        }
+
+        .preview-value {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .preview-medicine {
+            margin-bottom: 0.75rem;
+        }
+
+        .preview-medicine-name {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .preview-medicine-details {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-left: 1.25rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .signature-area {
+            margin-top: 2.5rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .signature-box {
+            text-align: right;
+        }
+
+        .signature-line {
+            height: 3rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .signature-name {
+            font-weight: 500;
+            color: #1f2937;
+            border-top: 1px solid #9ca3af;
+            padding-top: 0.25rem;
+        }
+
+        .signature-title {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .error-msg {
+            font-size: 0.875rem;
+            color: #ef4444;
+            margin-top: 0.75rem;
+        }
+
+        .note-text {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-style: italic;
+            margin-top: 0.25rem;
+        }
+
+        .mobile-tabs {
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .mobile-tabs-container {
+            display: flex;
+            background: #e5e7eb;
+            padding: 0.25rem;
+            border-radius: 0.5rem;
+        }
+
+        .mobile-tab-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: #374151;
+        }
+
+        .mobile-tab-btn.active {
+            background: #fff;
+            color: #0d9488;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (min-width: 1024px) {
+            .mobile-tabs {
+                display: none;
+            }
+        }
+
+        .hidden-mobile {
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            .hidden-mobile {
+                display: block;
+            }
+        }
+
+        .active-mobile {
+            display: block;
+        }
+
+        @media (min-width: 1024px) {
+
+            .form-card,
+            .preview-card {
+                display: block !important;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .header-card {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                margin-top: 0;
+            }
+        }
     </style>
 </head>
+
 <body>
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
@@ -155,17 +520,21 @@
 
                     <div class="form-group">
                         <label class="form-label">Diagnosis <span class="required">*</span></label>
-                        <textarea id="diagnosis" class="form-textarea" rows="2" placeholder="Enter patient's diagnosis"></textarea>
+                        <textarea id="diagnosis" class="form-textarea" rows="2"
+                            placeholder="Enter patient's diagnosis"></textarea>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Symptoms</label>
-                        <textarea id="symptoms" class="form-textarea" rows="2" placeholder="Enter patient's symptoms"></textarea>
+                        <textarea id="symptoms" class="form-textarea" rows="2"
+                            placeholder="Enter patient's symptoms"></textarea>
                     </div>
 
                     <div class="form-group">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <label class="form-label" style="margin-bottom: 0;">Medicines <span class="required">*</span></label>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <label class="form-label" style="margin-bottom: 0;">Medicines <span
+                                    class="required">*</span></label>
                             <button class="add-medicine-btn" onclick="addMedicine()">
                                 <i class="fas fa-plus"></i> Add Medicine
                             </button>
@@ -175,7 +544,8 @@
 
                     <div class="form-group">
                         <label class="form-label">Advice/Recommendations</label>
-                        <textarea id="advice" class="form-textarea" rows="2" placeholder="Enter advice for the patient"></textarea>
+                        <textarea id="advice" class="form-textarea" rows="2"
+                            placeholder="Enter advice for the patient"></textarea>
                     </div>
 
                     <div class="form-group">
@@ -188,8 +558,10 @@
 
                     <div class="form-group">
                         <label class="form-label">Comments (internal only)</label>
-                        <textarea id="comments" class="form-textarea" rows="2" placeholder="These comments won't be visible on the prescription"></textarea>
-                        <p class="note-text">Note: Comments are for internal reference only and won't appear on the prescription.</p>
+                        <textarea id="comments" class="form-textarea" rows="2"
+                            placeholder="These comments won't be visible on the prescription"></textarea>
+                        <p class="note-text">Note: Comments are for internal reference only and won't appear on the
+                            prescription.</p>
                     </div>
 
                     <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem;">
@@ -212,13 +584,16 @@
                     <div class="preview-section">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                             <div>
-                                <h1 id="hospitalName" style="font-size: 1.25rem; font-weight: 700; color: #1f2937;">Loading...</h1>
+                                <h1 id="hospitalName" style="font-size: 1.25rem; font-weight: 700; color: #1f2937;">
+                                    Loading...</h1>
                                 <p id="hospitalAddress" style="font-size: 0.875rem; color: #6b7280;">Loading...</p>
                                 <p id="hospitalContact" style="font-size: 0.875rem; color: #6b7280;">Loading...</p>
                             </div>
                             <div style="text-align: right;">
-                                <p style="font-size: 0.875rem; font-weight: 500;">Date: <span id="previewDate"></span></p>
-                                <p id="prescriptionRef" style="font-size: 0.875rem; font-weight: 500;">Ref: Loading...</p>
+                                <p style="font-size: 0.875rem; font-weight: 500;">Date: <span id="previewDate"></span>
+                                </p>
+                                <p id="prescriptionRef" style="font-size: 0.875rem; font-weight: 500;">Ref: Loading...
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -257,7 +632,8 @@
 
                     <!-- Medicines -->
                     <div class="preview-section">
-                        <h3 style="font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <h3
+                            style="font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
                             <span>Rx</span>
                             <div style="flex: 1; border-bottom: 1px solid #9ca3af;"></div>
                         </h3>
@@ -295,11 +671,13 @@
         /* ===========================
            CONFIGURATION
         =========================== */
+
+        const SITE_URL = window.location.origin;
         const API_CONFIG = {
-            BASE_URL: 'http://127.0.0.1:8000/api/prescriptions/',
+            BASE_URL: `${SITE_URL}/api/prescriptions/`,
             ENDPOINTS: {
-                APPOINTMENT: '/appointments/{id}/',
-                DOCTOR: '/doctor/create/',
+                APPOINTMENT: 'appointments/{id}/',
+                DOCTOR: 'doctor/create/',
             },
             TIMEOUT: 10000
         };
@@ -418,22 +796,22 @@
             // Header
             const patientName = `${data.patient.first_name} ${data.patient.last_name}`;
             document.getElementById('patientName').textContent = patientName;
-            
+
             const appointmentDate = new Date(data.appointment_datetime);
-            const formattedDate = appointmentDate.toLocaleDateString('en-US', { 
-                month: 'long', 
-                day: 'numeric', 
-                year: 'numeric' 
+            const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
             });
-            const formattedTime = appointmentDate.toLocaleTimeString('en-US', { 
-                hour: 'numeric', 
-                minute: '2-digit' 
+            const formattedTime = appointmentDate.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit'
             });
             document.getElementById('appointmentDate').textContent = `${formattedDate} • ${formattedTime}`;
 
             // Preview - Patient info
             document.getElementById('previewPatientName').textContent = patientName;
-            
+
             const age = data.patient.age || '--';
             const gender = data.patient.gender || '--';
             document.getElementById('previewPatientAgeGender').textContent = `${age} / ${gender}`;
@@ -566,6 +944,6 @@
             const symptoms = document.getElementById('symptoms').value;
             const advice = document.getElementById('advice').value;
             const followUpDate = document.getElementById('followUpDate').value;
-            
+
             // Diagnosis & Symptoms
             const diagSection = document.getElementById('previewD

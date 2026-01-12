@@ -562,7 +562,8 @@
     </div>
 
     <script>
-        const API_URL = "http://127.0.0.1:8000/api/prescriptions/patient/";
+        const SITE_URL = window.location.origin;
+        const API_URL = `${SITE_URL}/api/prescriptions/patient/`;
 
         // ==================== SIDEBAR TOGGLE ====================
         const sidebar = document.getElementById("sidebar");

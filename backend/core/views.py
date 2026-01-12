@@ -6,12 +6,6 @@ from django.contrib.auth import login
 from accounts.models import User
 
 
-BASE_URL = getattr(settings, "BASE_URL", "http://127.0.0.1:8000")
-
-API_LOGIN_URL = f"{BASE_URL}/api/login/"
-API_REGISTER_URL = f"{BASE_URL}/api/register/"
-
-
 def home(request):
     return JsonResponse({"status": "API running successfully"})
 

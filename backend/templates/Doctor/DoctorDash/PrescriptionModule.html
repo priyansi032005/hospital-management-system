@@ -612,12 +612,14 @@
         /* ==========================
            CONFIG
         ========================== */
-        const API_BASE_URL = 'http://127.0.0.1:8000';
+
+        const SITE_URL = window.location.origin;
 
         const API_ENDPOINTS = {
-            appointments: `${API_BASE_URL}/api/doctors/appointments/`,
-            patients: `${API_BASE_URL}/api/doctors/patients/`,
-            createPrescription: `${API_BASE_URL}/api/prescriptions/doctor/create/`
+            doctors: `${SITE_URL}/api/doctors/`,
+            appointments: `${SITE_URL}/api/doctors/appointments/`,
+            prescriptions: `${SITE_URL}/api/prescriptions/`,
+            refresh: `${SITE_URL}/api/token/refresh/`
         };
 
         let appointmentsData = [];

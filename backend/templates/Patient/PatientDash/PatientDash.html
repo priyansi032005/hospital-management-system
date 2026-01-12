@@ -793,10 +793,12 @@
     })();
 
     // ==================== API CONFIGURATION ====================
+    const SITE_URL = window.location.origin;
+
     const API_CONFIG = {
-      profileEndpoint: 'http://127.0.0.1:8000/api/patient/profile/',
-      appointmentsEndpoint: 'http://127.0.0.1:8000/api/patient/appointments/',
-      tokenRefreshEndpoint: 'http://127.0.0.1:8000/api/token/refresh/',
+      profileEndpoint: `${SITE_URL}/api/patient/profile/`,
+      appointmentsEndpoint: `${SITE_URL}/api/patient/appointments/`,
+      tokenRefreshEndpoint: `${SITE_URL}/api/token/refresh/`,
       timeout: 10000
     };
 
@@ -860,7 +862,7 @@
         }
 
         const refreshResponse = await fetch(
-          "http://127.0.0.1:8000/api/token/refresh/",
+          API_CONFIG.tokenRefreshEndpoint,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
